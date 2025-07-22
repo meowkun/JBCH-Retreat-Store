@@ -20,9 +20,7 @@ class ItemListViewModel: ViewModel() {
                 // Handle item click
             }
             is ItemListAction.OnTabSelected -> {
-                _state.update {
-                    it.copy(selectedTabIndex = action.index)
-                }
+
             }
         }
     }

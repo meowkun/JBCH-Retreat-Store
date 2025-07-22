@@ -29,6 +29,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import com.example.jbchretreatstore.core.presentation.DarkBlue
 import com.example.jbchretreatstore.core.presentation.DesertWhite
 import com.example.jbchretreatstore.core.presentation.SandYellow
+import com.example.jbchretreatstore.core.presentation.UiConstants.searchBarRoundEndIconAlpha
+import com.example.jbchretreatstore.core.presentation.UiConstants.searchBarRoundPercentage
+import com.example.jbchretreatstore.core.presentation.UiConstants.searchbarBackgroundAlpha
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.clear_hint
 import jbchretreatstore.composeapp.generated.resources.search_hint
@@ -44,16 +47,16 @@ fun ItemSearchBar(
 ) {
     CompositionLocalProvider(
         LocalTextSelectionColors provides TextSelectionColors(
-            handleColor = SandYellow, backgroundColor = SandYellow.copy(alpha = .4f)
+            handleColor = SandYellow, backgroundColor = SandYellow.copy(alpha = searchbarBackgroundAlpha)
         )
     ) {
         OutlinedTextField(
             modifier = modifier.background(
-                shape = RoundedCornerShape(percent = 100), color = DesertWhite
+                shape = RoundedCornerShape(percent = searchBarRoundPercentage), color = DesertWhite
             ).minimumInteractiveComponentSize(),
             value = searchQuery,
             onValueChange = onSearchQueryChange,
-            shape = RoundedCornerShape(percent = 100),
+            shape = RoundedCornerShape(percent = searchBarRoundPercentage),
             colors = OutlinedTextFieldDefaults.colors(
                 cursorColor = DarkBlue,
                 focusedBorderColor = SandYellow,
@@ -65,7 +68,7 @@ fun ItemSearchBar(
                 Icon(
                     imageVector = Icons.Default.Search,
                     contentDescription = stringResource(Res.string.search_hint),
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = .67f)
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = searchBarRoundEndIconAlpha)
                 )
             },
             singleLine = true,
