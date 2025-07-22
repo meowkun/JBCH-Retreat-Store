@@ -7,7 +7,6 @@ data class ItemListState(
     val searchQuery: String = "",
     val searchResults: List<Item> = emptyList(),
     val favoriteItems: List<Item> = emptyList(),
-    val selectedTabIndex:  Int = 0,
     val isLoading: Boolean = false,
     val errorMessage: UiText? = null
 )

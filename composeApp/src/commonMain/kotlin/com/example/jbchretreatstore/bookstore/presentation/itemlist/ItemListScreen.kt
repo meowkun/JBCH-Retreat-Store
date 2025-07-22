@@ -16,7 +16,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.jbchretreatstore.bookstore.domain.Item
 import com.example.jbchretreatstore.bookstore.presentation.itemlist.components.ItemSearchBar
 import com.example.jbchretreatstore.core.presentation.DarkBlue
-import com.example.jbchretreatstore.core.presentation.Spacing
+import com.example.jbchretreatstore.core.presentation.UiConstants.max_width
+import com.example.jbchretreatstore.core.presentation.UiConstants.spacing_m
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -60,9 +61,9 @@ private fun ItemListScreen(
                 keyboardController?.hide()
             },
             modifier = Modifier
-                .widthIn(max = Spacing.searchBarMaxWidth)
+                .widthIn(max = max_width)
                 .fillMaxWidth()
-                .padding(Spacing.m)
+                .padding(spacing_m)
         )
     }
 }
