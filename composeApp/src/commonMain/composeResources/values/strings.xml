@@ -1,7 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
+    <!--  Item view  -->
     <string name="search_hint">Find item...</string>
     <string name="clear_hint">Clear search</string>
     <string name="item_arrow_up_content_description">Collapse item</string>
     <string name="item_arrow_down_content_description">Expend item</string>
+    <string name="drop_down_content_description">Drop down</string>
+    <string name="item_price_per_unit">Price: $%1$d/each</string>
+    <string name="item_option_menu_selection_hint">Select %1$d</string>
+    <string name="quantity_label">Quantity</string>
+    <string name="total_price_text">Total: $%1$d</string>
+    <string name="add_to_cart">Add to cart</string>
+
+    <!--  Add item dialog  -->
+    <string name="add_item_dialog_title">Add New Item</string>
+    <string name="add_item_name_label">Item name</string>
+    <string name="add_item_error_name_empty">Enter name</string>
+    <string name="add_item_price_label">Item price</string>
+    <string name="add_item_error_price_invalid">Enter price</string>
+    <string name="add_item_options_label">Add Item options:</string>
+    <string name="add_item_options_key">Option key</string>
+    <string name="add_item_options_value">Option value</string>
+    <string name="add_item_cancel">Cancel</string>
+    <string name="add_item_add">Add</string>
+    <string name="add_item_save">Save</string>
 </resources>
