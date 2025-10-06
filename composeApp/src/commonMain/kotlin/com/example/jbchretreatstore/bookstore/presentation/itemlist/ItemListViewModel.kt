@@ -9,7 +9,7 @@ class ItemListViewModel: ViewModel() {
     private val _state = MutableStateFlow(ItemListState())
     val state = _state.asStateFlow()
 
-    fun onAction(action: ItemListAction) {
+    fun onItemListAction(action: ItemListAction) {
         when (action) {
             is ItemListAction.OnSearchQueryChange -> {
                 _state.update {
@@ -19,7 +19,7 @@ class ItemListViewModel: ViewModel() {
             is ItemListAction.OnIteClick -> {
                 // Handle item click
             }
-            is ItemListAction.OnTabSelected -> {
+            is ItemListAction.OnBottomNavSelected -> {
 
             }
         }

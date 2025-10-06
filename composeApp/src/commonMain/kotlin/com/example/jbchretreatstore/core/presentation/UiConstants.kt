@@ -27,5 +27,9 @@ object UiConstants {
 
     // Item View
     val itemViewCardColorElevation= 6.dp
-    val itemViewCardColorAlpha = 0.2f
+    val itemViewCardColorAlpha = 0.3f
+
+    // Item List View Container
+    val itemListContainerRoundShape = 32.dp
+    val botttomNavigationTabColorAlpha = 0.5f
 }
