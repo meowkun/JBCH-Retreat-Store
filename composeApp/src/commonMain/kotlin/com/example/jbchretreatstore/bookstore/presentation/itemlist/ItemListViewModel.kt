@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class ItemListViewModel: ViewModel() {
+class ItemListViewModel : ViewModel() {
     private val _state = MutableStateFlow(ItemListState())
     val state = _state.asStateFlow()
 
@@ -16,9 +16,19 @@ class ItemListViewModel: ViewModel() {
                     it.copy(searchQuery = action.query)
                 }
             }
+
+            is ItemListAction.OnAddNewItem -> {
+                _state.update {
+                    it.copy(
+                        displayItemList = it.displayItemList + action.newItem
+                    )
+                }
+            }
+
             is ItemListAction.OnIteClick -> {
                 // Handle item click
             }
+
             is ItemListAction.OnBottomNavSelected -> {
 
             }

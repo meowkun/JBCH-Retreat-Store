@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.presentation.itemlist.components
+package com.example.jbchretreatstore.bookstore.presentation.itemlist
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn

@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.domain
+package com.example.jbchretreatstore.bookstore.domain.model
 
 data class CartItem(
     var quantity : Int = 1,

@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.presentation.itemlist.components
+package com.example.jbchretreatstore.bookstore.presentation.itemlist
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -12,7 +12,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.White
-import com.example.jbchretreatstore.bookstore.domain.DisplayItem
+import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.core.presentation.UiConstants.spacing_m
 import com.example.jbchretreatstore.core.presentation.UiConstants.spacing_xl
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -52,11 +52,11 @@ fun ItemListViewPreview() {
                 options = listOf(
                     DisplayItem.Option(
                         optionKey = "Language",
-                        optionValue = listOf("English", "French", "Spanish")
+                        optionValueList = listOf("English", "French", "Spanish")
                     ),
                     DisplayItem.Option(
                         optionKey = "Version",
-                        optionValue = listOf("KJV", "NKJV", "NIV")
+                        optionValueList = listOf("KJV", "NKJV", "NIV")
                     ),
                 )
             ),
@@ -67,11 +67,11 @@ fun ItemListViewPreview() {
                 options = listOf(
                     DisplayItem.Option(
                         optionKey = "Color",
-                        optionValue = listOf("Blue", "Black")
+                        optionValueList = listOf("Blue", "Black")
                     ),
                     DisplayItem.Option(
                         optionKey = "Size",
-                        optionValue = listOf("XS", "S", "M", "L", "XL", "XXL", "XXXL")
+                        optionValueList = listOf("XS", "S", "M", "L", "XL", "XXL", "XXXL")
                     ),
                 )
             )
