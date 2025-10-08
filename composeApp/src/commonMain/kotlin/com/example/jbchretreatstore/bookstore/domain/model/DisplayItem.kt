@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.domain
+package com.example.jbchretreatstore.bookstore.domain.model
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -12,6 +12,6 @@ data class DisplayItem(
 ) {
     data class Option(
         val optionKey: String = "",
-        val optionValue: List<String> = emptyList()
+        val optionValueList: List<String> = emptyList()
     )
 }

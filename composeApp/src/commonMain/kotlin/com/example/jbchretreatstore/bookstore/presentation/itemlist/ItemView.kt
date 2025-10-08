@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.presentation.itemlist.components
+package com.example.jbchretreatstore.bookstore.presentation.itemlist
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
@@ -42,8 +42,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import com.example.jbchretreatstore.bookstore.domain.CartItem
-import com.example.jbchretreatstore.bookstore.domain.DisplayItem
+import com.example.jbchretreatstore.bookstore.domain.model.CartItem
+import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.core.presentation.SandYellow
 import com.example.jbchretreatstore.core.presentation.UiConstants
 import com.example.jbchretreatstore.core.presentation.UiConstants.itemViewCardColorElevation
@@ -72,7 +72,7 @@ fun ItemView(
         mutableStateOf(
             CartItem(
                 optionsMap = displayItem.options.associate {
-                    it.optionKey to it.optionValue.first()
+                    it.optionKey to it.optionValueList.first()
                 }.toMutableMap(),
                 totalPrice = displayItem.price
             )
@@ -169,9 +169,9 @@ fun ItemOptionDescription(option: DisplayItem.Option) {
         FlowRow(
             verticalArrangement = Arrangement.Center
         ) {
-            option.optionValue.forEachIndexed { index, value ->
+            option.optionValueList.forEachIndexed { index, value ->
                 Text(
-                    text = if (index == option.optionValue.lastIndex) value else "$value, ",
+                    text = if (index == option.optionValueList.lastIndex) value else "$value, ",
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -246,7 +246,7 @@ fun ItemOptionMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            option.optionValue.forEach { value ->
+            option.optionValueList.forEach { value ->
                 DropdownMenuItem(
                     text = { Text(value) },
                     onClick = {
@@ -355,11 +355,11 @@ fun ItemViewPreview() {
                 options = listOf(
                     DisplayItem.Option(
                         optionKey = "Language",
-                        optionValue = listOf("English", "French", "Spanish")
+                        optionValueList = listOf("English", "French", "Spanish")
                     ),
                     DisplayItem.Option(
                         optionKey = "Version",
-                        optionValue = listOf("KJV", "NKJV", "NIV")
+                        optionValueList = listOf("KJV", "NKJV", "NIV")
                     ),
                 ),
                 isInCart = false

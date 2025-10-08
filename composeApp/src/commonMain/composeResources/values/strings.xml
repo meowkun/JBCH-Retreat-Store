@@ -15,9 +15,7 @@
     <!--  Add item dialog  -->
     <string name="add_item_dialog_title">Add New Item</string>
     <string name="add_item_name_label">Item name</string>
-    <string name="add_item_error_name_empty">Enter name</string>
     <string name="add_item_price_label">Item price</string>
-    <string name="add_item_error_price_invalid">Enter price</string>
     <string name="add_item_options_label">Add Item options:</string>
     <string name="add_item_options_key">Option key</string>
     <string name="add_item_options_value">Option value</string>

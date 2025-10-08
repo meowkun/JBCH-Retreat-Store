@@ -24,10 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.jbchretreatstore.bookstore.domain.DisplayItem
-import com.example.jbchretreatstore.bookstore.presentation.itemlist.components.AddItemDialog
-import com.example.jbchretreatstore.bookstore.presentation.itemlist.components.ItemListView
-import com.example.jbchretreatstore.bookstore.presentation.itemlist.components.ItemSearchBar
+import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.core.presentation.DarkBlue
 import com.example.jbchretreatstore.core.presentation.DesertWhite
 import com.example.jbchretreatstore.core.presentation.UiConstants.itemListContainerRoundShape
@@ -43,43 +40,11 @@ fun ItemListScreenRoot(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     ItemListScreen(
-        state = state.copy(
-            searchResults = listOf(
-                DisplayItem(
-                    id = 0,
-                    name = "Bible",
-                    price = 40.00,
-                    options = listOf(
-                        DisplayItem.Option(
-                            optionKey = "Language",
-                            optionValue = listOf("English", "French", "Spanish")
-                        ),
-                        DisplayItem.Option(
-                            optionKey = "Version",
-                            optionValue = listOf("KJV", "NKJV", "NIV")
-                        ),
-                    )
-                ),
-                DisplayItem(
-                    id = 1,
-                    name = "T-shirt",
-                    price = 15.00,
-                    options = listOf(
-                        DisplayItem.Option(
-                            optionKey = "Color",
-                            optionValue = listOf("Blue", "Black")
-                        ),
-                        DisplayItem.Option(
-                            optionKey = "Size",
-                            optionValue = listOf("XS", "S", "M", "L", "XL", "XXL", "XXXL")
-                        ),
-                    )
-                )
-            )
-        ),
+        state = state,
         onAction = { action ->
             when (action) {
                 is ItemListAction.OnIteClick -> onItemClick(action.displayItem)
+                is ItemListAction.OnAddNewItem -> onItemClick(action.newItem)
                 else -> Unit
             }
             viewModel.onItemListAction(action)
@@ -104,12 +69,6 @@ private fun ItemListScreen(
             }
         },
     ) {
-        if (showDialog) {
-            AddItemDialog(
-                onDismiss = { showDialog = false },
-                onConfirm = { showDialog = false }
-            )
-        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -145,8 +104,18 @@ private fun ItemListScreen(
                     modifier = Modifier.padding(
                         vertical = spacing_m
                     ),
-                    displayItemList = state.searchResults
+                    displayItemList = state.displayItemList
                 )
+            }
+        }
+        if (showDialog) {
+            AddItemDialog(
+                onDismiss = { showDialog = false },
+                onConfirm = {
+                    showDialog = false
+                }
+            ) { newItem ->
+                onAction(ItemListAction.OnAddNewItem(newItem))
             }
         }
     }
@@ -157,7 +126,7 @@ private fun ItemListScreen(
 fun ItemListScreenPreview() {
     ItemListScreen(
         state = ItemListState(
-            searchResults = listOf(
+            displayItemList = listOf(
                 DisplayItem(
                     id = 0,
                     name = "Bible",
@@ -165,11 +134,11 @@ fun ItemListScreenPreview() {
                     options = listOf(
                         DisplayItem.Option(
                             optionKey = "Language",
-                            optionValue = listOf("English", "French", "Spanish")
+                            optionValueList = listOf("English", "French", "Spanish")
                         ),
                         DisplayItem.Option(
                             optionKey = "Version",
-                            optionValue = listOf("KJV", "NKJV", "NIV")
+                            optionValueList = listOf("KJV", "NKJV", "NIV")
                         ),
                     )
                 ),
@@ -180,11 +149,11 @@ fun ItemListScreenPreview() {
                     options = listOf(
                         DisplayItem.Option(
                             optionKey = "Color",
-                            optionValue = listOf("Blue", "Black")
+                            optionValueList = listOf("Blue", "Black")
                         ),
                         DisplayItem.Option(
                             optionKey = "Size",
-                            optionValue = listOf("XS", "S", "M", "L", "XL", "XXL", "XXXL")
+                            optionValueList = listOf("XS", "S", "M", "L", "XL", "XXL", "XXXL")
                         ),
                     )
                 )

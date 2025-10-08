@@ -1,11 +1,11 @@
 package com.example.jbchretreatstore.bookstore.presentation.itemlist
 
-import com.example.jbchretreatstore.bookstore.domain.DisplayItem
+import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.core.presentation.UiText
 
 data class ItemListState(
     val searchQuery: String = "",
-    val searchResults: List<DisplayItem> = emptyList(),
+    val displayItemList: List<DisplayItem> = emptyList(),
     val favoriteDisplayItems: List<DisplayItem> = emptyList(),
     val cartList: List<DisplayItem> = emptyList(),
     val isLoading: Boolean = false,
