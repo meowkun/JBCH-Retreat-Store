@@ -16,7 +16,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddShoppingCart
-import androidx.compose.material.icons.filled.BrokenImage
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -47,13 +46,11 @@ import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.core.presentation.SandYellow
 import com.example.jbchretreatstore.core.presentation.UiConstants
 import com.example.jbchretreatstore.core.presentation.UiConstants.itemViewCardColorElevation
-import com.example.jbchretreatstore.core.presentation.UiConstants.spacer_weight
 import com.example.jbchretreatstore.core.presentation.UiConstants.spacing_m
 import com.example.jbchretreatstore.core.presentation.White
 import com.example.jbchretreatstore.core.presentation.toPriceFormatString
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.add_to_cart
-import jbchretreatstore.composeapp.generated.resources.clear_hint
 import jbchretreatstore.composeapp.generated.resources.item_option_menu_selection_hint
 import jbchretreatstore.composeapp.generated.resources.item_price_per_unit
 import jbchretreatstore.composeapp.generated.resources.quantity_label
@@ -93,7 +90,7 @@ fun ItemView(
             horizontalAlignment = Alignment.CenterHorizontally,
 
             ) {
-            ItemInfoView(displayItem = displayItem) {
+            ItemDescriptionView(displayItem = displayItem) {
                 expanded = !expanded
             }
             if (expanded) {
@@ -109,31 +106,14 @@ fun ItemView(
 }
 
 @Composable
-fun ItemInfoView(
+fun ItemDescriptionView(
     displayItem: DisplayItem,
     onItemClicked: () -> Unit = {},
 ) {
-    Row(
+    Column(
         modifier = Modifier.fillMaxWidth()
             .padding(all = spacing_m)
-            .clickable { onItemClicked.invoke() },
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Icon(
-            imageVector = displayItem.iconVector ?: Icons.Default.BrokenImage,
-            contentDescription = stringResource(Res.string.clear_hint),
-            tint = MaterialTheme.colorScheme.onSurface,
-        )
-        ItemDescriptionView(displayItem = displayItem)
-        Spacer(modifier = Modifier.weight(spacer_weight))
-    }
-}
-
-@Composable
-fun ItemDescriptionView(displayItem: DisplayItem) {
-    Column(
-        modifier = Modifier.padding(start = UiConstants.spacing_s)
+            .clickable { onItemClicked.invoke() }
     ) {
         Text(
             text = displayItem.name,

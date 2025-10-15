@@ -8,7 +8,7 @@ data class ItemListState(
     val displayItemList: List<DisplayItem> = emptyList(),
     val favoriteDisplayItems: List<DisplayItem> = emptyList(),
     val cartList: List<DisplayItem> = emptyList(),
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val errorMessage: UiText? = null,
-    val selectedIndex: Int = 0,
+    val selectedIndex: Int = 0
 )

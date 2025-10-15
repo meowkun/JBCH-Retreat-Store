@@ -1,11 +1,32 @@
 package com.example.jbchretreatstore.bookstore.presentation.itemlist
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.jbchretreatstore.bookstore.data.local.DisplayItemRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class ItemListViewModel : ViewModel() {
+    private val repository: DisplayItemRepository by lazy {
+        DisplayItemRepository()
+    }
+
+    init {
+        // Load saved data
+        viewModelScope.launch {
+            repository.getItems().collect { list ->
+                _state.update {
+                    it.copy(
+                        displayItemList = list,
+                        isLoading = false
+                    )
+                }
+            }
+        }
+    }
+
     private val _state = MutableStateFlow(ItemListState())
     val state = _state.asStateFlow()
 
@@ -22,6 +43,9 @@ class ItemListViewModel : ViewModel() {
                     it.copy(
                         displayItemList = it.displayItemList + action.newItem
                     )
+                }
+                viewModelScope.launch {
+                    repository.saveItems(state.value.displayItemList)
                 }
             }
 
