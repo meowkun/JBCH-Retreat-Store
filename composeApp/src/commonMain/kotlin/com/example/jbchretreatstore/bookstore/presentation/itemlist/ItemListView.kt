@@ -22,6 +22,7 @@ fun ItemListView(
     modifier: Modifier = Modifier.fillMaxWidth()
         .padding(vertical = spacing_m),
     displayItemList: List<DisplayItem>,
+    onRemoveItem: (DisplayItem) -> Unit = {},
     scrollState: LazyListState = rememberLazyListState()
 ) {
     LazyColumn(
@@ -35,6 +36,7 @@ fun ItemListView(
                 displayItem = item,
                 modifier = Modifier.fillParentMaxWidth()
                     .padding(horizontal = spacing_m),
+                onRemove = onRemoveItem
             )
         }
     }

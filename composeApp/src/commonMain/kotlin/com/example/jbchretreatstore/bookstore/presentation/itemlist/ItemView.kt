@@ -16,6 +16,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddShoppingCart
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -62,9 +63,11 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun ItemView(
     displayItem: DisplayItem,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onRemove: (DisplayItem) -> Unit = {}
 ) {
     var expanded by remember { mutableStateOf(true) }
+    var showRemoveDialog by remember { mutableStateOf(false) }
     var cartItem by remember {
         mutableStateOf(
             CartItem(
@@ -73,6 +76,17 @@ fun ItemView(
                 }.toMutableMap(),
                 totalPrice = displayItem.price
             )
+        )
+    }
+
+    if (showRemoveDialog) {
+        RemoveItemDialog(
+            itemName = displayItem.name,
+            onDismiss = { showRemoveDialog = false },
+            onConfirm = {
+                onRemove.invoke(displayItem)
+                showRemoveDialog = false
+            }
         )
     }
 
@@ -88,10 +102,22 @@ fun ItemView(
                 .animateContentSize(),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally,
-
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
             ) {
-            ItemDescriptionView(displayItem = displayItem) {
-                expanded = !expanded
+                ItemDescriptionView(
+                    displayItem = displayItem
+                ) {
+                    expanded = !expanded
+                }
+                IconButton(
+                    onClick = { showRemoveDialog = true }
+                ) {
+                    Icon(Icons.Default.Delete, contentDescription = "Remove item")
+                }
             }
             if (expanded) {
                 ItemExpandableView(
@@ -111,8 +137,7 @@ fun ItemDescriptionView(
     onItemClicked: () -> Unit = {},
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth()
-            .padding(all = spacing_m)
+        modifier = Modifier.padding(all = spacing_m)
             .clickable { onItemClicked.invoke() }
     ) {
         Text(

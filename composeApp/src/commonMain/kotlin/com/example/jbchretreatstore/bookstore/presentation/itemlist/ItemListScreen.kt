@@ -104,7 +104,10 @@ private fun ItemListScreen(
                     modifier = Modifier.padding(
                         vertical = spacing_m
                     ),
-                    displayItemList = state.displayItemList
+                    displayItemList = state.displayItemList,
+                    onRemoveItem = { item ->
+                        onAction(ItemListAction.onRemoveItem(item))
+                    }
                 )
             }
         }
