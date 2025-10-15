@@ -128,7 +128,6 @@ fun ItemListScreenPreview() {
         state = ItemListState(
             displayItemList = listOf(
                 DisplayItem(
-                    id = 0,
                     name = "Bible",
                     price = 40.00,
                     options = listOf(
@@ -143,7 +142,6 @@ fun ItemListScreenPreview() {
                     )
                 ),
                 DisplayItem(
-                    id = 1,
                     name = "T-shirt",
                     price = 15.00,
                     options = listOf(

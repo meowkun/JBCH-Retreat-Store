@@ -30,7 +30,7 @@ fun ItemListView(
         verticalArrangement = Arrangement.spacedBy(spacing_m),
         contentPadding = PaddingValues(bottom = spacing_xl)
     ) {
-        items(items = displayItemList, key = { it.id }) { item ->
+        items(items = displayItemList) { item ->
             ItemView(
                 displayItem = item,
                 modifier = Modifier.fillParentMaxWidth()
@@ -46,7 +46,6 @@ fun ItemListViewPreview() {
     ItemListView(
         displayItemList = listOf(
             DisplayItem(
-                id = 0,
                 name = "Bible",
                 price = 40.00,
                 options = listOf(
@@ -61,7 +60,6 @@ fun ItemListViewPreview() {
                 )
             ),
             DisplayItem(
-                id = 1,
                 name = "T-shirt",
                 price = 15.00,
                 options = listOf(
