@@ -39,9 +39,21 @@ class ItemListViewModel : ViewModel() {
             }
 
             is ItemListAction.OnAddNewItem -> {
+                if (state.value.displayItemList.contains(action.newItem)) return
                 _state.update {
                     it.copy(
                         displayItemList = it.displayItemList + action.newItem
+                    )
+                }
+                viewModelScope.launch {
+                    repository.saveItems(state.value.displayItemList)
+                }
+            }
+
+            is ItemListAction.onRemoveItem -> {
+                _state.update {
+                    it.copy(
+                        displayItemList = it.displayItemList.filter { item -> item != action.item }
                     )
                 }
                 viewModelScope.launch {
