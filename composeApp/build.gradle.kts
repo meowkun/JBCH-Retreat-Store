@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -19,7 +20,8 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+    val iosXCFramework = XCFramework()
+
     listOf(
         iosX64(),
         iosArm64(),
@@ -27,7 +29,7 @@ kotlin {
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
-            isStatic = true
+            iosXCFramework.add(this)
         }
     }
 
@@ -66,9 +68,6 @@ kotlin {
 
             implementation(libs.bundles.ktor)
             implementation(libs.bundles.coil)
-
-            api(libs.datastore.preferences)
-            api(libs.datastore)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

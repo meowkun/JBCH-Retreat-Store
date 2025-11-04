@@ -28,4 +28,23 @@
     <string name="remove_item_dialog_message">Are you sure you want to %1$d?</string>
     <string name="remove_item_cancel">Cancel</string>
     <string name="remove_item_remove">Remove</string>
+
+    <!--  Cart view  -->
+    <string name="checkout_view_item_title">Shopping Cart</string>
+    <string name="checkout_view_item_price">$%1$d</string>
+    <string name="checkout_view_item_description">%1$d,%2$d</string>
+    <string name="checkout_view_item_option"> (%1$d - %2$d)</string>
+    <string name="checkout_view_item_quantity">Quantity %1$d</string>
+    <string name="checkout_view_item_remove">Remove</string>
+    <string name="checkout_view_item_subtotal">Subtotal: </string>
+    <string name="checkout_view_item_checkout">Checkout</string>
+    <string name="checkout_view_item_save_to_waitlist">Save to waitlist</string>
+    <string name="checkout_dialog_checkout_button">Checkout</string>
+    <string name="checkout_dialog_save_button">Save</string>
+    <string name="checkout_dialog_cancel_button">Cancel</string>
+    <string name="checkout_dialog_buyer_name_title">Enter buyer name</string>
+    <string name="checkout_dialog_buyer_name_hint">Buyer Name</string>
+
+    <!--  Setting view  -->
+    <string name="settings_view_title">Settings</string>
 </resources>
