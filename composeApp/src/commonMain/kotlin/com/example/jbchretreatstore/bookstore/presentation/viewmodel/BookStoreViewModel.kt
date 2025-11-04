@@ -2,8 +2,11 @@ package com.example.jbchretreatstore.bookstore.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.jbchretreatstore.bookstore.domain.model.AlertDialogType
+import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
 import com.example.jbchretreatstore.bookstore.domain.repository.BookStoreRepository
 import com.example.jbchretreatstore.bookstore.domain.usecase.DisplayItemUseCase
+import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavDestination
 import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavigator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -44,7 +47,7 @@ class BookStoreViewModel : ViewModel() {
                 }
             }
 
-            is BookStoreIntent.OnAddNewItem -> {
+            is BookStoreIntent.OnAddDisplayItem -> {
                 if (state.value.displayItemList.any {
                         it.name.equals(intent.newItem.name, ignoreCase = true)
                     }) return
@@ -58,7 +61,7 @@ class BookStoreViewModel : ViewModel() {
                 }
             }
 
-            is BookStoreIntent.OnRemoveItem -> {
+            is BookStoreIntent.OnRemoveDisplayItem -> {
                 _state.update {
                     it.copy(
                         displayItemList = it.displayItemList.filter { item -> item != intent.displayItem }
@@ -69,14 +72,14 @@ class BookStoreViewModel : ViewModel() {
                 }
             }
 
-            is BookStoreIntent.OnAddToCart -> {
+            is BookStoreIntent.OnAddToCheckoutItem -> {
                 _state.update { currentState ->
-                    val existingItem = currentState.cartList.find {
-                        it.name == intent.checkoutItem.name && it.optionsMap == intent.checkoutItem.optionsMap
+                    val existingItem = currentState.currentCheckoutList.checkoutList.find {
+                        it.itemName == intent.checkoutItem.itemName && it.optionsMap == intent.checkoutItem.optionsMap
                     }
-                    val updatedCartList = if (existingItem != null) {
-                        currentState.cartList.map { item ->
-                            if (item.name == intent.checkoutItem.name) {
+                    val updatedCheckoutList = if (existingItem != null) {
+                        currentState.currentCheckoutList.checkoutList.map { item ->
+                            if (item.itemName == intent.checkoutItem.itemName && item.optionsMap == intent.checkoutItem.optionsMap) {
                                 item.copy(
                                     quantity = item.quantity + intent.checkoutItem.quantity,
                                     totalPrice = item.totalPrice + intent.checkoutItem.totalPrice
@@ -85,15 +88,65 @@ class BookStoreViewModel : ViewModel() {
                         }
                     } else {
                         // Add as new cart item
-                        currentState.cartList + intent.checkoutItem
+                        val clonedItem = intent.checkoutItem.copy(
+                            optionsMap = intent.checkoutItem.optionsMap.toMap() as MutableMap<String, String>
+                        )
+                        currentState.currentCheckoutList.checkoutList + clonedItem
                     }
 
-                    currentState.copy(cartList = updatedCartList)
+                    currentState.copy(
+                        currentCheckoutList = currentState.currentCheckoutList.copy(
+                            checkoutList = updatedCheckoutList
+                        )
+                    )
+                }
+            }
+
+            is BookStoreIntent.OnCheckout -> {
+                _state.update { currentState ->
+                    val checkoutData = currentState.currentCheckoutList.copy(
+                        buyerName = intent.buyerName,
+                        checkoutStatus = intent.checkoutStatus
+                    )
+                    currentState.copy(
+                        currentCheckoutList = ReceiptData(),
+                        displayCheckoutDialog = false,
+                        receiptList = currentState.receiptList + checkoutData
+                    )
+                }
+            }
+
+            is BookStoreIntent.OnRemoveFromCheckoutItem -> {
+                _state.update { currentState ->
+                    val updatedCheckoutList =
+                        currentState.currentCheckoutList.checkoutList.filterNot { item ->
+                            item == intent.checkoutItem
+                        }
+                    currentState.copy(
+                        currentCheckoutList = currentState.currentCheckoutList.copy(
+                            checkoutList = updatedCheckoutList
+                        )
+                    )
                 }
             }
 
             is BookStoreIntent.OnNavigate -> {
+                if (intent.destination == BookStoreNavDestination.CheckoutScreen && state.value.currentCheckoutList.checkoutList.isEmpty()) return
                 navigator.navigateTo(intent.destination)
+            }
+
+            is BookStoreIntent.OnUpdateDialogVisibility -> {
+                when (intent.alertDialogType) {
+                    AlertDialogType.CHECKOUT -> {
+                        _state.update {
+                            it.copy(
+                                displayCheckoutDialog = intent.isVisible
+                            )
+                        }
+                    }
+
+                    else -> {}
+                }
             }
         }
     }

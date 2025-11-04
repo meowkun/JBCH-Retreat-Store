@@ -97,7 +97,7 @@ fun AddItemDialog(
                     val isItemValid =
                         viewState.newItem.name.isNotBlank() && viewState.newItem.price > 0.0
                     if (isItemValid) {
-                        onUserIntent(BookStoreIntent.OnAddNewItem(viewState.newItem))
+                        onUserIntent(BookStoreIntent.OnAddDisplayItem(viewState.newItem))
                         onConfirm.invoke()
                     } else {
                         viewState = viewState.copy(

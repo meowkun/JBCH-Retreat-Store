@@ -1,8 +1,7 @@
 package com.example.jbchretreatstore.bookstore.domain.model
 
-enum class PaymentMethod {
-    CASH,
-    ZELLE,
-    VENMO,
-    NOT_SPECIFIED
+enum class PaymentMethod(val methodName: String) {
+    CASH("Cash"),
+    ZELLE("Zelle"),
+    VENMO("Venmo"),
 }

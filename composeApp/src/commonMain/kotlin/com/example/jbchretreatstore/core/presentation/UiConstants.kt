@@ -11,6 +11,8 @@ object UiConstants {
     val spacing_l = 24.dp
     val spacing_xl = 32.dp
 
+    val spacing_xxl = 40.dp
+
     // UI max size
     val max_width = 500.dp
 

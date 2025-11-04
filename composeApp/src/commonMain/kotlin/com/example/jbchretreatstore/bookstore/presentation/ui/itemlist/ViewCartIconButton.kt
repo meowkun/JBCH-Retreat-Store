@@ -25,10 +25,10 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun ViewCartIconButton(
     modifier: Modifier,
-    cartList: List<CheckoutItem>,
+    checkoutList: List<CheckoutItem>,
     onUserIntent: (BookStoreIntent) -> Unit
 ) {
-    val totalItems = cartList.sumOf { it.quantity }
+    val totalItems = checkoutList.sumOf { it.quantity }
     BadgedBox(
         modifier = modifier,
         badge = {
@@ -51,7 +51,7 @@ fun ViewCartIconButton(
                     .width(spacing_xl)
                     .height(spacing_xl),
                 onClick = {
-                    onUserIntent.invoke(BookStoreIntent.OnNavigate(BookStoreNavDestination.Checkout))
+                    onUserIntent.invoke(BookStoreIntent.OnNavigate(BookStoreNavDestination.CheckoutScreen))
                 }
             ) {
                 Icon(
@@ -63,7 +63,7 @@ fun ViewCartIconButton(
 
             if (totalItems > 0) {
                 Text(
-                    text = "$${cartList.sumOf { it.totalPrice }.toPriceFormatString()}",
+                    text = "$${checkoutList.sumOf { it.totalPrice }.toPriceFormatString()}",
                     color = Color.White
                 )
             }
@@ -77,14 +77,14 @@ fun ViewCartIconButton(
 fun ViewCartIconButtonPreview() {
     ViewCartIconButton(
         modifier = Modifier,
-        cartList = listOf(
+        checkoutList = listOf(
             CheckoutItem(
-                name = "Bible",
+                itemName = "Bible",
                 quantity = 1,
                 totalPrice = 40.00,
             ),
             CheckoutItem(
-                name = "T-shirt",
+                itemName = "T-shirt",
                 quantity = 2,
                 totalPrice = 15.00,
             )

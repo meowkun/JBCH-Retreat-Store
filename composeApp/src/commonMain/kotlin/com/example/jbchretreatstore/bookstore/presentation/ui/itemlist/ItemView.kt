@@ -72,7 +72,7 @@ fun ItemView(
     var checkoutItem by remember {
         mutableStateOf(
             CheckoutItem(
-                name = displayItem.name,
+                itemName = displayItem.name,
                 optionsMap = displayItem.options.associate {
                     it.optionKey to it.optionValueList.first()
                 }.toMutableMap(),
@@ -86,7 +86,7 @@ fun ItemView(
             itemName = displayItem.name,
             onDismiss = { showRemoveDialog = false },
             onConfirm = {
-                onUserIntent(BookStoreIntent.OnRemoveItem(displayItem))
+                onUserIntent(BookStoreIntent.OnRemoveDisplayItem(displayItem))
                 showRemoveDialog = false
             }
         )
@@ -106,7 +106,7 @@ fun ItemView(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().clickable { expanded = !expanded },
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Top
             ) {
@@ -204,7 +204,8 @@ fun ItemExpandableView(
         displayItem.options.forEachIndexed { index, option ->
             ItemOptionMenu(
                 option = option,
-                checkoutItem = checkoutItem
+                checkoutItem = checkoutItem,
+                updateCartItem = updateCartItem
             )
             Spacer(Modifier.height(spacing_m))
         }
@@ -230,7 +231,8 @@ fun ItemExpandableView(
 fun ItemOptionMenu(
     option: DisplayItem.Option,
     checkoutItem: CheckoutItem,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    updateCartItem: (CheckoutItem) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(
@@ -263,7 +265,12 @@ fun ItemOptionMenu(
                 DropdownMenuItem(
                     text = { Text(value) },
                     onClick = {
-                        checkoutItem.optionsMap[option.optionKey] = value
+                        val updatedOptions = checkoutItem.optionsMap.toMutableMap()
+                        updatedOptions[option.optionKey] = value
+
+                        updateCartItem.invoke(
+                            checkoutItem.copy(optionsMap = updatedOptions.toMap())
+                        )
                         expanded = false
                     }
                 )
@@ -345,7 +352,7 @@ fun AddToCartView(
         Button(
             modifier = Modifier.weight(.6f),
             onClick = {
-                onUserIntent(BookStoreIntent.OnAddToCart(checkoutItem))
+                onUserIntent(BookStoreIntent.OnAddToCheckoutItem(checkoutItem))
             },
         ) {
             Icon(

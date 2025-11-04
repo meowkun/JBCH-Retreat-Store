@@ -17,7 +17,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun RemoveItemDialog(
     itemName: String,
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
+    onConfirm: () -> Unit
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,

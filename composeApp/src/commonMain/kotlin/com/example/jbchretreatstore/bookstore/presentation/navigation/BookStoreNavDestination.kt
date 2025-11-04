@@ -1,6 +1,8 @@
 package com.example.jbchretreatstore.bookstore.presentation.navigation
 
 sealed class BookStoreNavDestination(val route: String) {
-    data object ItemList : BookStoreNavDestination("itemList")
-    data object Checkout : BookStoreNavDestination("checkout")
+    data object ItemListScreen : BookStoreNavDestination("ItemListScreen")
+    data object CheckoutScreen : BookStoreNavDestination("CheckoutScreen")
+    data object SettingScreen : BookStoreNavDestination("SettingScreen")
+    data object ReceiptScreen : BookStoreNavDestination("ReceiptScreen")
 }
