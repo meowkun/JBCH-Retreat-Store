@@ -13,18 +13,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.White
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
-import com.example.jbchretreatstore.bookstore.presentation.viewmodel.BookStoreIntent
+import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
+import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewState
 import com.example.jbchretreatstore.core.presentation.UiConstants.spacing_m
 import com.example.jbchretreatstore.core.presentation.UiConstants.spacing_xl
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import kotlin.uuid.ExperimentalUuidApi
 
+@OptIn(ExperimentalUuidApi::class)
 @Composable
 fun ItemListView(
     modifier: Modifier = Modifier.fillMaxWidth()
         .padding(vertical = spacing_m),
     displayItemList: List<DisplayItem>,
     onUserIntent: (BookStoreIntent) -> Unit,
-    scrollState: LazyListState = rememberLazyListState()
+    scrollState: LazyListState = rememberLazyListState(),
+    state: BookStoreViewState
 ) {
     LazyColumn(
         modifier = modifier,
@@ -32,8 +36,9 @@ fun ItemListView(
         verticalArrangement = Arrangement.spacedBy(spacing_m),
         contentPadding = PaddingValues(bottom = spacing_xl)
     ) {
-        items(items = displayItemList, key = { it.name }) { item ->
+        items(items = displayItemList, key = { it.id }) { item ->
             ItemView(
+                state = state,
                 displayItem = item,
                 modifier = Modifier.fillParentMaxWidth()
                     .padding(horizontal = spacing_m),
@@ -42,6 +47,7 @@ fun ItemListView(
         }
     }
 }
+
 
 @Preview
 @Composable
@@ -78,6 +84,7 @@ fun ItemListViewPreview() {
             )
         ),
         modifier = Modifier.background(White),
-        onUserIntent = { }
+        onUserIntent = { },
+        state = BookStoreViewState()
     )
 }

@@ -15,8 +15,8 @@ import androidx.compose.ui.Modifier
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
-import com.example.jbchretreatstore.bookstore.presentation.viewmodel.BookStoreIntent
-import com.example.jbchretreatstore.bookstore.presentation.viewmodel.BookStoreViewState
+import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
+import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewState
 import com.example.jbchretreatstore.core.presentation.DarkBlue
 import com.example.jbchretreatstore.core.presentation.DesertWhite
 import com.example.jbchretreatstore.core.presentation.UiConstants.itemListContainerRoundShape
@@ -47,7 +47,7 @@ fun ItemListScreen(
                 onUserIntent = onUserIntent
             )
 
-            ViewCartIconButton(
+            ViewShoppingCartIconButton(
                 modifier = Modifier.padding(end = spacing_m),
                 checkoutList = state.currentCheckoutList.checkoutList,
                 onUserIntent = onUserIntent
@@ -69,7 +69,8 @@ fun ItemListScreen(
                     vertical = spacing_m
                 ),
                 displayItemList = state.searchedItemList,
-                onUserIntent = onUserIntent
+                onUserIntent = onUserIntent,
+                state = state
             )
         }
     }
