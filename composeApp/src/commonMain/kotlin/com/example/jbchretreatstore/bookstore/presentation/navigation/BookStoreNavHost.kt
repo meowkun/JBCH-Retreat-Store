@@ -17,11 +17,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.jbchretreatstore.bookstore.domain.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.presentation.ui.checkout.CheckoutScreen
 import com.example.jbchretreatstore.bookstore.presentation.ui.itemlist.AddItemDialog
 import com.example.jbchretreatstore.bookstore.presentation.ui.itemlist.BottomNavigationBar
 import com.example.jbchretreatstore.bookstore.presentation.ui.itemlist.ItemListScreen
-import com.example.jbchretreatstore.bookstore.presentation.viewmodel.BookStoreViewModel
+import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
+import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewModel
 import com.example.jbchretreatstore.core.presentation.DarkBlue
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -33,7 +35,6 @@ fun BookStoreNavHost(
     val navController = rememberNavController()
     val navigator = remember { BookStoreNavigator(navController) }
     val state by viewModel.state.collectAsStateWithLifecycle()
-    var showDialog by remember { mutableStateOf(false) }
     var currentNavDestination by remember {
         mutableStateOf<BookStoreNavDestination>(
             BookStoreNavDestination.ItemListScreen
@@ -44,7 +45,15 @@ fun BookStoreNavHost(
         floatingActionButton = {
             if (currentNavDestination == BookStoreNavDestination.ItemListScreen) {
                 FloatingActionButton(
-                    onClick = { showDialog = true },
+                    onClick = {
+                        viewModel.onUserIntent(
+                            BookStoreIntent.OnUpdateDialogVisibility(
+                                AlertDialogType.ADD_ITEM,
+                                true
+                            ),
+                            navigator
+                        )
+                    },
                     containerColor = MaterialTheme.colorScheme.primary
                 ) {
                     Icon(Icons.Default.Add, contentDescription = null)
@@ -54,6 +63,7 @@ fun BookStoreNavHost(
         bottomBar = {
             if (currentNavDestination != BookStoreNavDestination.CheckoutScreen) {
                 BottomNavigationBar(
+                    saveForLaterCount = state.saveForLaterList.size,
                     currentDestination = currentNavDestination
                 ) { intent ->
                     viewModel.onUserIntent(intent, navigator)
@@ -74,7 +84,6 @@ fun BookStoreNavHost(
                     viewModel.onUserIntent(intent, navigator)
                 }
             }
-
             composable(BookStoreNavDestination.CheckoutScreen.route) {
                 currentNavDestination = BookStoreNavDestination.CheckoutScreen
                 CheckoutScreen(
@@ -84,13 +93,8 @@ fun BookStoreNavHost(
                 }
             }
         }
-        if (showDialog) {
-            AddItemDialog(
-                onDismiss = { showDialog = false },
-                onConfirm = {
-                    showDialog = false
-                }
-            ) { intent ->
+        if (state.displayAddDisplayItemDialog) {
+            AddItemDialog { intent ->
                 viewModel.onUserIntent(intent, navigator)
             }
         }

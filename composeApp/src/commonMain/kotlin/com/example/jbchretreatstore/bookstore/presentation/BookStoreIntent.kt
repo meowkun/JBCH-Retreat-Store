@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.presentation.viewmodel
+package com.example.jbchretreatstore.bookstore.presentation
 
 import com.example.jbchretreatstore.bookstore.domain.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem

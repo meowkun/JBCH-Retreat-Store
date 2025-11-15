@@ -17,13 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavDestination
-import com.example.jbchretreatstore.bookstore.presentation.viewmodel.BookStoreIntent
+import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.core.presentation.UiConstants.spacing_xl
 import com.example.jbchretreatstore.core.presentation.toPriceFormatString
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun ViewCartIconButton(
+fun ViewShoppingCartIconButton(
     modifier: Modifier,
     checkoutList: List<CheckoutItem>,
     onUserIntent: (BookStoreIntent) -> Unit
@@ -68,14 +68,13 @@ fun ViewCartIconButton(
                 )
             }
         }
-
     }
 }
 
 @Preview
 @Composable
 fun ViewCartIconButtonPreview() {
-    ViewCartIconButton(
+    ViewShoppingCartIconButton(
         modifier = Modifier,
         checkoutList = listOf(
             CheckoutItem(

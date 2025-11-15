@@ -1,10 +1,10 @@
-package com.example.jbchretreatstore.bookstore.presentation.viewmodel
+package com.example.jbchretreatstore.bookstore.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.jbchretreatstore.bookstore.domain.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
-import com.example.jbchretreatstore.bookstore.domain.repository.BookStoreRepository
+import com.example.jbchretreatstore.bookstore.domain.repository.BookStoreRepositoryImpl
 import com.example.jbchretreatstore.bookstore.domain.usecase.DisplayItemUseCase
 import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavDestination
 import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavigator
@@ -12,10 +12,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 class BookStoreViewModel : ViewModel() {
-    private val repository: BookStoreRepository by lazy {
-        BookStoreRepository()
+    private val repository: BookStoreRepositoryImpl by lazy {
+        BookStoreRepositoryImpl()
     }
 
     private val displayItemUseCase: DisplayItemUseCase by lazy {
@@ -39,6 +43,7 @@ class BookStoreViewModel : ViewModel() {
     private val _state = MutableStateFlow(BookStoreViewState())
     val state = _state.asStateFlow()
 
+    @OptIn(ExperimentalTime::class)
     fun onUserIntent(intent: BookStoreIntent, navigator: BookStoreNavigator) {
         when (intent) {
             is BookStoreIntent.OnSearchQueryChange -> {
@@ -48,12 +53,18 @@ class BookStoreViewModel : ViewModel() {
             }
 
             is BookStoreIntent.OnAddDisplayItem -> {
-                if (state.value.displayItemList.any {
-                        it.name.equals(intent.newItem.name, ignoreCase = true)
-                    }) return
+                if (state.value.displayItemList.any { it.name.equals(intent.newItem.name, ignoreCase = true) }) {
+                    _state.update {
+                        it.copy(
+                            displayAddDisplayItemDialog = false
+                        )
+                    }
+                    return
+                }
                 _state.update {
                     it.copy(
-                        displayItemList = it.displayItemList + intent.newItem
+                        displayItemList = it.displayItemList + intent.newItem,
+                        displayAddDisplayItemDialog = false
                     )
                 }
                 viewModelScope.launch {
@@ -64,7 +75,8 @@ class BookStoreViewModel : ViewModel() {
             is BookStoreIntent.OnRemoveDisplayItem -> {
                 _state.update {
                     it.copy(
-                        displayItemList = it.displayItemList.filter { item -> item != intent.displayItem }
+                        displayItemList = it.displayItemList.filter { item -> item != intent.displayItem },
+                        displayRemoveDisplayItemDialog = false
                     )
                 }
                 viewModelScope.launch {
@@ -87,9 +99,9 @@ class BookStoreViewModel : ViewModel() {
                             } else item
                         }
                     } else {
-                        // Add as new cart item
+                        // Add as new cart item - create new mutable map from optionsMap
                         val clonedItem = intent.checkoutItem.copy(
-                            optionsMap = intent.checkoutItem.optionsMap.toMap() as MutableMap<String, String>
+                            optionsMap = intent.checkoutItem.optionsMap.toMutableMap()
                         )
                         currentState.currentCheckoutList.checkoutList + clonedItem
                     }
@@ -106,7 +118,9 @@ class BookStoreViewModel : ViewModel() {
                 _state.update { currentState ->
                     val checkoutData = currentState.currentCheckoutList.copy(
                         buyerName = intent.buyerName,
-                        checkoutStatus = intent.checkoutStatus
+                        checkoutStatus = intent.checkoutStatus,
+                        dateTime = Clock.System.now()
+                            .toLocalDateTime(TimeZone.currentSystemDefault())
                     )
                     currentState.copy(
                         currentCheckoutList = ReceiptData(),
@@ -145,7 +159,21 @@ class BookStoreViewModel : ViewModel() {
                         }
                     }
 
-                    else -> {}
+                    AlertDialogType.ADD_ITEM -> {
+                        _state.update {
+                            it.copy(
+                                displayAddDisplayItemDialog = intent.isVisible
+                            )
+                        }
+                    }
+
+                    AlertDialogType.REMOVE_ITEM -> {
+                        _state.update {
+                            it.copy(
+                                displayRemoveDisplayItemDialog = intent.isVisible
+                            )
+                        }
+                    }
                 }
             }
         }

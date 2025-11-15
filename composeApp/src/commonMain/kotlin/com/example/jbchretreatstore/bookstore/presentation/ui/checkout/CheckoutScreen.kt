@@ -27,20 +27,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.jbchretreatstore.bookstore.domain.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
-import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod
 import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod.CASH
 import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod.VENMO
 import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod.ZELLE
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
+import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
+import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewState
 import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavDestination
-import com.example.jbchretreatstore.bookstore.presentation.viewmodel.BookStoreIntent
-import com.example.jbchretreatstore.bookstore.presentation.viewmodel.BookStoreViewState
+import com.example.jbchretreatstore.bookstore.presentation.ui.shared.TitleView
 import com.example.jbchretreatstore.core.presentation.DesertWhite
 import com.example.jbchretreatstore.core.presentation.UiConstants.itemListContainerRoundShape
 import com.example.jbchretreatstore.core.presentation.UiConstants.spacing_m
@@ -79,16 +78,8 @@ fun CheckoutScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
-                modifier = Modifier.padding(top = spacing_m),
-                text = stringResource(Res.string.checkout_view_item_title),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.headlineSmall
-            )
 
-            HorizontalDivider(
-                modifier = Modifier.padding(top = spacing_m)
-            )
+            TitleView(stringResource(Res.string.checkout_view_item_title))
 
             LazyColumn(
                 modifier = Modifier.padding(top = spacing_m).weight(1f),
@@ -96,7 +87,7 @@ fun CheckoutScreen(
             ) {
                 items(
                     items = state.currentCheckoutList.checkoutList,
-                    key = { it.itemName + it.totalPrice + it.optionsMap.toString() }) { item ->
+                    key = { "${it.id}_${it.optionsMap.hashCode()}" }) { item ->
                     CheckoutItemView(
                         checkoutItem = item,
                         onUserIntent = onUserIntent
@@ -227,36 +218,6 @@ fun RadioButtonSingleSelection(
 fun CheckoutScreenPreview() {
     CheckoutScreen(
         state = BookStoreViewState(
-            displayItemList = listOf(
-                DisplayItem(
-                    name = "Bible",
-                    price = 40.00,
-                    options = listOf(
-                        DisplayItem.Option(
-                            optionKey = "Language",
-                            optionValueList = listOf("English", "French", "Spanish")
-                        ),
-                        DisplayItem.Option(
-                            optionKey = "Version",
-                            optionValueList = listOf("KJV", "NKJV", "NIV")
-                        ),
-                    )
-                ),
-                DisplayItem(
-                    name = "T-shirt",
-                    price = 15.00,
-                    options = listOf(
-                        DisplayItem.Option(
-                            optionKey = "Color",
-                            optionValueList = listOf("Blue", "Black")
-                        ),
-                        DisplayItem.Option(
-                            optionKey = "Size",
-                            optionValueList = listOf("XS", "S", "M", "L", "XL", "XXL", "XXXL")
-                        ),
-                    )
-                )
-            ),
             currentCheckoutList = ReceiptData(
                 checkoutList = listOf(
                     CheckoutItem(

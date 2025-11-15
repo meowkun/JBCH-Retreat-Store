@@ -1,5 +1,7 @@
 package com.example.jbchretreatstore.core.presentation
 
+import kotlinx.datetime.LocalDateTime
+
 internal fun Double.toPriceFormatString(): String {
     val rawPrice = this.toString().split(".")
     val priceInteger= rawPrice[0]
@@ -11,3 +13,12 @@ internal fun Double.toPriceFormatString(): String {
     }
     return "$priceInteger.$priceDecimal"
 }
+
+fun LocalDateTime.toFormattedDateString(): String {
+    val month = month.ordinal.plus(1).toString().padStart(2, '0')
+    val day = day.toString().padStart(2, '0')
+    val hour = hour.toString().padStart(2, '0')
+    val minute = minute.toString().padStart(2, '0')
+    return "$month/$day/$year $hour:$minute"
+}
+

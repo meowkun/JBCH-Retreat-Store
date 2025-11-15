@@ -45,6 +45,6 @@
     <string name="checkout_dialog_buyer_name_title">Enter buyer name</string>
     <string name="checkout_dialog_buyer_name_hint">Buyer Name</string>
 
-    <!--  Setting view  -->
-    <string name="settings_view_title">Settings</string>
+    <!--  Purchase history view  -->
+    <string name="purchase_history_view_title">Purchase History</string>
 </resources>

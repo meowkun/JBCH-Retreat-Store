@@ -42,9 +42,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import com.example.jbchretreatstore.bookstore.domain.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
-import com.example.jbchretreatstore.bookstore.presentation.viewmodel.BookStoreIntent
+import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
+import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewState
 import com.example.jbchretreatstore.core.presentation.SandYellow
 import com.example.jbchretreatstore.core.presentation.UiConstants
 import com.example.jbchretreatstore.core.presentation.UiConstants.itemViewCardColorElevation
@@ -63,12 +65,12 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemView(
+    state: BookStoreViewState,
     displayItem: DisplayItem,
     modifier: Modifier = Modifier,
     onUserIntent: (BookStoreIntent) -> Unit
 ) {
     var expanded by remember { mutableStateOf(true) }
-    var showRemoveDialog by remember { mutableStateOf(false) }
     var checkoutItem by remember {
         mutableStateOf(
             CheckoutItem(
@@ -81,14 +83,10 @@ fun ItemView(
         )
     }
 
-    if (showRemoveDialog) {
+    if (state.displayRemoveDisplayItemDialog) {
         RemoveItemDialog(
-            itemName = displayItem.name,
-            onDismiss = { showRemoveDialog = false },
-            onConfirm = {
-                onUserIntent(BookStoreIntent.OnRemoveDisplayItem(displayItem))
-                showRemoveDialog = false
-            }
+            displayItem = displayItem,
+            onUserIntent = onUserIntent
         )
     }
 
@@ -116,7 +114,7 @@ fun ItemView(
                     expanded = !expanded
                 }
                 IconButton(
-                    onClick = { showRemoveDialog = true }
+                    onClick = { onUserIntent(BookStoreIntent.OnUpdateDialogVisibility(AlertDialogType.REMOVE_ITEM, true))}
                 ) {
                     Icon(Icons.Default.Delete, contentDescription = null)
                 }
@@ -372,6 +370,7 @@ fun ItemViewPreview() {
         modifier = Modifier.background(color = White)
     ) {
         ItemView(
+            state = BookStoreViewState(),
             displayItem = DisplayItem(
                 price = 40.00,
                 name = "Bible",

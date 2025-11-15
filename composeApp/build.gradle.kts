@@ -36,7 +36,11 @@ kotlin {
     room {
         schemaDirectory("$projectDir/schemas")
     }
-    
+    sourceSets.all {
+        languageSettings {
+            optIn("kotlin.uuid.ExperimentalUuidApi")
+        }
+    }
     sourceSets {
         androidMain.dependencies {
             implementation(compose.preview)
@@ -68,6 +72,10 @@ kotlin {
 
             implementation(libs.bundles.ktor)
             implementation(libs.bundles.coil)
+
+            implementation(libs.datetime)
+
+            implementation(libs.uuid)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

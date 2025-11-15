@@ -14,7 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
-import com.example.jbchretreatstore.bookstore.presentation.viewmodel.BookStoreIntent
+import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.core.presentation.UiConstants.spacing_m
 import com.example.jbchretreatstore.core.presentation.toPriceFormatString
 import jbchretreatstore.composeapp.generated.resources.Res

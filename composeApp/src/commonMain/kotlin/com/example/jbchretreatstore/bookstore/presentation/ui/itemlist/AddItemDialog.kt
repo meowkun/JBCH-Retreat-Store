@@ -27,8 +27,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import com.example.jbchretreatstore.bookstore.domain.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
-import com.example.jbchretreatstore.bookstore.presentation.viewmodel.BookStoreIntent
+import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.core.presentation.UiConstants.spacing_m
 import com.example.jbchretreatstore.core.presentation.UiConstants.spacing_s
 import jbchretreatstore.composeapp.generated.resources.Res
@@ -46,8 +47,6 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun AddItemDialog(
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
     onUserIntent: (BookStoreIntent) -> Unit
 ) {
     var viewState by remember { mutableStateOf(AddItemState()) }
@@ -57,7 +56,14 @@ fun AddItemDialog(
         stringResource(Res.string.add_item_add)
     }
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {
+            onUserIntent.invoke(
+                BookStoreIntent.OnUpdateDialogVisibility(
+                    AlertDialogType.ADD_ITEM,
+                    false
+                )
+            )
+        },
         title = { Text(stringResource(Res.string.add_item_dialog_title)) },
         text = {
             Column(
@@ -98,7 +104,6 @@ fun AddItemDialog(
                         viewState.newItem.name.isNotBlank() && viewState.newItem.price > 0.0
                     if (isItemValid) {
                         onUserIntent(BookStoreIntent.OnAddDisplayItem(viewState.newItem))
-                        onConfirm.invoke()
                     } else {
                         viewState = viewState.copy(
                             showAddItemError = true
@@ -118,7 +123,12 @@ fun AddItemDialog(
                         newItemOption = DisplayItem.Option()
                     )
                 } else {
-                    onDismiss.invoke()
+                    onUserIntent.invoke(
+                        BookStoreIntent.OnUpdateDialogVisibility(
+                            AlertDialogType.ADD_ITEM,
+                            false
+                        )
+                    )
                 }
             }) {
                 Text(stringResource(Res.string.add_item_cancel))
@@ -284,7 +294,7 @@ fun AddItemState.AddNewOptionView(
                             )
                         )
                     )
-                }else {
+                } else {
                     updateViewState.invoke(
                         this@AddNewOptionView.copy(
                             newItemOption = newItemOption.copy(
@@ -321,8 +331,5 @@ fun AddItemState.AddNewOptionView(
 @Preview
 @Composable
 fun AddItemDialogPreview() {
-    AddItemDialog(
-        onDismiss = {},
-        onConfirm = {}
-    ) { }
+    AddItemDialog { }
 }
