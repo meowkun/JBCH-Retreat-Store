@@ -7,18 +7,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import com.example.jbchretreatstore.core.presentation.UiConstants.spacing_m
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 
 @Composable
 fun TitleView(title: String) {
     Text(
-        modifier = Modifier.padding(top = spacing_m),
+        modifier = Modifier.padding(top = Dimensions.spacing_m),
         text = title,
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.headlineSmall
     )
 
     HorizontalDivider(
-        modifier = Modifier.padding(top = spacing_m)
+        modifier = Modifier.padding(top = Dimensions.spacing_m)
     )
 }

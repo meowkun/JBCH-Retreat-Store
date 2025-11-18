@@ -8,6 +8,7 @@ import androidx.compose.ui.text.style.TextAlign
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.remove_item_cancel
 import jbchretreatstore.composeapp.generated.resources.remove_item_dialog_message
@@ -49,7 +50,9 @@ fun RemoveItemDialog(
 @Preview
 @Composable
 fun RemoveItemDialogPreview() {
-    RemoveItemDialog(
-        displayItem = DisplayItem(name = "Sample Item")
-    ) {}
+    BookStoreTheme {
+        RemoveItemDialog(
+            displayItem = DisplayItem(name = "Sample Item")
+        ) {}
+    }
 }

@@ -24,12 +24,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
-import com.example.jbchretreatstore.core.presentation.DarkBlue
-import com.example.jbchretreatstore.core.presentation.DesertWhite
-import com.example.jbchretreatstore.core.presentation.SandYellow
-import com.example.jbchretreatstore.core.presentation.UiConstants.searchBarRoundEndIconAlpha
-import com.example.jbchretreatstore.core.presentation.UiConstants.searchBarRoundPercentage
-import com.example.jbchretreatstore.core.presentation.UiConstants.searchbarBackgroundAlpha
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Alpha
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BrightBlue
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.LightBlue
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.MediumBlue
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.clear_hint
 import jbchretreatstore.composeapp.generated.resources.search_hint
@@ -44,21 +43,22 @@ fun ItemSearchBar(
 ) {
     CompositionLocalProvider(
         LocalTextSelectionColors provides TextSelectionColors(
-            handleColor = SandYellow, backgroundColor = SandYellow.copy(alpha = searchbarBackgroundAlpha)
+            handleColor = MediumBlue,
+            backgroundColor = MediumBlue.copy(alpha = Alpha.search_bar_background)
         )
     ) {
         OutlinedTextField(
             modifier = modifier.background(
-                shape = RoundedCornerShape(percent = searchBarRoundPercentage), color = DesertWhite
+                shape = RoundedCornerShape(percent = 100), color = LightBlue
             ).minimumInteractiveComponentSize(),
             value = searchQuery,
             onValueChange = { query ->
                 onUserIntent(BookStoreIntent.OnSearchQueryChange(query))
             },
-            shape = RoundedCornerShape(percent = searchBarRoundPercentage),
+            shape = RoundedCornerShape(percent = 100),
             colors = OutlinedTextFieldDefaults.colors(
-                cursorColor = DarkBlue,
-                focusedBorderColor = SandYellow,
+                cursorColor = BrightBlue,
+                focusedBorderColor = MediumBlue,
             ),
             placeholder = {
                 Text(text = stringResource(Res.string.search_hint))
@@ -67,7 +67,7 @@ fun ItemSearchBar(
                 Icon(
                     imageVector = Icons.Default.Search,
                     contentDescription = stringResource(Res.string.search_hint),
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = searchBarRoundEndIconAlpha)
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = Alpha.search_bar_icon)
                 )
             },
             singleLine = true,
@@ -99,8 +99,10 @@ fun ItemSearchBar(
 @Preview
 @Composable
 fun ItemSearchBarPreview() {
-    ItemSearchBar(
-        searchQuery = "Bible",
-        onUserIntent = {}
-    )
+    BookStoreTheme {
+        ItemSearchBar(
+            searchQuery = "Bible",
+            onUserIntent = {}
+        )
+    }
 }

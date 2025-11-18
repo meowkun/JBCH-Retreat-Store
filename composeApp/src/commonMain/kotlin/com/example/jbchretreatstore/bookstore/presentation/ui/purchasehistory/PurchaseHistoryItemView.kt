@@ -25,9 +25,10 @@ import androidx.compose.ui.unit.dp
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
-import com.example.jbchretreatstore.core.presentation.UiConstants.spacing_m
-import com.example.jbchretreatstore.core.presentation.toFormattedDateString
-import com.example.jbchretreatstore.core.presentation.toPriceFormatString
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
+import com.example.jbchretreatstore.bookstore.presentation.utils.toFormattedDateString
+import com.example.jbchretreatstore.bookstore.presentation.utils.toPriceFormatString
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.checkout_view_item_price
 import org.jetbrains.compose.resources.stringResource
@@ -44,10 +45,10 @@ fun PurchaseHistoryItemView(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = spacing_m)
-            .padding(spacing_m),
+            .padding(horizontal = Dimensions.spacing_m)
+            .padding(Dimensions.spacing_m),
         horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.spacedBy(spacing_m)
+        verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_m)
     ) {
         // Header: buyer name and summary (clickable to expand)
         Row(
@@ -169,14 +170,16 @@ private fun PurchaseHistoryCheckoutItem(item: CheckoutItem) {
 @Preview(showBackground = true)
 @Composable
 fun PurchaseHistoryItemViewPreview() {
-    PurchaseHistoryItemView(
-        receipt = ReceiptData(
-            buyerName = "Isaac",
-            checkoutList = listOf(
-                CheckoutItem(itemName = "Bible", totalPrice = 40.0),
-                CheckoutItem(itemName = "T-shirt", totalPrice = 15.0)
-            )
-        ),
-        onUserIntent = {}
-    )
+    BookStoreTheme {
+        PurchaseHistoryItemView(
+            receipt = ReceiptData(
+                buyerName = "Isaac",
+                checkoutList = listOf(
+                    CheckoutItem(itemName = "Bible", totalPrice = 40.0),
+                    CheckoutItem(itemName = "T-shirt", totalPrice = 15.0)
+                )
+            ),
+            onUserIntent = {}
+        )
+    }
 }

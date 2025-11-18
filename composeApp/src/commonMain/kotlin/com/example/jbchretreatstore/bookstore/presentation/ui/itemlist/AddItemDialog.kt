@@ -30,8 +30,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
-import com.example.jbchretreatstore.core.presentation.UiConstants.spacing_m
-import com.example.jbchretreatstore.core.presentation.UiConstants.spacing_s
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.add_item_add
 import jbchretreatstore.composeapp.generated.resources.add_item_cancel
@@ -164,7 +164,7 @@ private fun AddItemState.AddItemContent(
             label = { Text(stringResource(Res.string.add_item_name_label)) }
         )
 
-        Spacer(Modifier.height(spacing_m))
+        Spacer(Modifier.height(Dimensions.spacing_m))
 
         OutlinedTextField(
             value = displayPrice,
@@ -186,7 +186,7 @@ private fun AddItemState.AddItemContent(
             label = { Text(stringResource(Res.string.add_item_price_label)) }
         )
 
-        Spacer(Modifier.height(spacing_s))
+        Spacer(Modifier.height(Dimensions.spacing_s))
 
         Column(modifier = Modifier.fillMaxWidth()) {
             Row(
@@ -259,7 +259,7 @@ fun AddItemState.AddNewOptionView(
             singleLine = true,
             label = { Text(stringResource(Res.string.add_item_options_key)) }
         )
-        Spacer(Modifier.height(spacing_m))
+        Spacer(Modifier.height(Dimensions.spacing_m))
         OutlinedTextField(
             value = optionValue,
             onValueChange = {
@@ -270,7 +270,7 @@ fun AddItemState.AddNewOptionView(
             singleLine = true,
             label = { Text(stringResource(Res.string.add_item_options_value)) }
         )
-        Spacer(Modifier.height(spacing_m))
+        Spacer(Modifier.height(Dimensions.spacing_m))
         if (newItemOption.optionKey.isNotEmpty()) {
             ItemOptionDescription(
                 DisplayItem.Option(
@@ -331,5 +331,7 @@ fun AddItemState.AddNewOptionView(
 @Preview
 @Composable
 fun AddItemDialogPreview() {
-    AddItemDialog { }
+    BookStoreTheme {
+        AddItemDialog { }
+    }
 }

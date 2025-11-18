@@ -13,8 +13,9 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavDestination
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
+import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavDestination
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -79,8 +80,10 @@ fun BottomNavigationBar(
 @Preview
 @Composable
 fun BottomNavigationBarPreview() {
-    BottomNavigationBar(
-        currentDestination = BookStoreNavDestination.ItemListScreen,
-        saveForLaterCount = 2
-    ) {}
+    BookStoreTheme {
+        BottomNavigationBar(
+            currentDestination = BookStoreNavDestination.ItemListScreen,
+            saveForLaterCount = 2
+        ) {}
+    }
 }

@@ -12,6 +12,7 @@ import androidx.compose.runtime.setValue
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.checkout_dialog_buyer_name_hint
 import jbchretreatstore.composeapp.generated.resources.checkout_dialog_buyer_name_title
@@ -86,7 +87,9 @@ fun CheckoutDialog(
 @Preview
 @Composable
 fun CheckoutDialogPreview() {
-    CheckoutDialog(
-        checkoutStatus = CheckoutStatus.CHECKED_OUT
-    ) {}
+    BookStoreTheme {
+        CheckoutDialog(
+            checkoutStatus = CheckoutStatus.CHECKED_OUT
+        ) {}
+    }
 }
