@@ -47,12 +47,13 @@ import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewState
 import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
-import com.example.jbchretreatstore.core.presentation.SandYellow
-import com.example.jbchretreatstore.core.presentation.UiConstants
-import com.example.jbchretreatstore.core.presentation.UiConstants.itemViewCardColorElevation
-import com.example.jbchretreatstore.core.presentation.UiConstants.spacing_m
-import com.example.jbchretreatstore.core.presentation.White
-import com.example.jbchretreatstore.core.presentation.toPriceFormatString
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Alpha
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.MediumBlue
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Shapes
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.White
+import com.example.jbchretreatstore.bookstore.presentation.utils.toPriceFormatString
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.add_to_cart
 import jbchretreatstore.composeapp.generated.resources.item_option_menu_selection_hint
@@ -92,13 +93,14 @@ fun ItemView(
 
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
-            defaultElevation = itemViewCardColorElevation
+            defaultElevation = Dimensions.item_card_elevation
         ),
-        modifier = modifier.padding(horizontal = spacing_m)
+        shape = Shapes.itemCard,
+        modifier = modifier.padding(horizontal = Dimensions.spacing_m)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
-                .background(color = SandYellow.copy(alpha = UiConstants.itemViewCardColorAlpha))
+                .background(color = MediumBlue.copy(alpha = Alpha.item_card_background))
                 .animateContentSize(),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -140,7 +142,7 @@ fun ItemDescriptionView(
     onItemClicked: () -> Unit = {},
 ) {
     Column(
-        modifier = Modifier.padding(all = spacing_m)
+        modifier = Modifier.padding(all = Dimensions.spacing_m)
             .clickable { onItemClicked.invoke() }
     ) {
         Text(
@@ -197,7 +199,7 @@ fun ItemExpandableView(
 ) {
     Column(
         modifier = Modifier.background(color = White).padding(
-            all = spacing_m
+            all = Dimensions.spacing_m
         )
     ) {
         displayItem.options.forEachIndexed { index, option ->
@@ -206,7 +208,7 @@ fun ItemExpandableView(
                 checkoutItem = checkoutItem,
                 updateCartItem = updateCartItem
             )
-            Spacer(Modifier.height(spacing_m))
+            Spacer(Modifier.height(Dimensions.spacing_m))
         }
 
         QuantityStepper(
@@ -216,7 +218,7 @@ fun ItemExpandableView(
             updateCartItem.invoke(it)
         }
 
-        Spacer(Modifier.height(spacing_m))
+        Spacer(Modifier.height(Dimensions.spacing_m))
 
         AddToCartView(
             checkoutItem = checkoutItem,
@@ -367,12 +369,13 @@ fun AddToCartView(
 @Preview
 @Composable
 fun ItemViewPreview() {
-    Box(
-        modifier = Modifier.background(color = White)
-    ) {
-        ItemView(
-            state = BookStoreViewState(),
-            displayItem = DisplayItem(
+    BookStoreTheme {
+        Box(
+            modifier = Modifier.background(color = White)
+        ) {
+            ItemView(
+                state = BookStoreViewState(),
+                displayItem = DisplayItem(
                 price = 40.00,
                 name = "Bible",
                 options = listOf(
@@ -388,5 +391,6 @@ fun ItemViewPreview() {
                 isInCart = false
             )
         ) {}
+        }
     }
 }

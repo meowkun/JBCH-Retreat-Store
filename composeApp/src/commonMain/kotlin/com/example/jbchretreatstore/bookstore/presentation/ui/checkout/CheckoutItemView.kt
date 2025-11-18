@@ -15,8 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
-import com.example.jbchretreatstore.core.presentation.UiConstants.spacing_m
-import com.example.jbchretreatstore.core.presentation.toPriceFormatString
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
+import com.example.jbchretreatstore.bookstore.presentation.utils.toPriceFormatString
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.checkout_view_item_price
 import jbchretreatstore.composeapp.generated.resources.checkout_view_item_quantity
@@ -31,7 +32,7 @@ fun CheckoutItemView(
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
-            .padding(horizontal = spacing_m),
+            .padding(horizontal = Dimensions.spacing_m),
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
@@ -93,12 +94,14 @@ fun CheckoutItemView(
 )
 @Composable
 fun CheckoutItemViewPreview() {
-    CheckoutItemView(
-        checkoutItem = CheckoutItem(
-            itemName = "T-shirt",
-            quantity = 2,
-            totalPrice = 15.00,
-            optionsMap = mutableMapOf("Size" to "M", "Color" to "Red")
-        ),
-    ) {}
+    BookStoreTheme {
+        CheckoutItemView(
+            checkoutItem = CheckoutItem(
+                itemName = "T-shirt",
+                quantity = 2,
+                totalPrice = 15.00,
+                optionsMap = mutableMapOf("Size" to "M", "Color" to "Red")
+            ),
+        ) {}
+    }
 }

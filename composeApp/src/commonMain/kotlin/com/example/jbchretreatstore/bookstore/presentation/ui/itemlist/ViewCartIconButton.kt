@@ -16,10 +16,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
-import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavDestination
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
-import com.example.jbchretreatstore.core.presentation.UiConstants.spacing_xl
-import com.example.jbchretreatstore.core.presentation.toPriceFormatString
+import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavDestination
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
+import com.example.jbchretreatstore.bookstore.presentation.utils.toPriceFormatString
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -48,8 +49,8 @@ fun ViewShoppingCartIconButton(
         ) {
             IconButton(
                 modifier = Modifier
-                    .width(spacing_xl)
-                    .height(spacing_xl),
+                    .width(Dimensions.spacing_xl)
+                    .height(Dimensions.spacing_xl),
                 onClick = {
                     onUserIntent.invoke(BookStoreIntent.OnNavigate(BookStoreNavDestination.CheckoutScreen))
                 }
@@ -74,9 +75,10 @@ fun ViewShoppingCartIconButton(
 @Preview
 @Composable
 fun ViewCartIconButtonPreview() {
-    ViewShoppingCartIconButton(
-        modifier = Modifier,
-        checkoutList = listOf(
+    BookStoreTheme {
+        ViewShoppingCartIconButton(
+            modifier = Modifier,
+            checkoutList = listOf(
             CheckoutItem(
                 itemName = "Bible",
                 quantity = 1,
@@ -88,6 +90,7 @@ fun ViewCartIconButtonPreview() {
                 totalPrice = 15.00,
             )
         ),
-        onUserIntent = {}
-    )
+            onUserIntent = {}
+        )
+    }
 }

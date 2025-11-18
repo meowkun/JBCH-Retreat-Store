@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -40,9 +39,10 @@ import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewState
 import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavDestination
 import com.example.jbchretreatstore.bookstore.presentation.ui.shared.TitleView
-import com.example.jbchretreatstore.core.presentation.DesertWhite
-import com.example.jbchretreatstore.core.presentation.UiConstants.itemListContainerRoundShape
-import com.example.jbchretreatstore.core.presentation.UiConstants.spacing_m
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.LightBlue
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Shapes
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.checkout_view_item_checkout
 import jbchretreatstore.composeapp.generated.resources.checkout_view_item_price
@@ -66,11 +66,8 @@ fun CheckoutScreen(
     Surface(
         modifier = Modifier
             .fillMaxWidth().statusBarsPadding(),
-        color = DesertWhite,
-        shape = RoundedCornerShape(
-            topStart = itemListContainerRoundShape,
-            topEnd = itemListContainerRoundShape
-        )
+        color = LightBlue,
+        shape = Shapes.topRounded
     ) {
         Column(
             modifier = Modifier
@@ -82,8 +79,8 @@ fun CheckoutScreen(
             TitleView(stringResource(Res.string.checkout_view_item_title))
 
             LazyColumn(
-                modifier = Modifier.padding(top = spacing_m).weight(1f),
-                verticalArrangement = Arrangement.spacedBy(spacing_m),
+                modifier = Modifier.padding(top = Dimensions.spacing_m).weight(1f),
+                verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_m),
             ) {
                 items(
                     items = state.currentCheckoutList.checkoutList,
@@ -96,7 +93,7 @@ fun CheckoutScreen(
             }
 
             Surface(
-                modifier = Modifier.fillMaxWidth().padding(top = spacing_m),
+                modifier = Modifier.fillMaxWidth().padding(top = Dimensions.spacing_m),
                 color = MaterialTheme.colorScheme.surface,
             ) {
                 Column(
@@ -107,7 +104,7 @@ fun CheckoutScreen(
                     HorizontalDivider()
                     Row(
                         modifier = Modifier.fillMaxWidth()
-                            .padding(spacing_m),
+                            .padding(Dimensions.spacing_m),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -216,8 +213,9 @@ fun RadioButtonSingleSelection(
 @Preview(showBackground = true)
 @Composable
 fun CheckoutScreenPreview() {
-    CheckoutScreen(
-        state = BookStoreViewState(
+    BookStoreTheme {
+        CheckoutScreen(
+            state = BookStoreViewState(
             currentCheckoutList = ReceiptData(
                 checkoutList = listOf(
                     CheckoutItem(
@@ -255,5 +253,6 @@ fun CheckoutScreenPreview() {
                 )
             )
         ),
-    ) {}
+        ) {}
+    }
 }
