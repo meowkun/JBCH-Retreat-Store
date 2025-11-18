@@ -5,9 +5,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.style.TextAlign
-import com.example.jbchretreatstore.bookstore.domain.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
+import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.remove_item_cancel
 import jbchretreatstore.composeapp.generated.resources.remove_item_dialog_message

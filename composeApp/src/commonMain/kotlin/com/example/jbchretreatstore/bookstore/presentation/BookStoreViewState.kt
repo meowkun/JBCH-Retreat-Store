@@ -3,7 +3,7 @@ package com.example.jbchretreatstore.bookstore.presentation
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
-import com.example.jbchretreatstore.core.presentation.UiText
+import org.jetbrains.compose.resources.StringResource
 
 data class BookStoreViewState(
     val searchQuery: String = "",
@@ -11,7 +11,7 @@ data class BookStoreViewState(
     val currentCheckoutList: ReceiptData = ReceiptData(),
     val receiptList: List<ReceiptData> = emptyList(),
     val isLoading: Boolean = true,
-    val errorMessage: UiText? = null,
+    val snackbarMessage: StringResource? = null,
     val selectedIndex: Int = 0,
     val displayAddDisplayItemDialog: Boolean = false,
     val displayRemoveDisplayItemDialog: Boolean = false,

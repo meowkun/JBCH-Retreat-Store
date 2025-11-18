@@ -47,4 +47,24 @@
 
     <!--  Purchase history view  -->
     <string name="purchase_history_view_title">Purchase History</string>
+
+    <!--  ViewModel toast/snackbar messages  -->
+    <!-- Display item messages -->
+    <string name="item_added_success">Item added successfully</string>
+    <string name="item_add_failed">Failed to add item</string>
+    <string name="item_removed_success">Item removed successfully</string>
+    <string name="item_remove_failed">Failed to remove item</string>
+
+    <!-- Cart messages -->
+    <string name="added_to_cart">Added to cart</string>
+    <string name="add_to_cart_failed">Failed to add to cart</string>
+    <string name="item_removed_from_cart">Item removed from cart</string>
+    <string name="remove_from_cart_failed">Failed to remove from cart</string>
+
+    <!-- Checkout messages -->
+    <string name="checkout_success">Checkout completed successfully</string>
+    <string name="checkout_failed">Checkout failed</string>
+
+    <!-- Validation messages -->
+    <string name="cart_empty">Cart is empty</string>
 </resources>

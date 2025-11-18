@@ -42,11 +42,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import com.example.jbchretreatstore.bookstore.domain.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewState
+import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.core.presentation.SandYellow
 import com.example.jbchretreatstore.core.presentation.UiConstants
 import com.example.jbchretreatstore.core.presentation.UiConstants.itemViewCardColorElevation
@@ -114,7 +114,8 @@ fun ItemView(
                     expanded = !expanded
                 }
                 IconButton(
-                    onClick = { onUserIntent(BookStoreIntent.OnUpdateDialogVisibility(AlertDialogType.REMOVE_ITEM, true))}
+                    onClick = { onUserIntent(BookStoreIntent.OnUpdateDialogVisibility(
+                        AlertDialogType.REMOVE_ITEM, true))}
                 ) {
                     Icon(Icons.Default.Delete, contentDescription = null)
                 }

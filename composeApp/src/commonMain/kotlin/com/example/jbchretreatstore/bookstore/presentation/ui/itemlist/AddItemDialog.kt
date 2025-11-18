@@ -27,9 +27,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import com.example.jbchretreatstore.bookstore.domain.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
+import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.core.presentation.UiConstants.spacing_m
 import com.example.jbchretreatstore.core.presentation.UiConstants.spacing_s
 import jbchretreatstore.composeapp.generated.resources.Res

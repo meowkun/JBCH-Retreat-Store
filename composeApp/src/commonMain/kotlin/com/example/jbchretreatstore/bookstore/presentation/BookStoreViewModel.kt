@@ -2,34 +2,34 @@ package com.example.jbchretreatstore.bookstore.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.jbchretreatstore.bookstore.domain.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
-import com.example.jbchretreatstore.bookstore.domain.repository.BookStoreRepositoryImpl
-import com.example.jbchretreatstore.bookstore.domain.usecase.DisplayItemUseCase
-import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavDestination
+import com.example.jbchretreatstore.bookstore.domain.usecase.CheckoutUseCase
+import com.example.jbchretreatstore.bookstore.domain.usecase.ManageCartUseCase
+import com.example.jbchretreatstore.bookstore.domain.usecase.ManageDisplayItemsUseCase
+import com.example.jbchretreatstore.bookstore.domain.usecase.PurchaseHistoryUseCase
+import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavigator
+import jbchretreatstore.composeapp.generated.resources.Res
+import jbchretreatstore.composeapp.generated.resources.added_to_cart
+import jbchretreatstore.composeapp.generated.resources.checkout_success
+import jbchretreatstore.composeapp.generated.resources.item_added_success
+import jbchretreatstore.composeapp.generated.resources.item_removed_success
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 
-class BookStoreViewModel : ViewModel() {
-    private val repository: BookStoreRepositoryImpl by lazy {
-        BookStoreRepositoryImpl()
-    }
-
-    private val displayItemUseCase: DisplayItemUseCase by lazy {
-        DisplayItemUseCase(repository)
-    }
+class BookStoreViewModel(
+    private val manageDisplayItemsUseCase: ManageDisplayItemsUseCase,
+    private val manageCartUseCase: ManageCartUseCase,
+    private val checkoutUseCase: CheckoutUseCase,
+    private val purchaseHistoryUseCase: PurchaseHistoryUseCase
+) : ViewModel() {
 
     init {
         // Load saved data
         viewModelScope.launch {
-            displayItemUseCase.fetchDisplayItems().collect { list ->
+            manageDisplayItemsUseCase.getDisplayItems().collect { list ->
                 _state.update {
                     it.copy(
                         displayItemList = list,
@@ -38,12 +38,19 @@ class BookStoreViewModel : ViewModel() {
                 }
             }
         }
+
+        viewModelScope.launch {
+            purchaseHistoryUseCase.getAllReceipts().collect { receipts ->
+                _state.update {
+                    it.copy(receiptList = receipts)
+                }
+            }
+        }
     }
 
     private val _state = MutableStateFlow(BookStoreViewState())
     val state = _state.asStateFlow()
 
-    @OptIn(ExperimentalTime::class)
     fun onUserIntent(intent: BookStoreIntent, navigator: BookStoreNavigator) {
         when (intent) {
             is BookStoreIntent.OnSearchQueryChange -> {
@@ -53,100 +60,103 @@ class BookStoreViewModel : ViewModel() {
             }
 
             is BookStoreIntent.OnAddDisplayItem -> {
-                if (state.value.displayItemList.any { it.name.equals(intent.newItem.name, ignoreCase = true) }) {
-                    _state.update {
-                        it.copy(
-                            displayAddDisplayItemDialog = false
-                        )
-                    }
-                    return
-                }
-                _state.update {
-                    it.copy(
-                        displayItemList = it.displayItemList + intent.newItem,
-                        displayAddDisplayItemDialog = false
-                    )
-                }
                 viewModelScope.launch {
-                    displayItemUseCase.updateDisplayItems(state.value.displayItemList)
+                    val result = manageDisplayItemsUseCase.addDisplayItem(intent.newItem)
+                    result.onSuccess {
+                        _state.update {
+                            it.copy(
+                                displayAddDisplayItemDialog = false,
+                                snackbarMessage = Res.string.item_added_success
+                            )
+                        }
+                    }.onFailure { error ->
+                        _state.update {
+                            it.copy(
+                                displayAddDisplayItemDialog = false
+                            )
+                        }
+                    }
                 }
             }
 
             is BookStoreIntent.OnRemoveDisplayItem -> {
-                _state.update {
-                    it.copy(
-                        displayItemList = it.displayItemList.filter { item -> item != intent.displayItem },
-                        displayRemoveDisplayItemDialog = false
-                    )
-                }
                 viewModelScope.launch {
-                    displayItemUseCase.updateDisplayItems(state.value.displayItemList)
+                    val result = manageDisplayItemsUseCase.removeDisplayItem(intent.displayItem)
+                    result.onSuccess {
+                        _state.update {
+                            it.copy(
+                                displayRemoveDisplayItemDialog = false,
+                                snackbarMessage = Res.string.item_removed_success
+                            )
+                        }
+                    }.onFailure { error ->
+                        _state.update {
+                            it.copy(
+                                displayRemoveDisplayItemDialog = false
+                            )
+                        }
+                    }
                 }
             }
 
             is BookStoreIntent.OnAddToCheckoutItem -> {
-                _state.update { currentState ->
-                    val existingItem = currentState.currentCheckoutList.checkoutList.find {
-                        it.itemName == intent.checkoutItem.itemName && it.optionsMap == intent.checkoutItem.optionsMap
-                    }
-                    val updatedCheckoutList = if (existingItem != null) {
-                        currentState.currentCheckoutList.checkoutList.map { item ->
-                            if (item.itemName == intent.checkoutItem.itemName && item.optionsMap == intent.checkoutItem.optionsMap) {
-                                item.copy(
-                                    quantity = item.quantity + intent.checkoutItem.quantity,
-                                    totalPrice = item.totalPrice + intent.checkoutItem.totalPrice
-                                )
-                            } else item
-                        }
-                    } else {
-                        // Add as new cart item - create new mutable map from optionsMap
-                        val clonedItem = intent.checkoutItem.copy(
-                            optionsMap = intent.checkoutItem.optionsMap.toMutableMap()
+                val result = manageCartUseCase.addToCart(
+                    state.value.currentCheckoutList,
+                    intent.checkoutItem
+                )
+                result.onSuccess { updatedCart ->
+                    _state.update {
+                        it.copy(
+                            currentCheckoutList = updatedCart,
+                            snackbarMessage = Res.string.added_to_cart
                         )
-                        currentState.currentCheckoutList.checkoutList + clonedItem
                     }
-
-                    currentState.copy(
-                        currentCheckoutList = currentState.currentCheckoutList.copy(
-                            checkoutList = updatedCheckoutList
-                        )
-                    )
+                }.onFailure {
+                    // Validation failed - use case handles validation
                 }
             }
 
             is BookStoreIntent.OnCheckout -> {
-                _state.update { currentState ->
-                    val checkoutData = currentState.currentCheckoutList.copy(
-                        buyerName = intent.buyerName,
-                        checkoutStatus = intent.checkoutStatus,
-                        dateTime = Clock.System.now()
-                            .toLocalDateTime(TimeZone.currentSystemDefault())
+                viewModelScope.launch {
+                    val result = checkoutUseCase.processCheckout(
+                        state.value.currentCheckoutList,
+                        intent.buyerName,
+                        intent.checkoutStatus
                     )
-                    currentState.copy(
-                        currentCheckoutList = ReceiptData(),
-                        displayCheckoutDialog = false,
-                        receiptList = currentState.receiptList + checkoutData
-                    )
+                    result.onSuccess {
+                        _state.update {
+                            it.copy(
+                                currentCheckoutList = ReceiptData(),
+                                displayCheckoutDialog = false,
+                                snackbarMessage = Res.string.checkout_success
+                            )
+                        }
+                    }.onFailure {
+                        // Validation failed - use case handles validation
+                    }
                 }
             }
 
             is BookStoreIntent.OnRemoveFromCheckoutItem -> {
-                _state.update { currentState ->
-                    val updatedCheckoutList =
-                        currentState.currentCheckoutList.checkoutList.filterNot { item ->
-                            item == intent.checkoutItem
-                        }
-                    currentState.copy(
-                        currentCheckoutList = currentState.currentCheckoutList.copy(
-                            checkoutList = updatedCheckoutList
-                        )
-                    )
+                val result = manageCartUseCase.removeFromCart(
+                    state.value.currentCheckoutList,
+                    intent.checkoutItem
+                )
+                result.onSuccess { updatedCart ->
+                    _state.update {
+                        it.copy(currentCheckoutList = updatedCart)
+                    }
                 }
             }
 
             is BookStoreIntent.OnNavigate -> {
-                if (intent.destination == BookStoreNavDestination.CheckoutScreen && state.value.currentCheckoutList.checkoutList.isEmpty()) return
                 navigator.navigateTo(intent.destination)
+            }
+
+            is BookStoreIntent.OnSnackbarDismissed -> {
+                _state.update {
+                    it.copy(snackbarMessage = null)
+                }
             }
 
             is BookStoreIntent.OnUpdateDialogVisibility -> {
