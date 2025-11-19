@@ -1,9 +1,6 @@
 package com.example.jbchretreatstore.bookstore.presentation.ui.itemlist
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,10 +14,7 @@ import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewState
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
-import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BrightBlue
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
-import com.example.jbchretreatstore.bookstore.presentation.ui.theme.LightBlue
-import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Shapes
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -28,43 +22,26 @@ fun ItemListScreen(
     state: BookStoreViewState,
     onUserIntent: (BookStoreIntent) -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(BrightBlue),
-        horizontalAlignment = Alignment.CenterHorizontally
+    Surface(
+        modifier = Modifier.fillMaxSize()
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+
+            ) {
             ItemSearchBar(
                 modifier = Modifier
-                    .weight(1f)
+                    .fillMaxWidth()
                     .padding(Dimensions.spacing_m),
                 searchQuery = state.searchQuery,
                 onUserIntent = onUserIntent
             )
-
-            ViewShoppingCartIconButton(
-                modifier = Modifier.padding(end = Dimensions.spacing_m),
-                checkoutList = state.currentCheckoutList.checkoutList,
-                onUserIntent = onUserIntent
-            )
-        }
-
-        Surface(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-            color = LightBlue,
-            shape = Shapes.topRounded
-        ) {
             ItemListView(
-                modifier = Modifier.padding(
-                    vertical = Dimensions.spacing_m
-                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = Dimensions.spacing_m),
                 displayItemList = state.searchedItemList,
                 onUserIntent = onUserIntent,
                 state = state

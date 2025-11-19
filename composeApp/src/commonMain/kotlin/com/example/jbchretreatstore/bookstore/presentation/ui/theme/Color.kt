@@ -17,8 +17,8 @@ val OnSecondary = Color(0xFF58657E)
 val OnSecondaryContainer = Color(0xFF58657E)
 
 // Background and Surface
-val Background = Color(0xFFECEFF4) // Light gray background
-val Surface = Color(0xFFE0E8FF) // Light blue surface
+val Background = Color(0xFFFFFFFF) // White background
+val Surface = Color(0xFFFFFFFF) // White surface
 val SurfaceVariant = Color(0xFFB7C3E4) // Card surface
 val OnBackground = Color(0xFF58657E) // Dark gray text
 val OnSurface = Color(0xFF58657E) // Dark gray text
@@ -34,6 +34,8 @@ val LightBlue = Color(0xFFE0E8FF)
 val MediumBlue = Color(0xFFB7C3E4)
 val BrightBlue = Color(0xFF4242EA)
 val TextGray = Color(0xFF58657E)
+val SearchContentColor = Color(0xFF495479) // Search bar text and icon color
+val SearchPlaceholderColor = Color(0xFF8A92A8) // Lighter placeholder color for search bar
 
 val LightColorScheme = lightColorScheme(
     primary = Primary,

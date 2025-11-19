@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
+    <!--  App branding  -->
+    <string name="app_logo_description">JBCH Market Manager</string>
+
+    <!--  Search bar  -->
+    <string name="search_placeholder">Search For Books</string>
+    <string name="search_icon_description">Search icon</string>
+    <string name="clear_search_description">Clear search</string>
+
     <!--  Item view  -->
     <string name="search_hint">Find item...</string>
     <string name="clear_hint">Clear search</string>

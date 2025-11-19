@@ -1,6 +1,10 @@
 package com.example.jbchretreatstore.bookstore.presentation.navigation
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
@@ -14,7 +18,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -28,7 +34,10 @@ import com.example.jbchretreatstore.bookstore.presentation.ui.itemlist.AddItemDi
 import com.example.jbchretreatstore.bookstore.presentation.ui.itemlist.BottomNavigationBar
 import com.example.jbchretreatstore.bookstore.presentation.ui.itemlist.ItemListScreen
 import com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory.PurchaseHistoryScreen
-import com.example.jbchretreatstore.core.presentation.DarkBlue
+import jbchretreatstore.composeapp.generated.resources.Res
+import jbchretreatstore.composeapp.generated.resources.app_logo_description
+import jbchretreatstore.composeapp.generated.resources.ic_app_logo
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -62,7 +71,17 @@ fun BookStoreNavHost(viewModel: BookStoreViewModel) {
     }
 
     Scaffold(
-        containerColor = DarkBlue,
+        topBar = {
+            Image(
+                modifier = Modifier.fillMaxWidth()
+                    .statusBarsPadding(),
+                painter = painterResource(Res.drawable.ic_app_logo),
+                contentDescription = stringResource(Res.string.app_logo_description),
+                contentScale = ContentScale.Inside,
+                alignment = Alignment.Center
+            )
+        },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             if (currentDestination == BookStoreNavDestination.ItemListScreen) {
