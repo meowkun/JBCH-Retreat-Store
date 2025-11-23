@@ -61,6 +61,10 @@ object Dimensions {
     val divider_thickness: Dp = 1.dp
     val divider_thickness_thick: Dp = 2.dp
 
+    // Border
+    val border_width: Dp = 1.5.dp
+    val border_width_thick: Dp = 2.dp
+
     // Cards
     val card_elevation: Dp = 6.dp
     val card_corner_radius: Dp = 16.dp
@@ -73,7 +77,7 @@ object Dimensions {
 
     // Item List
     val item_card_elevation: Dp = 6.dp
-    val item_card_corner_radius: Dp = 12.dp
+    val item_card_corner_radius: Dp = 14.5.dp
     val item_card_padding: Dp = 16.dp
     val item_spacing: Dp = 12.dp
 

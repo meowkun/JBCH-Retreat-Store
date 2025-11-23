@@ -1,5 +1,6 @@
 package com.example.jbchretreatstore.bookstore.presentation.ui.itemlist
 
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.material.icons.filled.Receipt
@@ -12,10 +13,14 @@ import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavDestination
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -24,7 +29,15 @@ fun BottomNavigationBar(
     currentDestination: BookStoreNavDestination,
     onUserIntent: (BookStoreIntent) -> Unit
 ) {
-    NavigationBar(windowInsets = NavigationBarDefaults.windowInsets) {
+    NavigationBar(
+        modifier = Modifier
+            .shadow(
+                elevation = Dimensions.elevation_l,
+                shape = RoundedCornerShape(Dimensions.corner_radius_l)
+            )
+            .clip(RoundedCornerShape(Dimensions.corner_radius_l)),
+        windowInsets = NavigationBarDefaults.windowInsets
+    ) {
         NavigationBarItem(
             selected = currentDestination == BookStoreNavDestination.CheckoutScreen,
             onClick = {

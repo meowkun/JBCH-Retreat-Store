@@ -20,7 +20,7 @@ import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavDestination
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
-import com.example.jbchretreatstore.bookstore.presentation.utils.toPriceFormatString
+import com.example.jbchretreatstore.bookstore.presentation.utils.toCurrency
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -64,7 +64,7 @@ fun ViewShoppingCartIconButton(
 
             if (totalItems > 0) {
                 Text(
-                    text = "$${checkoutList.sumOf { it.totalPrice }.toPriceFormatString()}",
+                    text = "$${checkoutList.sumOf { it.totalPrice }.toCurrency()}",
                     color = Color.White
                 )
             }

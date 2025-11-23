@@ -17,7 +17,7 @@ import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
-import com.example.jbchretreatstore.bookstore.presentation.utils.toPriceFormatString
+import com.example.jbchretreatstore.bookstore.presentation.utils.toCurrency
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.checkout_view_item_price
 import jbchretreatstore.composeapp.generated.resources.checkout_view_item_quantity
@@ -48,7 +48,7 @@ fun CheckoutItemView(
             Text(
                 text = stringResource(
                     Res.string.checkout_view_item_price,
-                    checkoutItem.totalPrice.toPriceFormatString()
+                    checkoutItem.totalPrice.toCurrency()
                 ),
                 style = MaterialTheme.typography.titleLarge,
             )

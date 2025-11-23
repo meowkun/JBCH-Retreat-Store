@@ -1,7 +1,10 @@
 package com.example.jbchretreatstore.bookstore.presentation.ui.itemlist
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,27 +14,22 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddShoppingCart
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Remove
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,27 +37,33 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewState
-import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
-import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Alpha
+import com.example.jbchretreatstore.bookstore.presentation.ui.shared.Stepper
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Black
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.MediumBlue
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Shapes
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.White
-import com.example.jbchretreatstore.bookstore.presentation.utils.toPriceFormatString
+import com.example.jbchretreatstore.bookstore.presentation.utils.toCurrency
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.add_to_cart
+import jbchretreatstore.composeapp.generated.resources.ic_chevron
+import jbchretreatstore.composeapp.generated.resources.ic_chevron_small
+import jbchretreatstore.composeapp.generated.resources.ic_trash_can
 import jbchretreatstore.composeapp.generated.resources.item_option_menu_selection_hint
 import jbchretreatstore.composeapp.generated.resources.item_price_per_unit
-import jbchretreatstore.composeapp.generated.resources.quantity_label
-import jbchretreatstore.composeapp.generated.resources.total_price_text
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -92,46 +96,44 @@ fun ItemView(
     }
 
     ElevatedCard(
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = Dimensions.item_card_elevation
-        ),
         shape = Shapes.itemCard,
-        modifier = modifier.padding(horizontal = Dimensions.spacing_m)
+        modifier = modifier
+            .padding(horizontal = Dimensions.spacing_m)
+            .border(
+                width = Dimensions.border_width,
+                color = MediumBlue,
+                shape = Shapes.itemCard
+            )
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
-                .background(color = MediumBlue.copy(alpha = Alpha.item_card_background))
+                .background(color = MediumBlue)
                 .animateContentSize(),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth().clickable { expanded = !expanded },
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+            ItemDescriptionView(
+                displayItem = displayItem,
+                checkoutItem = checkoutItem,
+                expanded = expanded
             ) {
-                ItemDescriptionView(
-                    displayItem = displayItem
-                ) {
-                    expanded = !expanded
-                }
-                IconButton(
-                    onClick = { onUserIntent(BookStoreIntent.OnUpdateDialogVisibility(
-                        AlertDialogType.REMOVE_ITEM, true))}
-                ) {
-                    Icon(Icons.Default.Delete, contentDescription = null)
-                }
+                expanded = !expanded
             }
-            if (expanded) {
-                ItemExpandableView(
-                    displayItem = displayItem,
-                    checkoutItem = checkoutItem,
-                    updateCartItem = {
-                        checkoutItem = it
-                    },
-                    onUserIntent = onUserIntent
-                )
-            }
+
+        }
+        if (expanded) {
+            HorizontalDivider(
+                thickness = Dimensions.border_width,
+                color = MediumBlue
+            )
+            ItemExpandableView(
+                displayItem = displayItem,
+                checkoutItem = checkoutItem,
+                updateCartItem = {
+                    checkoutItem = it
+                },
+                onUserIntent = onUserIntent
+            )
         }
     }
 }
@@ -139,29 +141,61 @@ fun ItemView(
 @Composable
 fun ItemDescriptionView(
     displayItem: DisplayItem,
+    checkoutItem: CheckoutItem,
+    expanded: Boolean,
     onItemClicked: () -> Unit = {},
 ) {
-    Column(
-        modifier = Modifier.padding(all = Dimensions.spacing_m)
-            .clickable { onItemClicked.invoke() }
+    val rotationAngle by animateFloatAsState(
+        targetValue = if (expanded) 0f else 180f
+    )
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                onItemClicked.invoke()
+            }
+            .padding(all = Dimensions.spacing_m),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = displayItem.name,
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.weight(1f)
         )
 
-        displayItem.options.forEach { option ->
-            ItemOptionDescription(option)
-        }
+        PriceTag(displayItem.price)
 
+        Image(
+            painter = painterResource(Res.drawable.ic_chevron),
+            contentDescription = null,
+            modifier = Modifier
+                .wrapContentSize()
+                .padding(start = Dimensions.spacing_m)
+                .rotate(rotationAngle)
+        )
+    }
+}
+
+@Composable
+fun PriceTag(
+    price: Double,
+) {
+    Box(
+        modifier = Modifier
+            .background(color = Black, shape = Shapes.priceTag)
+    ) {
         Text(
-            text = stringResource(
-                Res.string.item_price_per_unit,
-                displayItem.price.toPriceFormatString()
+            modifier = Modifier.padding(
+                top = Dimensions.spacing_xs,
+                bottom = Dimensions.spacing_xs,
+                start = Dimensions.spacing_s,
+                end = Dimensions.spacing_s
             ),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.labelLarge
+            text = stringResource(Res.string.item_price_per_unit, price.toCurrency()),
+            style = MaterialTheme.typography.bodyMedium,
+            color = White
         )
     }
 }
@@ -213,17 +247,58 @@ fun ItemExpandableView(
 
         QuantityStepper(
             displayItem = displayItem,
-            checkoutItem = checkoutItem
-        ) {
-            updateCartItem.invoke(it)
-        }
+            checkoutItem = checkoutItem,
+            updateCartItem = updateCartItem
+        )
 
         Spacer(Modifier.height(Dimensions.spacing_m))
 
-        AddToCartView(
-            checkoutItem = checkoutItem,
-            onUserIntent = onUserIntent,
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = {
+                    onUserIntent(
+                        BookStoreIntent.OnUpdateDialogVisibility(
+                            com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType.REMOVE_ITEM,
+                            true
+                        )
+                    )
+                }
+            ) {
+                Image(
+                    painter = painterResource(Res.drawable.ic_trash_can),
+                    contentDescription = "Delete item"
+                )
+            }
+
+            Button(
+                shape = RoundedCornerShape(Dimensions.corner_radius_l),
+                modifier = Modifier
+                    .weight(1f)
+                    .heightIn(min = Dimensions.button_height_l)
+                    .padding(start = Dimensions.spacing_m),
+                onClick = {
+                    onUserIntent(BookStoreIntent.OnAddToCheckoutItem(checkoutItem))
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append(stringResource(Res.string.add_to_cart))
+                        }
+                        append(" Total (${checkoutItem.totalPrice.toCurrency()})")
+                    },
+                    maxLines = 1,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
     }
 }
 
@@ -236,13 +311,17 @@ fun ItemOptionMenu(
     updateCartItem: (CheckoutItem) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val rotationAngle by animateFloatAsState(
+        targetValue = if (expanded) 180f else 0f
+    )
+
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = it },
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.wrapContentSize()
     ) {
-        TextField(
-            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable, true).fillMaxWidth(),
+        OutlinedTextField(
+            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable, true).wrapContentSize(),
             value = checkoutItem.optionsMap[option.optionKey] ?: option.optionValueList.first(),
             onValueChange = { },
             label = {
@@ -254,13 +333,23 @@ fun ItemOptionMenu(
                 )
             },
             readOnly = true,
+            shape = RoundedCornerShape(percent = 50),
             trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                Image(
+                    painter = painterResource(Res.drawable.ic_chevron_small),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .rotate(rotationAngle)
+                )
             }
         )
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .background(MediumBlue)
+                .clip(RoundedCornerShape(Dimensions.corner_radius_m))
         ) {
             option.optionValueList.forEach { value ->
                 DropdownMenuItem(
@@ -286,54 +375,33 @@ fun QuantityStepper(
     checkoutItem: CheckoutItem,
     updateCartItem: (CheckoutItem) -> Unit
 ) {
-    TextField(
-        modifier = Modifier.fillMaxWidth(),
-        value = checkoutItem.quantity.toString(),
-        onValueChange = { },
-        readOnly = true,
-        label = { Text(text = stringResource(Res.string.quantity_label)) },
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Done
-        ),
-        trailingIcon = {
-            Row {
-                IconButton(
-                    onClick = {
-                        val newQuantity = checkoutItem.quantity + 1
-                        updateCartItem.invoke(
-                            checkoutItem.copy(
-                                quantity = newQuantity,
-                                totalPrice = displayItem.price * newQuantity
-                            )
-                        )
-                    }
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = null)
-                }
-
-                IconButton(
-                    onClick = {
-                        if (checkoutItem.quantity <= 1) return@IconButton
-                        val newQuantity = checkoutItem.quantity - 1
-                        updateCartItem.invoke(
-                            checkoutItem.copy(
-                                quantity = newQuantity,
-                                totalPrice = displayItem.price * newQuantity
-                            )
-                        )
-                    }
-                ) {
-                    Icon(Icons.Filled.Remove, contentDescription = null)
-                }
-            }
-        }
+    Stepper(
+        value = checkoutItem.quantity,
+        onDecrement = { newQuantity ->
+            updateCartItem.invoke(
+                checkoutItem.copy(
+                    quantity = newQuantity,
+                    totalPrice = displayItem.price * newQuantity
+                )
+            )
+        },
+        onIncrement = { newQuantity ->
+            updateCartItem.invoke(
+                checkoutItem.copy(
+                    quantity = newQuantity,
+                    totalPrice = displayItem.price * newQuantity
+                )
+            )
+        },
+        minValue = 1
     )
 }
 
 @Composable
-fun AddToCartView(
+fun AddToCartButton(
+    displayItem: DisplayItem,
     checkoutItem: CheckoutItem,
+    updateCartItem: (CheckoutItem) -> Unit,
     onUserIntent: (BookStoreIntent) -> Unit,
 ) {
     Row(
@@ -341,27 +409,34 @@ fun AddToCartView(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            modifier = Modifier.weight(.4f),
-            text = stringResource(
-                Res.string.total_price_text,
-                checkoutItem.totalPrice
-            ),
-            style = MaterialTheme.typography.titleMedium,
+        QuantityStepper(
+            displayItem = displayItem,
+            checkoutItem = checkoutItem,
+            updateCartItem = updateCartItem
         )
 
         Button(
-            modifier = Modifier.weight(.6f),
+            shape = RoundedCornerShape(Dimensions.corner_radius_l),
+            modifier = Modifier
+                .weight(1f)
+                .heightIn(min = Dimensions.button_height_l)
+                .padding(start = Dimensions.spacing_m),
             onClick = {
                 onUserIntent(BookStoreIntent.OnAddToCheckoutItem(checkoutItem))
             },
-        ) {
-            Icon(
-                Icons.Filled.AddShoppingCart,
-                contentDescription = stringResource(Res.string.add_to_cart), // Important for accessibility
-                modifier = Modifier.padding(end = ButtonDefaults.IconSpacing)
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary
             )
-            Text(stringResource(Res.string.add_to_cart))
+        ) {
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                        append(stringResource(Res.string.add_to_cart))
+                    }
+                    append(" (${checkoutItem.totalPrice.toCurrency()})")
+                },
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }
@@ -376,21 +451,21 @@ fun ItemViewPreview() {
             ItemView(
                 state = BookStoreViewState(),
                 displayItem = DisplayItem(
-                price = 40.00,
-                name = "Bible",
-                options = listOf(
-                    DisplayItem.Option(
-                        optionKey = "Language",
-                        optionValueList = listOf("English", "French", "Spanish")
+                    price = 40.00,
+                    name = "Bible",
+                    options = listOf(
+                        DisplayItem.Option(
+                            optionKey = "Language",
+                            optionValueList = listOf("English", "French", "Spanish")
+                        ),
+                        DisplayItem.Option(
+                            optionKey = "Version",
+                            optionValueList = listOf("KJV", "NKJV", "NIV")
+                        ),
                     ),
-                    DisplayItem.Option(
-                        optionKey = "Version",
-                        optionValueList = listOf("KJV", "NKJV", "NIV")
-                    ),
-                ),
-                isInCart = false
-            )
-        ) {}
+                    isInCart = false
+                )
+            ) {}
         }
     }
 }

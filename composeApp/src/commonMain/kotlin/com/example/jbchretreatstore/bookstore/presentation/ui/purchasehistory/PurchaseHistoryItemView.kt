@@ -27,8 +27,8 @@ import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
+import com.example.jbchretreatstore.bookstore.presentation.utils.toCurrency
 import com.example.jbchretreatstore.bookstore.presentation.utils.toFormattedDateString
-import com.example.jbchretreatstore.bookstore.presentation.utils.toPriceFormatString
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.checkout_view_item_price
 import org.jetbrains.compose.resources.stringResource
@@ -82,7 +82,7 @@ fun PurchaseHistoryItemView(
                 Text(
                     text = stringResource(
                         Res.string.checkout_view_item_price,
-                        receipt.checkoutList.sumOf { it.totalPrice }.toPriceFormatString()
+                        receipt.checkoutList.sumOf { it.totalPrice }.toCurrency()
                     ),
                     style = MaterialTheme.typography.titleMedium,
                 )
@@ -134,7 +134,7 @@ fun PurchaseHistoryItemView(
                 Text(
                     text = stringResource(
                         Res.string.checkout_view_item_price,
-                        receipt.checkoutList.sumOf { it.totalPrice }.toPriceFormatString()
+                        receipt.checkoutList.sumOf { it.totalPrice }.toCurrency()
                     ),
                     style = MaterialTheme.typography.titleMedium,
                 )
@@ -160,7 +160,7 @@ private fun PurchaseHistoryCheckoutItem(item: CheckoutItem) {
         Text(
             text = stringResource(
                 Res.string.checkout_view_item_price,
-                item.totalPrice.toPriceFormatString()
+                item.totalPrice.toCurrency()
             ),
             style = MaterialTheme.typography.bodyLarge,
         )

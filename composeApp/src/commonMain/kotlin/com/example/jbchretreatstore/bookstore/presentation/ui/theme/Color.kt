@@ -8,28 +8,28 @@ import androidx.compose.ui.graphics.Color
 val Primary = Color(0xFF4242EA) // Blue primary button color
 val PrimaryContainer = Color(0xFFE0E8FF) // Light blue background
 val OnPrimary = Color(0xFFFFFFFF)
-val OnPrimaryContainer = Color(0xFF58657E)
+val OnPrimaryContainer = Color(0xFF000000) // Black text on light primary container
 
 // Secondary colors
 val Secondary = Color(0xFFB7C3E4) // Light blue-gray for cards
 val SecondaryContainer = Color(0xFFE0E8FF)
-val OnSecondary = Color(0xFF58657E)
-val OnSecondaryContainer = Color(0xFF58657E)
+val OnSecondary = Color(0xFF000000) // Black text on secondary
+val OnSecondaryContainer = Color(0xFF000000) // Black text on secondary container
 
 // Background and Surface
 val Background = Color(0xFFFFFFFF) // White background
 val Surface = Color(0xFFFFFFFF) // White surface
 val SurfaceVariant = Color(0xFFB7C3E4) // Card surface
-val OnBackground = Color(0xFF58657E) // Dark gray text
-val OnSurface = Color(0xFF58657E) // Dark gray text
+val OnBackground = Color(0xFF000000) // Black text
+val OnSurface = Color(0xFF000000) // Black text
 
 // Error
 val Error = Color(0xFFE74C3C)
 val OnError = Color(0xFFFFFFFF)
 
 // Custom colors used in the app
+val Black = Color(0xFF000000)
 val White = Color(0xFFFFFFFF)
-val SandYellow = Color(0xFFFFF8E1) // Keep for backward compatibility
 val LightBlue = Color(0xFFE0E8FF)
 val MediumBlue = Color(0xFFB7C3E4)
 val BrightBlue = Color(0xFF4242EA)

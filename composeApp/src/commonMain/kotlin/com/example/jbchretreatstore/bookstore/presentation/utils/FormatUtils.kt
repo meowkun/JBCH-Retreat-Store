@@ -6,7 +6,7 @@ import kotlinx.datetime.LocalDateTime
  * Formats a Double price value to a string with 2 decimal places.
  * Example: 12.5 -> "12.50", 12 -> "12.00", 12.999 -> "12.99"
  */
-fun Double.toPriceFormatString(): String {
+fun Double.toCurrency(): String {
     val rawPrice = this.toString().split(".")
     val priceInteger = rawPrice[0]
     val priceDecimal = when {
@@ -15,7 +15,7 @@ fun Double.toPriceFormatString(): String {
         rawPrice[1].length > 2 -> rawPrice[1].substring(0, 2)
         else -> rawPrice[1]
     }
-    return "$priceInteger.$priceDecimal"
+    return "$$priceInteger.$priceDecimal"
 }
 
 /**

@@ -1,6 +1,15 @@
 package com.example.jbchretreatstore.bookstore.presentation.ui.checkout
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -9,6 +18,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
@@ -39,7 +50,22 @@ fun CheckoutDialog(
     var buyerName by remember { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = onDismissHandler,
-        title = { Text(stringResource(Res.string.checkout_dialog_buyer_name_title)) },
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        title = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(stringResource(Res.string.checkout_dialog_buyer_name_title))
+                IconButton(onClick = onDismissHandler) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close dialog"
+                    )
+                }
+            }
+        },
         text = {
             OutlinedTextField(
                 value = buyerName,
@@ -55,18 +81,23 @@ fun CheckoutDialog(
             )
         },
         confirmButton = {
-            TextButton(onClick = {
-                if (buyerName.isEmpty()) {
-                    showErrorState = true
-                } else {
-                    onUserIntent.invoke(
-                        BookStoreIntent.OnCheckout(
-                            buyerName = buyerName,
-                            checkoutStatus = checkoutStatus
+            TextButton(
+                onClick = {
+                    if (buyerName.isEmpty()) {
+                        showErrorState = true
+                    } else {
+                        onUserIntent.invoke(
+                            BookStoreIntent.OnCheckout(
+                                buyerName = buyerName,
+                                checkoutStatus = checkoutStatus
+                            )
                         )
-                    )
-                }
-            }) {
+                    }
+                },
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
                 Text(
                     when (checkoutStatus) {
                         CheckoutStatus.CHECKED_OUT -> stringResource(Res.string.checkout_dialog_checkout_button)
@@ -77,7 +108,12 @@ fun CheckoutDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismissHandler) {
+            TextButton(
+                onClick = onDismissHandler,
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
                 Text(stringResource(Res.string.checkout_dialog_cancel_button))
             }
         }

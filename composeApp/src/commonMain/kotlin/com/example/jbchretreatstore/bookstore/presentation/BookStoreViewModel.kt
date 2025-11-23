@@ -79,7 +79,7 @@ class BookStoreViewModel(
                 }
             }
 
-            is BookStoreIntent.OnRemoveDisplayItem -> {
+            is BookStoreIntent.OnDeleteDisplayItem -> {
                 viewModelScope.launch {
                     val result = manageDisplayItemsUseCase.removeDisplayItem(intent.displayItem)
                     result.onSuccess {

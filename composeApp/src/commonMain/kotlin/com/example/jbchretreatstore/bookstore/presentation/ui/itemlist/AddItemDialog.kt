@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +34,7 @@ import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.White
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.add_item_add
 import jbchretreatstore.composeapp.generated.resources.add_item_cancel
@@ -64,7 +67,31 @@ fun AddItemDialog(
                 )
             )
         },
-        title = { Text(stringResource(Res.string.add_item_dialog_title)) },
+        containerColor = White,
+        title = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(stringResource(Res.string.add_item_dialog_title))
+                IconButton(
+                    onClick = {
+                        onUserIntent.invoke(
+                            BookStoreIntent.OnUpdateDialogVisibility(
+                                AlertDialogType.ADD_ITEM,
+                                false
+                            )
+                        )
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close dialog"
+                    )
+                }
+            }
+        },
         text = {
             Column(
                 modifier = Modifier.fillMaxWidth()
@@ -81,7 +108,8 @@ fun AddItemDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = {
+            TextButton(
+                onClick = {
                 if (viewState.displayAddOptionView) {
                     val isOptionValid =
                         viewState.newItemOption.optionKey.isNotBlank() && viewState.newItemOption.optionValueList.isNotEmpty()
@@ -110,12 +138,17 @@ fun AddItemDialog(
                         )
                     }
                 }
-            }) {
+                },
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
                 Text(confirmButtonText)
             }
         },
         dismissButton = {
-            TextButton(onClick = {
+            TextButton(
+                onClick = {
                 if (viewState.displayAddOptionView) {
                     viewState = viewState.copy(
                         displayAddOptionView = false,
@@ -130,7 +163,11 @@ fun AddItemDialog(
                         )
                     )
                 }
-            }) {
+                },
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
                 Text(stringResource(Res.string.add_item_cancel))
             }
         }
