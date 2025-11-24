@@ -62,6 +62,7 @@ object Dimensions {
     val divider_thickness_thick: Dp = 2.dp
 
     // Border
+    val border_width_thin: Dp = 0.5.dp
     val border_width: Dp = 1.5.dp
     val border_width_thick: Dp = 2.dp
 

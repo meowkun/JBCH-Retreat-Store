@@ -79,4 +79,12 @@
     <!-- Stepper component -->
     <string name="stepper_decrease">Decrease</string>
     <string name="stepper_increase">Increase</string>
+
+    <!-- Checkout button -->
+    <string name="check_cart_button">Check Cart</string>
+    <string name="cart_icon_description">Cart icon</string>
+
+    <!-- Bottom Navigation -->
+    <string name="bottom_nav_shop">Shop</string>
+    <string name="bottom_nav_receipt">Receipt</string>
 </resources>

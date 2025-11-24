@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.presentation.ui.checkout
+package com.example.jbchretreatstore.bookstore.presentation.ui.dialog
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

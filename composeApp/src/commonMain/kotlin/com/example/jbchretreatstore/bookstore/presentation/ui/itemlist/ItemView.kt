@@ -48,6 +48,7 @@ import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewState
+import com.example.jbchretreatstore.bookstore.presentation.ui.dialog.RemoveItemDialog
 import com.example.jbchretreatstore.bookstore.presentation.ui.shared.Stepper
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Black
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
@@ -295,7 +296,7 @@ fun ItemExpandableView(
                         append(" Total (${checkoutItem.totalPrice.toCurrency()})")
                     },
                     maxLines = 1,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.titleMedium
                 )
             }
         }

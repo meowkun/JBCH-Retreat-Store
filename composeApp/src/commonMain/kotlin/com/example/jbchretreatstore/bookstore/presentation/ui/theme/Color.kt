@@ -32,10 +32,10 @@ val Black = Color(0xFF000000)
 val White = Color(0xFFFFFFFF)
 val LightBlue = Color(0xFFE0E8FF)
 val MediumBlue = Color(0xFFB7C3E4)
-val BrightBlue = Color(0xFF4242EA)
 val TextGray = Color(0xFF58657E)
 val SearchContentColor = Color(0xFF495479) // Search bar text and icon color
 val SearchPlaceholderColor = Color(0xFF8A92A8) // Lighter placeholder color for search bar
+val UnselectedIconColor = Color(0xFF000000) // Unselected icon button color (Black)
 
 val LightColorScheme = lightColorScheme(
     primary = Primary,

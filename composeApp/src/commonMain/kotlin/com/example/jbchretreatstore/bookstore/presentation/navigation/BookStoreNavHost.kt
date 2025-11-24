@@ -1,15 +1,13 @@
 package com.example.jbchretreatstore.bookstore.presentation.navigation
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -28,12 +26,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewModel
-import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.presentation.ui.checkout.CheckoutScreen
-import com.example.jbchretreatstore.bookstore.presentation.ui.itemlist.AddItemDialog
-import com.example.jbchretreatstore.bookstore.presentation.ui.itemlist.BottomNavigationBar
+import com.example.jbchretreatstore.bookstore.presentation.ui.dialog.AddItemDialog
 import com.example.jbchretreatstore.bookstore.presentation.ui.itemlist.ItemListScreen
 import com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory.PurchaseHistoryScreen
+import com.example.jbchretreatstore.bookstore.presentation.ui.shared.BottomNavigationBar
+import com.example.jbchretreatstore.bookstore.presentation.ui.shared.CheckoutButton
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.app_logo_description
 import jbchretreatstore.composeapp.generated.resources.ic_app_logo
@@ -84,33 +83,38 @@ fun BookStoreNavHost(viewModel: BookStoreViewModel) {
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
-            if (currentDestination == BookStoreNavDestination.ItemListScreen) {
-                FloatingActionButton(
-                    onClick = {
-                        viewModel.onUserIntent(
-                            BookStoreIntent.OnUpdateDialogVisibility(
-                                AlertDialogType.ADD_ITEM,
-                                true
-                            ),
-                            navigator
-                        )
-                    },
-                    containerColor = MaterialTheme.colorScheme.primary
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_m)
+            ) {
+                // Checkout button - only visible when there are items in cart
+                if (state.currentCheckoutList.checkoutList.isNotEmpty() &&
+                    currentDestination != BookStoreNavDestination.CheckoutScreen
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = null)
+                    CheckoutButton(
+                        itemCount = state.currentCheckoutList.checkoutList.sumOf { it.quantity },
+                        onClick = {
+                            viewModel.onUserIntent(
+                                BookStoreIntent.OnNavigate(BookStoreNavDestination.CheckoutScreen),
+                                navigator
+                            )
+                        }
+                    )
+                }
+
+                // Bottom Navigation Bar - visible when not on checkout screen
+                if (currentDestination != BookStoreNavDestination.CheckoutScreen) {
+                    BottomNavigationBar(
+                        currentDestination = currentDestination,
+                        onUserIntent = { intent ->
+                            viewModel.onUserIntent(intent, navigator)
+                        },
+                        modifier = Modifier.padding(bottom = Dimensions.spacing_xxl)
+                    )
                 }
             }
         },
-        bottomBar = {
-            if (currentDestination != BookStoreNavDestination.CheckoutScreen) {
-                BottomNavigationBar(
-                    saveForLaterCount = state.saveForLaterList.size,
-                    currentDestination = currentDestination
-                ) { intent ->
-                    viewModel.onUserIntent(intent, navigator)
-                }
-            }
-        }
+        floatingActionButtonPosition = FabPosition.Center
     ) { innerPadding ->
         NavHost(
             modifier = Modifier.padding(innerPadding),

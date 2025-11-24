@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.presentation.ui.itemlist
+package com.example.jbchretreatstore.bookstore.presentation.ui.dialog
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
@@ -32,6 +32,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
+import com.example.jbchretreatstore.bookstore.presentation.ui.itemlist.AddItemState
+import com.example.jbchretreatstore.bookstore.presentation.ui.itemlist.ItemOptionDescription
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.White
