@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.presentation.ui.itemlist
+package com.example.jbchretreatstore.bookstore.presentation.ui.shop
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,7 +18,7 @@ import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun ItemListScreen(
+fun ShopScreen(
     state: BookStoreViewState,
     onUserIntent: (BookStoreIntent) -> Unit,
 ) {
@@ -41,7 +41,7 @@ fun ItemListScreen(
             ItemListView(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(vertical = Dimensions.spacing_m),
+                    .padding(Dimensions.spacing_m),
                 displayItemList = state.searchedItemList,
                 onUserIntent = onUserIntent,
                 state = state
@@ -52,9 +52,9 @@ fun ItemListScreen(
 
 @Preview
 @Composable
-fun ItemListScreenPreview() {
+fun ShopScreenPreview() {
     BookStoreTheme {
-        ItemListScreen(
+        ShopScreen(
             state = BookStoreViewState(
                 displayItemList = listOf(
                     DisplayItem(

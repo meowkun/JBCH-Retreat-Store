@@ -61,7 +61,7 @@ fun CheckoutScreen(
     val radioOptions = listOf(ZELLE, VENMO, CASH)
     val selectedOption = remember { mutableStateOf(radioOptions[2]) }
     if (state.currentCheckoutList.checkoutList.isEmpty()) {
-        onUserIntent.invoke(BookStoreIntent.OnNavigate(BookStoreNavDestination.ItemListScreen))
+        onUserIntent.invoke(BookStoreIntent.OnNavigate(BookStoreNavDestination.ShopScreen))
     }
     var checkoutStatus by remember { mutableStateOf(CheckoutStatus.PENDING) }
     Surface(

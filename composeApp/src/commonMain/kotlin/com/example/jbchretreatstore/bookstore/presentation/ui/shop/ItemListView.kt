@@ -1,10 +1,9 @@
-package com.example.jbchretreatstore.bookstore.presentation.ui.itemlist
+package com.example.jbchretreatstore.bookstore.presentation.ui.shop
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -23,8 +22,7 @@ import kotlin.uuid.ExperimentalUuidApi
 @OptIn(ExperimentalUuidApi::class)
 @Composable
 fun ItemListView(
-    modifier: Modifier = Modifier.fillMaxWidth()
-        .padding(vertical = Dimensions.spacing_m),
+    modifier: Modifier = Modifier.fillMaxWidth(),
     displayItemList: List<DisplayItem>,
     onUserIntent: (BookStoreIntent) -> Unit,
     scrollState: LazyListState = rememberLazyListState(),
@@ -40,8 +38,7 @@ fun ItemListView(
             ItemView(
                 state = state,
                 displayItem = item,
-                modifier = Modifier.fillParentMaxWidth()
-                    .padding(horizontal = Dimensions.spacing_m),
+                modifier = Modifier.fillParentMaxWidth(),
                 onUserIntent = onUserIntent
             )
         }

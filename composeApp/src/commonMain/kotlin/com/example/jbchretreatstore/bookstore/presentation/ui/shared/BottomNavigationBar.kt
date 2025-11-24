@@ -65,9 +65,9 @@ fun BottomNavigationBar(
         CustomIconButton(
             painter = painterResource(Res.drawable.ic_shop),
             text = stringResource(Res.string.bottom_nav_shop),
-            isSelected = currentDestination == BookStoreNavDestination.ItemListScreen,
+            isSelected = currentDestination == BookStoreNavDestination.ShopScreen,
             onClick = {
-                onUserIntent(BookStoreIntent.OnNavigate(BookStoreNavDestination.ItemListScreen))
+                onUserIntent(BookStoreIntent.OnNavigate(BookStoreNavDestination.ShopScreen))
             }
         )
 
@@ -87,7 +87,7 @@ fun BottomNavigationBar(
 fun BottomNavigationBarPreview() {
     BookStoreTheme {
         BottomNavigationBar(
-            currentDestination = BookStoreNavDestination.ItemListScreen,
+            currentDestination = BookStoreNavDestination.ShopScreen,
             onUserIntent = {}
         )
     }

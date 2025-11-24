@@ -32,8 +32,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
-import com.example.jbchretreatstore.bookstore.presentation.ui.itemlist.AddItemState
-import com.example.jbchretreatstore.bookstore.presentation.ui.itemlist.ItemOptionDescription
+import com.example.jbchretreatstore.bookstore.presentation.ui.shop.AddItemState
+import com.example.jbchretreatstore.bookstore.presentation.ui.shop.ItemOptionDescription
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.White
