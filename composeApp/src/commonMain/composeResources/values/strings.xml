@@ -22,9 +22,9 @@
 
     <!--  Add item dialog  -->
     <string name="add_item_dialog_title">Add New Item</string>
-    <string name="add_item_name_label">Item name</string>
-    <string name="add_item_price_label">Item price</string>
-    <string name="add_item_options_label">Add Item options:</string>
+    <string name="add_item_name_place_holder">e.g. The Bible</string>
+    <string name="add_item_price_place_holder">e.g. 37.99</string>
+    <string name="add_item_options_label">Item variants:</string>
     <string name="add_item_options_key">Option key</string>
     <string name="add_item_options_value">Option value</string>
     <string name="add_item_cancel">Cancel</string>

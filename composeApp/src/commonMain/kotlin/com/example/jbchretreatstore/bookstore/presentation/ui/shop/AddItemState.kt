@@ -4,8 +4,9 @@ import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 
 data class AddItemState (
     val newItem: DisplayItem = DisplayItem(),
-    val newItemOption: DisplayItem.Option = DisplayItem.Option(),
+    val newItemVariant: DisplayItem.Variant = DisplayItem.Variant(),
     val displayAddOptionView: Boolean = false,
-    val showAddItemError: Boolean = false,
+    val showItemNameError: Boolean = false,
+    val showItemPriceError: Boolean = false,
     val showAddOptionError: Boolean = false
 )

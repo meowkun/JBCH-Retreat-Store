@@ -10,7 +10,7 @@ object CheckoutItemMapper {
             id = dto.id,
             itemName = dto.itemName,
             quantity = dto.quantity,
-            optionsMap = dto.optionsMap,
+            variantsMap = dto.optionsMap,
             totalPrice = dto.totalPrice
         )
     }
@@ -20,7 +20,7 @@ object CheckoutItemMapper {
             id = domain.id,
             itemName = domain.itemName,
             quantity = domain.quantity,
-            optionsMap = domain.optionsMap,
+            optionsMap = domain.variantsMap,
             totalPrice = domain.totalPrice
         )
     }

@@ -30,6 +30,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +54,7 @@ import com.example.jbchretreatstore.bookstore.presentation.ui.shared.Stepper
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Black
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions.corner_radius_percent_l
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.MediumBlue
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Shapes
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.White
@@ -81,8 +83,8 @@ fun ItemView(
         mutableStateOf(
             CheckoutItem(
                 itemName = displayItem.name,
-                optionsMap = displayItem.options.associate {
-                    it.optionKey to it.optionValueList.first()
+                variantsMap = displayItem.variants.associate {
+                    it.key to it.valueList.first()
                 }.toMutableMap(),
                 totalPrice = displayItem.price
             )
@@ -202,21 +204,21 @@ fun PriceTag(
 }
 
 @Composable
-fun ItemOptionDescription(option: DisplayItem.Option) {
+fun ItemOptionDescription(variant: DisplayItem.Variant) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "${option.optionKey}: ",
+            text = "${variant.key}: ",
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.labelLarge
         )
         FlowRow(
             verticalArrangement = Arrangement.Center
         ) {
-            option.optionValueList.forEachIndexed { index, value ->
+            variant.valueList.forEachIndexed { index, value ->
                 Text(
-                    text = if (index == option.optionValueList.lastIndex) value else "$value, ",
+                    text = if (index == variant.valueList.lastIndex) value else "$value, ",
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -237,9 +239,9 @@ fun ItemExpandableView(
             all = Dimensions.spacing_m
         )
     ) {
-        displayItem.options.forEachIndexed { index, option ->
+        displayItem.variants.forEachIndexed { index, option ->
             ItemOptionMenu(
-                option = option,
+                variant = option,
                 checkoutItem = checkoutItem,
                 updateCartItem = updateCartItem
             )
@@ -306,7 +308,7 @@ fun ItemExpandableView(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemOptionMenu(
-    option: DisplayItem.Option,
+    variant: DisplayItem.Variant,
     checkoutItem: CheckoutItem,
     modifier: Modifier = Modifier,
     updateCartItem: (CheckoutItem) -> Unit
@@ -323,18 +325,24 @@ fun ItemOptionMenu(
     ) {
         OutlinedTextField(
             modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable, true).wrapContentSize(),
-            value = checkoutItem.optionsMap[option.optionKey] ?: option.optionValueList.first(),
+            value = checkoutItem.variantsMap[variant.key] ?: variant.valueList.first(),
             onValueChange = { },
             label = {
                 Text(
                     stringResource(
                         Res.string.item_option_menu_selection_hint,
-                        option.optionKey
+                        variant.key
                     )
                 )
             },
             readOnly = true,
-            shape = RoundedCornerShape(percent = 50),
+            shape = RoundedCornerShape(corner_radius_percent_l),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = White,
+                unfocusedContainerColor = White,
+                focusedIndicatorColor = MaterialTheme.colorScheme.secondary,
+                unfocusedIndicatorColor = MaterialTheme.colorScheme.secondary
+            ),
             trailingIcon = {
                 Image(
                     painter = painterResource(Res.drawable.ic_chevron_small),
@@ -352,15 +360,15 @@ fun ItemOptionMenu(
                 .background(MediumBlue)
                 .clip(RoundedCornerShape(Dimensions.corner_radius_m))
         ) {
-            option.optionValueList.forEach { value ->
+            variant.valueList.forEach { value ->
                 DropdownMenuItem(
                     text = { Text(value) },
                     onClick = {
-                        val updatedOptions = checkoutItem.optionsMap.toMutableMap()
-                        updatedOptions[option.optionKey] = value
+                        val updatedOptions = checkoutItem.variantsMap.toMutableMap()
+                        updatedOptions[variant.key] = value
 
                         updateCartItem.invoke(
-                            checkoutItem.copy(optionsMap = updatedOptions.toMap())
+                            checkoutItem.copy(variantsMap = updatedOptions.toMap())
                         )
                         expanded = false
                     }
@@ -454,14 +462,14 @@ fun ItemViewPreview() {
                 displayItem = DisplayItem(
                     price = 40.00,
                     name = "Bible",
-                    options = listOf(
-                        DisplayItem.Option(
-                            optionKey = "Language",
-                            optionValueList = listOf("English", "French", "Spanish")
+                    variants = listOf(
+                        DisplayItem.Variant(
+                            key = "Language",
+                            valueList = listOf("English", "French", "Spanish")
                         ),
-                        DisplayItem.Option(
-                            optionKey = "Version",
-                            optionValueList = listOf("KJV", "NKJV", "NIV")
+                        DisplayItem.Variant(
+                            key = "Version",
+                            valueList = listOf("KJV", "NKJV", "NIV")
                         ),
                     ),
                     isInCart = false

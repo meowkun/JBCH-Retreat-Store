@@ -3,8 +3,6 @@ package com.example.jbchretreatstore.bookstore.presentation.ui.dialog
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -19,12 +17,15 @@ import androidx.compose.ui.text.style.TextAlign
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Black
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import jbchretreatstore.composeapp.generated.resources.Res
+import jbchretreatstore.composeapp.generated.resources.ic_close
 import jbchretreatstore.composeapp.generated.resources.remove_item_cancel
 import jbchretreatstore.composeapp.generated.resources.remove_item_dialog_message
 import jbchretreatstore.composeapp.generated.resources.remove_item_dialog_title
 import jbchretreatstore.composeapp.generated.resources.remove_item_remove
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -54,7 +55,7 @@ fun RemoveItemDialog(
                     }
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Close,
+                        painter = painterResource(Res.drawable.ic_close),
                         contentDescription = "Close dialog"
                     )
                 }
@@ -62,7 +63,9 @@ fun RemoveItemDialog(
         },
         text = {
             Text(
-                stringResource(
+                style = MaterialTheme.typography.bodyMedium,
+                color = Black,
+                text = stringResource(
                     Res.string.remove_item_dialog_message,
                     displayItem.name
                 ),

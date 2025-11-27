@@ -29,8 +29,20 @@ class ManageDisplayItemsUseCaseTest {
     fun `getDisplayItems should return flow of items`() = runTest {
         // Given
         val items = listOf(
-            DisplayItem(id = Uuid.random(), name = "Item 1", price = 10.0, options = emptyList(), isInCart = false),
-            DisplayItem(id = Uuid.random(), name = "Item 2", price = 20.0, options = emptyList(), isInCart = false)
+            DisplayItem(
+                id = Uuid.random(),
+                name = "Item 1",
+                price = 10.0,
+                variants = emptyList(),
+                isInCart = false
+            ),
+            DisplayItem(
+                id = Uuid.random(),
+                name = "Item 2",
+                price = 20.0,
+                variants = emptyList(),
+                isInCart = false
+            )
         )
         repository.seedDisplayItems(items)
 
@@ -50,7 +62,7 @@ class ManageDisplayItemsUseCaseTest {
             id = Uuid.random(),
             name = "New Item",
             price = 15.0,
-            options = emptyList(),
+            variants = emptyList(),
             isInCart = false
         )
 
@@ -70,7 +82,7 @@ class ManageDisplayItemsUseCaseTest {
             id = Uuid.random(),
             name = "",
             price = 15.0,
-            options = emptyList(),
+            variants = emptyList(),
             isInCart = false
         )
 
@@ -89,7 +101,7 @@ class ManageDisplayItemsUseCaseTest {
             id = Uuid.random(),
             name = "   ",
             price = 15.0,
-            options = emptyList(),
+            variants = emptyList(),
             isInCart = false
         )
 
@@ -108,7 +120,7 @@ class ManageDisplayItemsUseCaseTest {
             id = Uuid.random(),
             name = "Item",
             price = 0.0,
-            options = emptyList(),
+            variants = emptyList(),
             isInCart = false
         )
 
@@ -127,7 +139,7 @@ class ManageDisplayItemsUseCaseTest {
             id = Uuid.random(),
             name = "Item",
             price = -10.0,
-            options = emptyList(),
+            variants = emptyList(),
             isInCart = false
         )
 
@@ -146,7 +158,7 @@ class ManageDisplayItemsUseCaseTest {
             id = Uuid.random(),
             name = "Existing Item",
             price = 10.0,
-            options = emptyList(),
+            variants = emptyList(),
             isInCart = false
         )
         repository.seedDisplayItems(listOf(existingItem))
@@ -155,7 +167,7 @@ class ManageDisplayItemsUseCaseTest {
             id = Uuid.random(),
             name = "existing item",
             price = 15.0,
-            options = emptyList(),
+            variants = emptyList(),
             isInCart = false
         )
 
@@ -174,7 +186,7 @@ class ManageDisplayItemsUseCaseTest {
             id = Uuid.random(),
             name = "Item to Remove",
             price = 10.0,
-            options = emptyList(),
+            variants = emptyList(),
             isInCart = false
         )
         repository.seedDisplayItems(listOf(item))
@@ -194,7 +206,7 @@ class ManageDisplayItemsUseCaseTest {
             id = Uuid.random(),
             name = "Non-existing",
             price = 10.0,
-            options = emptyList(),
+            variants = emptyList(),
             isInCart = false
         )
 
@@ -214,7 +226,7 @@ class ManageDisplayItemsUseCaseTest {
             id = itemId,
             name = "Original",
             price = 10.0,
-            options = emptyList(),
+            variants = emptyList(),
             isInCart = false
         )
         repository.seedDisplayItems(listOf(originalItem))
@@ -238,7 +250,7 @@ class ManageDisplayItemsUseCaseTest {
             id = Uuid.random(),
             name = "Non-existing",
             price = 10.0,
-            options = emptyList(),
+            variants = emptyList(),
             isInCart = false
         )
 
@@ -254,8 +266,20 @@ class ManageDisplayItemsUseCaseTest {
     fun `searchItems with empty query should return all items`() = runTest {
         // Given
         val items = listOf(
-            DisplayItem(id = Uuid.random(), name = "Apple", price = 10.0, options = emptyList(), isInCart = false),
-            DisplayItem(id = Uuid.random(), name = "Banana", price = 20.0, options = emptyList(), isInCart = false)
+            DisplayItem(
+                id = Uuid.random(),
+                name = "Apple",
+                price = 10.0,
+                variants = emptyList(),
+                isInCart = false
+            ),
+            DisplayItem(
+                id = Uuid.random(),
+                name = "Banana",
+                price = 20.0,
+                variants = emptyList(),
+                isInCart = false
+            )
         )
         repository.seedDisplayItems(items)
 
@@ -270,9 +294,27 @@ class ManageDisplayItemsUseCaseTest {
     fun `searchItems with query should return matching items case insensitive`() = runTest {
         // Given
         val items = listOf(
-            DisplayItem(id = Uuid.random(), name = "Apple Juice", price = 10.0, options = emptyList(), isInCart = false),
-            DisplayItem(id = Uuid.random(), name = "Banana Smoothie", price = 20.0, options = emptyList(), isInCart = false),
-            DisplayItem(id = Uuid.random(), name = "Orange Juice", price = 15.0, options = emptyList(), isInCart = false)
+            DisplayItem(
+                id = Uuid.random(),
+                name = "Apple Juice",
+                price = 10.0,
+                variants = emptyList(),
+                isInCart = false
+            ),
+            DisplayItem(
+                id = Uuid.random(),
+                name = "Banana Smoothie",
+                price = 20.0,
+                variants = emptyList(),
+                isInCart = false
+            ),
+            DisplayItem(
+                id = Uuid.random(),
+                name = "Orange Juice",
+                price = 15.0,
+                variants = emptyList(),
+                isInCart = false
+            )
         )
         repository.seedDisplayItems(items)
 
@@ -289,8 +331,20 @@ class ManageDisplayItemsUseCaseTest {
     fun `searchItems with no matching query should return empty list`() = runTest {
         // Given
         val items = listOf(
-            DisplayItem(id = Uuid.random(), name = "Apple", price = 10.0, options = emptyList(), isInCart = false),
-            DisplayItem(id = Uuid.random(), name = "Banana", price = 20.0, options = emptyList(), isInCart = false)
+            DisplayItem(
+                id = Uuid.random(),
+                name = "Apple",
+                price = 10.0,
+                variants = emptyList(),
+                isInCart = false
+            ),
+            DisplayItem(
+                id = Uuid.random(),
+                name = "Banana",
+                price = 20.0,
+                variants = emptyList(),
+                isInCart = false
+            )
         )
         repository.seedDisplayItems(items)
 

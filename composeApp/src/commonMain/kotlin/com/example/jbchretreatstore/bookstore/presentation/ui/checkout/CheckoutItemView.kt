@@ -53,9 +53,9 @@ fun CheckoutItemView(
                 style = MaterialTheme.typography.titleLarge,
             )
         }
-        if (checkoutItem.optionsMap.isNotEmpty()) {
+        if (checkoutItem.variantsMap.isNotEmpty()) {
             Text(
-                text = checkoutItem.optionsMap.entries.joinToString { "${it.key}: ${it.value}" },
+                text = checkoutItem.variantsMap.entries.joinToString { "${it.key}: ${it.value}" },
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray
             )
@@ -100,7 +100,7 @@ fun CheckoutItemViewPreview() {
                 itemName = "T-shirt",
                 quantity = 2,
                 totalPrice = 15.00,
-                optionsMap = mutableMapOf("Size" to "M", "Color" to "Red")
+                variantsMap = mutableMapOf("Size" to "M", "Color" to "Red")
             ),
         ) {}
     }

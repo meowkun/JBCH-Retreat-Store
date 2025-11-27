@@ -23,6 +23,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.MediumBlue
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.SearchContentColor
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.SearchPlaceholderColor
@@ -47,7 +48,7 @@ fun ItemSearchBar(
         onValueChange = { query ->
             onUserIntent(BookStoreIntent.OnSearchQueryChange(query))
         },
-        shape = RoundedCornerShape(percent = 50),
+        shape = RoundedCornerShape(percent = Dimensions.corner_radius_percent_l),
         colors = OutlinedTextFieldDefaults.colors(
             focusedTextColor = SearchContentColor,
             unfocusedTextColor = SearchContentColor,

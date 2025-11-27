@@ -10,10 +10,10 @@ object DisplayItemMapper {
             id = dto.id,
             name = dto.name,
             price = dto.price,
-            options = dto.options.map { optionDto ->
-                DisplayItem.Option(
-                    optionKey = optionDto.optionKey,
-                    optionValueList = optionDto.optionValueList
+            variants = dto.options.map { optionDto ->
+                DisplayItem.Variant(
+                    key = optionDto.optionKey,
+                    valueList = optionDto.optionValueList
                 )
             },
             isInCart = dto.isInCart
@@ -25,10 +25,10 @@ object DisplayItemMapper {
             id = domain.id,
             name = domain.name,
             price = domain.price,
-            options = domain.options.map { option ->
+            options = domain.variants.map { option ->
                 DisplayItemDto.OptionDto(
-                    optionKey = option.optionKey,
-                    optionValueList = option.optionValueList
+                    optionKey = option.key,
+                    optionValueList = option.valueList
                 )
             },
             isInCart = domain.isInCart

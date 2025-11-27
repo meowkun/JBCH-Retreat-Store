@@ -32,9 +32,9 @@ class CheckoutItemMapperTest {
         assertEquals(id, domain.id)
         assertEquals("Coffee", domain.itemName)
         assertEquals(3, domain.quantity)
-        assertEquals(2, domain.optionsMap.size)
-        assertEquals("Large", domain.optionsMap["size"])
-        assertEquals("Yes", domain.optionsMap["sugar"])
+        assertEquals(2, domain.variantsMap.size)
+        assertEquals("Large", domain.variantsMap["size"])
+        assertEquals("Yes", domain.variantsMap["sugar"])
         assertEquals(15.0, domain.totalPrice)
     }
 
@@ -53,7 +53,7 @@ class CheckoutItemMapperTest {
         val domain = CheckoutItemMapper.toDomain(dto)
 
         // Then
-        assertEquals(0, domain.optionsMap.size)
+        assertEquals(0, domain.variantsMap.size)
     }
 
     @Test
@@ -78,10 +78,10 @@ class CheckoutItemMapperTest {
         val domain = CheckoutItemMapper.toDomain(dto)
 
         // Then
-        assertEquals(5, domain.optionsMap.size)
-        assertEquals("Large", domain.optionsMap["size"])
-        assertEquals("Blue", domain.optionsMap["color"])
-        assertEquals("Cotton", domain.optionsMap["material"])
+        assertEquals(5, domain.variantsMap.size)
+        assertEquals("Large", domain.variantsMap["size"])
+        assertEquals("Blue", domain.variantsMap["color"])
+        assertEquals("Cotton", domain.variantsMap["material"])
     }
 
     @Test
@@ -96,7 +96,7 @@ class CheckoutItemMapperTest {
         assertNotNull(domain.id)
         assertEquals("", domain.itemName)
         assertEquals(1, domain.quantity)
-        assertEquals(0, domain.optionsMap.size)
+        assertEquals(0, domain.variantsMap.size)
         assertEquals(0.0, domain.totalPrice)
     }
 
@@ -110,7 +110,7 @@ class CheckoutItemMapperTest {
             id = id,
             itemName = "Coffee",
             quantity = 3,
-            optionsMap = mapOf("size" to "Large", "sugar" to "Yes"),
+            variantsMap = mapOf("size" to "Large", "sugar" to "Yes"),
             totalPrice = 15.0
         )
 
@@ -134,7 +134,7 @@ class CheckoutItemMapperTest {
             id = Uuid.random(),
             itemName = "Simple Item",
             quantity = 1,
-            optionsMap = emptyMap(),
+            variantsMap = emptyMap(),
             totalPrice = 10.0
         )
 
@@ -157,7 +157,7 @@ class CheckoutItemMapperTest {
             id = Uuid.random(),
             itemName = "Complex Item",
             quantity = 2,
-            optionsMap = options,
+            variantsMap = options,
             totalPrice = 100.0
         )
 
@@ -203,7 +203,7 @@ class CheckoutItemMapperTest {
             id = Uuid.random(),
             itemName = "Test Item",
             quantity = 5,
-            optionsMap = mapOf("option1" to "value1", "option2" to "value2"),
+            variantsMap = mapOf("option1" to "value1", "option2" to "value2"),
             totalPrice = 50.0
         )
 
@@ -215,7 +215,7 @@ class CheckoutItemMapperTest {
         assertEquals(originalDomain.id, resultDomain.id)
         assertEquals(originalDomain.itemName, resultDomain.itemName)
         assertEquals(originalDomain.quantity, resultDomain.quantity)
-        assertEquals(originalDomain.optionsMap, resultDomain.optionsMap)
+        assertEquals(originalDomain.variantsMap, resultDomain.variantsMap)
         assertEquals(originalDomain.totalPrice, resultDomain.totalPrice)
     }
 
@@ -373,8 +373,8 @@ class CheckoutItemMapperTest {
         val domain = CheckoutItemMapper.toDomain(dto)
 
         // Then
-        assertEquals("value!@#$%", domain.optionsMap["special@key#1"])
-        assertEquals("emoji_🎉", domain.optionsMap["unicode_😀"])
+        assertEquals("value!@#$%", domain.variantsMap["special@key#1"])
+        assertEquals("emoji_🎉", domain.variantsMap["unicode_😀"])
     }
 }
 

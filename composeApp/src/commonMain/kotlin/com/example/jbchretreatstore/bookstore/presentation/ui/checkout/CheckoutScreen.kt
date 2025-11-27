@@ -85,7 +85,7 @@ fun CheckoutScreen(
             ) {
                 items(
                     items = state.currentCheckoutList.checkoutList,
-                    key = { "${it.id}_${it.optionsMap.hashCode()}" }) { item ->
+                    key = { "${it.id}_${it.variantsMap.hashCode()}" }) { item ->
                     CheckoutItemView(
                         checkoutItem = item,
                         onUserIntent = onUserIntent

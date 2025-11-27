@@ -7,12 +7,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -20,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
@@ -36,17 +40,21 @@ import com.example.jbchretreatstore.bookstore.presentation.ui.shop.AddItemState
 import com.example.jbchretreatstore.bookstore.presentation.ui.shop.ItemOptionDescription
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions.corner_radius_percent_m
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.LabelGray
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.White
+import com.example.jbchretreatstore.bookstore.presentation.utils.filterNumericInputWithMaxDecimals
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.add_item_add
-import jbchretreatstore.composeapp.generated.resources.add_item_cancel
 import jbchretreatstore.composeapp.generated.resources.add_item_dialog_title
-import jbchretreatstore.composeapp.generated.resources.add_item_name_label
+import jbchretreatstore.composeapp.generated.resources.add_item_name_place_holder
 import jbchretreatstore.composeapp.generated.resources.add_item_options_key
 import jbchretreatstore.composeapp.generated.resources.add_item_options_label
 import jbchretreatstore.composeapp.generated.resources.add_item_options_value
-import jbchretreatstore.composeapp.generated.resources.add_item_price_label
+import jbchretreatstore.composeapp.generated.resources.add_item_price_place_holder
 import jbchretreatstore.composeapp.generated.resources.add_item_save
+import jbchretreatstore.composeapp.generated.resources.ic_close
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -79,7 +87,7 @@ fun AddItemDialog(
                 Text(stringResource(Res.string.add_item_dialog_title))
                 IconButton(
                     onClick = {
-                        onUserIntent.invoke(
+                        onUserIntent(
                             BookStoreIntent.OnUpdateDialogVisibility(
                                 AlertDialogType.ADD_ITEM,
                                 false
@@ -88,7 +96,7 @@ fun AddItemDialog(
                     }
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Close,
+                        painter = painterResource(Res.drawable.ic_close),
                         contentDescription = "Close dialog"
                     )
                 }
@@ -103,74 +111,58 @@ fun AddItemDialog(
                         viewState = it
                     }
                 } else {
-                    viewState.AddItemContent {
-                        viewState = it
-                    }
+                    viewState.AddItemContent(
+                        updateViewState = { viewState = it },
+                        onUserIntent = onUserIntent
+                    )
                 }
             }
         },
         confirmButton = {
-            TextButton(
-                onClick = {
-                if (viewState.displayAddOptionView) {
-                    val isOptionValid =
-                        viewState.newItemOption.optionKey.isNotBlank() && viewState.newItemOption.optionValueList.isNotEmpty()
-                    viewState = if (isOptionValid) {
-                        viewState.copy(
-                            displayAddOptionView = false,
-                            showAddOptionError = false,
-                            newItem = viewState.newItem.copy(
-                                options = viewState.newItem.options + viewState.newItemOption
-                            ),
-                            newItemOption = DisplayItem.Option(),
-                        )
-                    } else {
-                        viewState.copy(
-                            showAddOptionError = true
-                        )
-                    }
-                } else {
-                    val isItemValid =
-                        viewState.newItem.name.isNotBlank() && viewState.newItem.price > 0.0
-                    if (isItemValid) {
-                        onUserIntent(BookStoreIntent.OnAddDisplayItem(viewState.newItem))
-                    } else {
-                        viewState = viewState.copy(
-                            showAddItemError = true
-                        )
-                    }
+            if (viewState.displayAddOptionView) {
+                TextButton(
+                    onClick = {
+                        val isOptionValid =
+                            viewState.newItemVariant.key.isNotBlank() && viewState.newItemVariant.valueList.isNotEmpty()
+                        if (isOptionValid) {
+                            viewState = viewState.copy(
+                                displayAddOptionView = false,
+                                showAddOptionError = false,
+                                newItem = viewState.newItem.copy(
+                                    variants = viewState.newItem.variants + viewState.newItemVariant
+                                ),
+                                newItemVariant = DisplayItem.Variant(),
+                            )
+                        } else {
+                            viewState = viewState.copy(
+                                showAddOptionError = true
+                            )
+                        }
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Text(confirmButtonText)
                 }
-                },
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = MaterialTheme.colorScheme.primary
-                )
-            ) {
-                Text(confirmButtonText)
             }
         },
         dismissButton = {
-            TextButton(
-                onClick = {
-                if (viewState.displayAddOptionView) {
-                    viewState = viewState.copy(
-                        displayAddOptionView = false,
-                        showAddOptionError = false,
-                        newItemOption = DisplayItem.Option()
-                    )
-                } else {
-                    onUserIntent.invoke(
-                        BookStoreIntent.OnUpdateDialogVisibility(
-                            AlertDialogType.ADD_ITEM,
-                            false
+            if (viewState.displayAddOptionView) {
+                TextButton(
+                    onClick = {
+                        viewState = viewState.copy(
+                            displayAddOptionView = false,
+                            showAddOptionError = false,
+                            newItemVariant = DisplayItem.Variant()
                         )
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary
                     )
+                ) {
+                    Text("Cancel")
                 }
-                },
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = MaterialTheme.colorScheme.primary
-                )
-            ) {
-                Text(stringResource(Res.string.add_item_cancel))
             }
         }
     )
@@ -178,7 +170,8 @@ fun AddItemDialog(
 
 @Composable
 private fun AddItemState.AddItemContent(
-    updateViewState: (AddItemState) -> Unit
+    updateViewState: (AddItemState) -> Unit,
+    onUserIntent: (BookStoreIntent) -> Unit
 ) {
     var displayPrice by remember {
         if (newItem.price > 0.0) {
@@ -188,88 +181,168 @@ private fun AddItemState.AddItemContent(
         }
     }
     Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            modifier = Modifier.padding(start = Dimensions.spacing_m),
+            text = "Name",
+            style = MaterialTheme.typography.titleSmall,
+            color = LabelGray
+        )
+
+        Spacer(Modifier.height(Dimensions.spacing_xs))
+
         OutlinedTextField(
             value = newItem.name,
             onValueChange = {
                 updateViewState.invoke(
                     this@AddItemContent.copy(
                         newItem = newItem.copy(name = it),
-                        showAddOptionError = if (showAddOptionError) false else showAddOptionError
+                        showItemNameError = false
                     )
                 )
             },
-            isError = showAddItemError && newItem.name.isBlank(),
+            isError = showItemNameError && newItem.name.isBlank(),
             singleLine = true,
-            label = { Text(stringResource(Res.string.add_item_name_label)) }
+            placeholder = {
+                Text(
+                    stringResource(Res.string.add_item_name_place_holder),
+                    color = LabelGray
+                )
+            },
+            shape = RoundedCornerShape(corner_radius_percent_m),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = White,
+                unfocusedContainerColor = White,
+                focusedIndicatorColor = MaterialTheme.colorScheme.secondary,
+                unfocusedIndicatorColor = MaterialTheme.colorScheme.secondary,
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black
+            )
         )
 
         Spacer(Modifier.height(Dimensions.spacing_m))
 
+        Text(
+            modifier = Modifier.padding(start = Dimensions.spacing_m),
+            text = "Price",
+            style = MaterialTheme.typography.titleSmall,
+            color = LabelGray
+        )
+
+        Spacer(Modifier.height(Dimensions.spacing_xs))
+
         OutlinedTextField(
             value = displayPrice,
             onValueChange = {
-                displayPrice = it
-                updateViewState.invoke(
-                    this@AddItemContent.copy(
-                        newItem = newItem.copy(price = it.toDoubleOrNull() ?: 0.0),
-                        showAddOptionError = if (showAddOptionError) false else showAddOptionError
+                it.filterNumericInputWithMaxDecimals()?.let { filtered ->
+                    displayPrice = filtered
+                    updateViewState.invoke(
+                        this@AddItemContent.copy(
+                            newItem = newItem.copy(price = filtered.toDoubleOrNull() ?: 0.0),
+                            showItemPriceError = false
+                        )
                     )
-                )
+                }
             },
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Number,
+                keyboardType = KeyboardType.Decimal,
                 imeAction = ImeAction.Done
             ),
-            isError = showAddItemError && newItem.price <= 0.0,
-            label = { Text(stringResource(Res.string.add_item_price_label)) }
+            isError = showItemPriceError && newItem.price <= 0.0,
+            shape = RoundedCornerShape(corner_radius_percent_m),
+            placeholder = {
+                Text(
+                    stringResource(Res.string.add_item_price_place_holder),
+                    color = LabelGray
+                )
+            },
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = White,
+                unfocusedContainerColor = White,
+                focusedIndicatorColor = MaterialTheme.colorScheme.secondary,
+                unfocusedIndicatorColor = MaterialTheme.colorScheme.secondary,
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black
+            )
         )
 
-        Spacer(Modifier.height(Dimensions.spacing_s))
+        Spacer(Modifier.height(Dimensions.spacing_m))
 
-        Column(modifier = Modifier.fillMaxWidth()) {
+        if (newItem.variants.isNotEmpty()) {
+            Text(
+                text = stringResource(Res.string.add_item_options_label),
+                style = MaterialTheme.typography.labelLarge
+            )
+        }
+
+        newItem.variants.forEach { option ->
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .animateContentSize(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = stringResource(Res.string.add_item_options_label),
-                    style = MaterialTheme.typography.labelLarge
-                )
+                ItemOptionDescription(option)
                 IconButton(onClick = {
                     updateViewState(
                         this@AddItemContent.copy(
-                            displayAddOptionView = true
+                            newItem = newItem.copy(
+                                variants = newItem.variants.filter { it != option }
+                            )
                         )
                     )
                 }) {
-                    Icon(Icons.Filled.Add, contentDescription = null)
+                    Icon(Icons.Filled.Remove, contentDescription = null)
                 }
             }
+        }
 
-            newItem.options.forEach { option ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .animateContentSize(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    ItemOptionDescription(option)
-                    IconButton(onClick = {
-                        updateViewState(
-                            this@AddItemContent.copy(
-                                newItem = newItem.copy(
-                                    options = newItem.options.filter { it != option }
-                                )
-                            )
+        Spacer(Modifier.height(Dimensions.spacing_m))
+
+        Button(
+            onClick = {
+                updateViewState(
+                    this@AddItemContent.copy(
+                        displayAddOptionView = true
+                    )
+                )
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.primary
+            ),
+            shape = RoundedCornerShape(Dimensions.corner_radius_s)
+        ) {
+            Text("Add variant")
+        }
+
+        Spacer(Modifier.height(Dimensions.spacing_s))
+
+        Button(
+            onClick = {
+                val isNameValid = newItem.name.isNotBlank()
+                val isPriceValid = newItem.price > 0.0
+
+                if (isNameValid && isPriceValid) {
+                    onUserIntent(BookStoreIntent.OnAddDisplayItem(newItem))
+                } else {
+                    updateViewState(
+                        this@AddItemContent.copy(
+                            showItemNameError = !isNameValid,
+                            showItemPriceError = !isPriceValid
                         )
-                    }) {
-                        Icon(Icons.Filled.Remove, contentDescription = null)
-                    }
+                    )
                 }
-            }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary
+            ),
+            shape = RoundedCornerShape(Dimensions.corner_radius_s)
+        ) {
+            Text("Save")
         }
     }
 }
@@ -283,38 +356,76 @@ fun AddItemState.AddNewOptionView(
     var isOptionKeyEnabled by remember { mutableStateOf(true) }
 
     Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            modifier = Modifier.padding(start = Dimensions.spacing_m),
+            text = stringResource(Res.string.add_item_options_key),
+            style = MaterialTheme.typography.titleSmall,
+            color = LabelGray
+        )
+
+        Spacer(Modifier.height(Dimensions.spacing_s))
+
         OutlinedTextField(
-            value = newItemOption.optionKey,
+            value = newItemVariant.key,
             onValueChange = {
-                updateViewState.invoke(
+                updateViewState(
                     this@AddNewOptionView.copy(
-                        newItemOption = this@AddNewOptionView.newItemOption.copy(optionKey = it),
-                        showAddOptionError = if (showAddItemError) false else showAddItemError
+                        newItemVariant = this@AddNewOptionView.newItemVariant.copy(key = it),
+                        showAddOptionError = false
                     )
                 )
             },
+            modifier = Modifier.fillMaxWidth(),
             enabled = isOptionKeyEnabled,
             isError = showAddOptionError,
             singleLine = true,
-            label = { Text(stringResource(Res.string.add_item_options_key)) }
+            shape = RoundedCornerShape(corner_radius_percent_m),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = White,
+                unfocusedContainerColor = White,
+                focusedIndicatorColor = MaterialTheme.colorScheme.secondary,
+                unfocusedIndicatorColor = MaterialTheme.colorScheme.secondary,
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black
+            )
         )
+
         Spacer(Modifier.height(Dimensions.spacing_m))
+
+        Text(
+            modifier = Modifier.padding(start = Dimensions.spacing_m),
+            text = stringResource(Res.string.add_item_options_value),
+            style = MaterialTheme.typography.titleSmall,
+            color = LabelGray
+        )
+
+        Spacer(Modifier.height(Dimensions.spacing_s))
+
         OutlinedTextField(
             value = optionValue,
             onValueChange = {
                 optionValue = it
                 showValueError = false
             },
+            modifier = Modifier.fillMaxWidth(),
             isError = showValueError,
             singleLine = true,
-            label = { Text(stringResource(Res.string.add_item_options_value)) }
+            shape = RoundedCornerShape(corner_radius_percent_m),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = White,
+                unfocusedContainerColor = White,
+                focusedIndicatorColor = MaterialTheme.colorScheme.secondary,
+                unfocusedIndicatorColor = MaterialTheme.colorScheme.secondary,
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black
+            )
         )
         Spacer(Modifier.height(Dimensions.spacing_m))
-        if (newItemOption.optionKey.isNotEmpty()) {
+        if (newItemVariant.key.isNotEmpty()) {
             ItemOptionDescription(
-                DisplayItem.Option(
-                    newItemOption.optionKey,
-                    newItemOption.optionValueList
+                DisplayItem.Variant(
+                    newItemVariant.key,
+                    newItemVariant.valueList
                 )
             )
         }
@@ -323,26 +434,27 @@ fun AddItemState.AddNewOptionView(
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = {
-                if (newItemOption.optionValueList.isEmpty()) {
-                    isOptionKeyEnabled = true
-                    updateViewState.invoke(
-                        this@AddNewOptionView.copy(
-                            newItemOption = newItemOption.copy(
-                                optionKey = ""
+            IconButton(
+                onClick = {
+                    if (newItemVariant.valueList.isEmpty()) {
+                        isOptionKeyEnabled = true
+                        updateViewState(
+                            this@AddNewOptionView.copy(
+                                newItemVariant = newItemVariant.copy(key = "")
                             )
                         )
-                    )
-                } else {
-                    updateViewState.invoke(
-                        this@AddNewOptionView.copy(
-                            newItemOption = newItemOption.copy(
-                                optionValueList = newItemOption.optionValueList.dropLast(1)
+                    } else {
+                        updateViewState(
+                            this@AddNewOptionView.copy(
+                                newItemVariant = newItemVariant.copy(
+                                    valueList = newItemVariant.valueList.dropLast(1)
+                                )
                             )
                         )
-                    )
-                }
-            }) {
+                    }
+                },
+                enabled = newItemVariant.key.isNotEmpty()
+            ) {
                 Icon(Icons.Filled.Remove, contentDescription = null)
             }
             IconButton(
@@ -350,8 +462,8 @@ fun AddItemState.AddNewOptionView(
                     if (optionValue.isNotEmpty()) {
                         updateViewState.invoke(
                             this@AddNewOptionView.copy(
-                                newItemOption = newItemOption.copy(
-                                    optionValueList = newItemOption.optionValueList + optionValue
+                                newItemVariant = newItemVariant.copy(
+                                    valueList = newItemVariant.valueList + optionValue
                                 )
                             )
                         )

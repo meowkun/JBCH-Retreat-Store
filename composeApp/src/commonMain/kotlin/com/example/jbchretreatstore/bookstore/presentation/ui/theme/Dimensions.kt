@@ -29,6 +29,9 @@ object Dimensions {
     val corner_radius_xxl: Dp = 32.dp
     val corner_radius_full: Dp = 100.dp
 
+    // Corner Radius Percentages
+    const val corner_radius_percent_m: Int = 40 // For pill-shaped elements
+    const val corner_radius_percent_l: Int = 50 // For pill-shaped elements
     // Elevation
     val elevation_none: Dp = 0.dp
     val elevation_xs: Dp = 1.dp

@@ -60,28 +60,28 @@ fun ShopScreenPreview() {
                     DisplayItem(
                         name = "Bible",
                         price = 40.00,
-                        options = listOf(
-                            DisplayItem.Option(
-                                optionKey = "Language",
-                                optionValueList = listOf("English", "French", "Spanish")
+                        variants = listOf(
+                            DisplayItem.Variant(
+                                key = "Language",
+                                valueList = listOf("English", "French", "Spanish")
                             ),
-                            DisplayItem.Option(
-                                optionKey = "Version",
-                                optionValueList = listOf("KJV", "NKJV", "NIV")
+                            DisplayItem.Variant(
+                                key = "Version",
+                                valueList = listOf("KJV", "NKJV", "NIV")
                             ),
                         )
                     ),
                     DisplayItem(
                         name = "T-shirt",
                         price = 15.00,
-                        options = listOf(
-                            DisplayItem.Option(
-                                optionKey = "Color",
-                                optionValueList = listOf("Blue", "Black")
+                        variants = listOf(
+                            DisplayItem.Variant(
+                                key = "Color",
+                                valueList = listOf("Blue", "Black")
                             ),
-                            DisplayItem.Option(
-                                optionKey = "Size",
-                                optionValueList = listOf("XS", "S", "M", "L", "XL", "XXL", "XXXL")
+                            DisplayItem.Variant(
+                                key = "Size",
+                                valueList = listOf("XS", "S", "M", "L", "XL", "XXL", "XXXL")
                             ),
                         )
                     )
