@@ -30,6 +30,7 @@ import jbchretreatstore.composeapp.generated.resources.checkout_dialog_buyer_nam
 import jbchretreatstore.composeapp.generated.resources.checkout_dialog_cancel_button
 import jbchretreatstore.composeapp.generated.resources.checkout_dialog_checkout_button
 import jbchretreatstore.composeapp.generated.resources.checkout_dialog_save_button
+import jbchretreatstore.composeapp.generated.resources.close_dialog_description
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -61,7 +62,7 @@ fun CheckoutDialog(
                 IconButton(onClick = onDismissHandler) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Close dialog"
+                        contentDescription = stringResource(Res.string.close_dialog_description)
                     )
                 }
             }

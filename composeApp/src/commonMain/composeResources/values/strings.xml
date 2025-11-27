@@ -22,11 +22,17 @@
 
     <!--  Add item dialog  -->
     <string name="add_item_dialog_title">Add New Item</string>
+    <string name="add_item_name_label">Name</string>
     <string name="add_item_name_place_holder">e.g. The Bible</string>
+    <string name="add_item_price_label">Price</string>
     <string name="add_item_price_place_holder">e.g. 37.99</string>
     <string name="add_item_options_label">Item variants:</string>
-    <string name="add_item_options_key">Option key</string>
-    <string name="add_item_options_value">Option value</string>
+    <string name="add_item_options_key">Variant key</string>
+    <string name="add_item_options_key_placeholder">e.g. Size, Color, Language</string>
+    <string name="add_item_options_value">Variant value</string>
+    <string name="add_item_options_value_placeholder">e.g. Large, Blue, English</string>
+    <string name="add_item_add_more_value">Add more variant value</string>
+    <string name="add_item_add_variant">Add variant</string>
     <string name="add_item_cancel">Cancel</string>
     <string name="add_item_add">Add</string>
     <string name="add_item_save">Save</string>
@@ -87,4 +93,8 @@
     <!-- Bottom Navigation -->
     <string name="bottom_nav_shop">Shop</string>
     <string name="bottom_nav_receipt">Receipt</string>
+
+    <!-- Content Descriptions -->
+    <string name="close_dialog_description">Close dialog</string>
+    <string name="remove_variant_value_description">Remove variant value</string>
 </resources>

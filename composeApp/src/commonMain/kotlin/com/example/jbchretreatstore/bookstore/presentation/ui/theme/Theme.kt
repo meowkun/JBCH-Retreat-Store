@@ -30,7 +30,7 @@ fun BookStoreTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = AppTypography(),
+        typography = appTypography(),
         content = content
     )
 }

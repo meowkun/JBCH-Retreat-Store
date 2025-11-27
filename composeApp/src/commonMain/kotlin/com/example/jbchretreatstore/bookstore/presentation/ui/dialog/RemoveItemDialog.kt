@@ -20,6 +20,7 @@ import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Black
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import jbchretreatstore.composeapp.generated.resources.Res
+import jbchretreatstore.composeapp.generated.resources.close_dialog_description
 import jbchretreatstore.composeapp.generated.resources.ic_close
 import jbchretreatstore.composeapp.generated.resources.remove_item_cancel
 import jbchretreatstore.composeapp.generated.resources.remove_item_dialog_message
@@ -56,7 +57,7 @@ fun RemoveItemDialog(
                 ) {
                     Icon(
                         painter = painterResource(Res.drawable.ic_close),
-                        contentDescription = "Close dialog"
+                        contentDescription = stringResource(Res.string.close_dialog_description)
                     )
                 }
             }

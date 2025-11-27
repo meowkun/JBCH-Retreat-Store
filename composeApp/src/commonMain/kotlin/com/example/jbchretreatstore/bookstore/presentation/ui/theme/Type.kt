@@ -23,7 +23,7 @@ fun nanumSquareFontFamily() = FontFamily(
 )
 
 @Composable
-fun AppTypography(): Typography {
+fun appTypography(): Typography {
     val fontFamily = nanumSquareFontFamily()
 
     return Typography(
