@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.presentation.ui.shared
+package com.example.jbchretreatstore.bookstore.presentation.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement

@@ -29,10 +29,10 @@ import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewModel
 import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.presentation.ui.checkout.CheckoutScreen
+import com.example.jbchretreatstore.bookstore.presentation.ui.components.BottomNavigationBar
+import com.example.jbchretreatstore.bookstore.presentation.ui.components.CustomFloatingActionButton
 import com.example.jbchretreatstore.bookstore.presentation.ui.dialog.AddItemDialog
 import com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory.PurchaseHistoryScreen
-import com.example.jbchretreatstore.bookstore.presentation.ui.shared.BottomNavigationBar
-import com.example.jbchretreatstore.bookstore.presentation.ui.shared.CustomFloatingActionButton
 import com.example.jbchretreatstore.bookstore.presentation.ui.shop.ShopScreen
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import jbchretreatstore.composeapp.generated.resources.Res

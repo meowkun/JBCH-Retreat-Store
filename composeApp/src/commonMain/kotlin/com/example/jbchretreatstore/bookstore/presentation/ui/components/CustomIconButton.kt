@@ -1,8 +1,10 @@
-package com.example.jbchretreatstore.bookstore.presentation.ui.shared
+package com.example.jbchretreatstore.bookstore.presentation.ui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -137,8 +139,8 @@ private fun CustomIconButtonContent(
 @Composable
 fun CustomIconButtonWithLongTextPreview() {
     BookStoreTheme {
-        androidx.compose.foundation.layout.Row(
-            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(16.dp),
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.padding(16.dp)
         ) {
             CustomIconButton(

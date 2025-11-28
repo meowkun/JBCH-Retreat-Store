@@ -22,11 +22,11 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -48,8 +48,8 @@ import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewState
+import com.example.jbchretreatstore.bookstore.presentation.ui.components.Stepper
 import com.example.jbchretreatstore.bookstore.presentation.ui.dialog.RemoveItemDialog
-import com.example.jbchretreatstore.bookstore.presentation.ui.shared.Stepper
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Black
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
@@ -105,12 +105,11 @@ fun ItemView(
                 width = Dimensions.border_width,
                 color = MediumBlue,
                 shape = Shapes.itemCard
-            )
+            ).animateContentSize()
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
-                .background(color = MediumBlue)
-                .animateContentSize(),
+                .background(color = MediumBlue),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -214,7 +213,7 @@ fun ItemExpandableView(
             all = Dimensions.spacing_m
         )
     ) {
-        displayItem.variants.forEachIndexed { index, option ->
+        displayItem.variants.forEach { option ->
             ItemVariantMenu(
                 variant = option,
                 checkoutItem = checkoutItem,
@@ -300,7 +299,8 @@ fun ItemVariantMenu(
         modifier = modifier.wrapContentSize()
     ) {
         OutlinedTextField(
-            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable, true).wrapContentSize(),
+            modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, true)
+                .wrapContentSize(),
             value = checkoutItem.variantsMap[variant.key] ?: variant.valueList.first(),
             onValueChange = { },
             textStyle = MaterialTheme.typography.bodyLarge.copy(
@@ -391,49 +391,6 @@ fun QuantityStepper(
     )
 }
 
-@Composable
-fun AddToCartButton(
-    displayItem: DisplayItem,
-    checkoutItem: CheckoutItem,
-    updateCartItem: (CheckoutItem) -> Unit,
-    onUserIntent: (BookStoreIntent) -> Unit,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        QuantityStepper(
-            displayItem = displayItem,
-            checkoutItem = checkoutItem,
-            updateCartItem = updateCartItem
-        )
-
-        Button(
-            shape = RoundedCornerShape(Dimensions.corner_radius_l),
-            modifier = Modifier
-                .weight(1f)
-                .heightIn(min = Dimensions.button_height_l)
-                .padding(start = Dimensions.spacing_m),
-            onClick = {
-                onUserIntent(BookStoreIntent.OnAddToCheckoutItem(checkoutItem))
-            },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary
-            )
-        ) {
-            Text(
-                text = buildAnnotatedString {
-                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append(stringResource(Res.string.add_to_cart))
-                    }
-                    append(" (${checkoutItem.totalPrice.toCurrency()})")
-                },
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-    }
-}
 
 @Preview
 @Composable

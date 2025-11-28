@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.presentation.ui.shared
+package com.example.jbchretreatstore.bookstore.presentation.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

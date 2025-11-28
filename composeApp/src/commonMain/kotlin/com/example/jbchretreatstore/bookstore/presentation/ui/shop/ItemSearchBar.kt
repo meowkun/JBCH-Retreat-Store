@@ -19,6 +19,7 @@ import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
@@ -49,7 +50,7 @@ fun ItemSearchBar(
             onUserIntent(BookStoreIntent.OnSearchQueryChange(query))
         },
         textStyle = MaterialTheme.typography.bodyLarge.copy(
-            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+            fontWeight = FontWeight.Bold
         ),
         shape = RoundedCornerShape(percent = Dimensions.corner_radius_percent_l),
         colors = OutlinedTextFieldDefaults.colors(
@@ -66,7 +67,9 @@ fun ItemSearchBar(
         placeholder = {
             Text(
                 text = stringResource(Res.string.search_placeholder),
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = FontWeight.Bold
+                ),
                 color = SearchPlaceholderColor
             )
         },

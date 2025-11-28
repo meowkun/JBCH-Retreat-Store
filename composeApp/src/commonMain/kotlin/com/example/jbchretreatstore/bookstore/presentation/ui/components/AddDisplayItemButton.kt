@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.presentation.ui.shared
+package com.example.jbchretreatstore.bookstore.presentation.ui.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add

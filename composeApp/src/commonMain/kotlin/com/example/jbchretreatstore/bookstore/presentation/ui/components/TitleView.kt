@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.presentation.ui.shared
+package com.example.jbchretreatstore.bookstore.presentation.ui.components
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider

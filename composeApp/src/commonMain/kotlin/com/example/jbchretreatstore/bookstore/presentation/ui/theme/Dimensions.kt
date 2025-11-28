@@ -56,6 +56,9 @@ object Dimensions {
     val button_horizontal_padding: Dp = 24.dp
     val button_vertical_padding: Dp = 8.dp
 
+    // Gradient Overlay
+    val gradient_overlay_height: Dp = 200.dp
+
     // Layout Constraints
     val max_content_width: Dp = 500.dp
     val min_touch_target_size: Dp = 48.dp
@@ -113,4 +116,3 @@ object Dimensions {
     val counter_text_width: Dp = 40.dp
     val counter_spacing: Dp = 8.dp
 }
-

@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.presentation.ui.shared
+package com.example.jbchretreatstore.bookstore.presentation.ui.components
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -95,14 +95,8 @@ private fun StepperPreview() {
     BookStoreTheme {
         Stepper(
             value = previewValue,
-            onDecrement = {
-                previewValue = it
-                println("Decremented to: $it")
-            },
-            onIncrement = {
-                previewValue = it
-                println("Incremented to: $it")
-            }
+            onDecrement = { previewValue = it },
+            onIncrement = { previewValue = it }
         )
     }
 }
