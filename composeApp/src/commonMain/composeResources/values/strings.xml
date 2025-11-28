@@ -36,6 +36,7 @@
     <string name="add_item_cancel">Cancel</string>
     <string name="add_item_add">Add</string>
     <string name="add_item_save">Save</string>
+    <string name="add_item_back">Back</string>
 
     <!--  Remove item dialog  -->
     <string name="remove_item_dialog_title">Remove Item</string>

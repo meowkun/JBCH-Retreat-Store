@@ -48,6 +48,9 @@ fun ItemSearchBar(
         onValueChange = { query ->
             onUserIntent(BookStoreIntent.OnSearchQueryChange(query))
         },
+        textStyle = MaterialTheme.typography.bodyLarge.copy(
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+        ),
         shape = RoundedCornerShape(percent = Dimensions.corner_radius_percent_l),
         colors = OutlinedTextFieldDefaults.colors(
             focusedTextColor = SearchContentColor,

@@ -40,6 +40,7 @@ val DialogShadow = Color(0xFFD4DBF1) // Shadow color for AlertDialogs
 val GrayBlue = Color(0xFF868C9C) // Gray-blue color for UI elements
 val LabelGray = Color(0xFF6A6A6A) // Gray color for labels and text
 val LightGrey = Color(0xFFD3D3D3) // Light grey for disabled text field backgrounds
+val DarkBlue = Color(0xFF243664) // Dark blue for button text
 
 val LightColorScheme = lightColorScheme(
     primary = Primary,

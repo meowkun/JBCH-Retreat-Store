@@ -8,5 +8,6 @@ data class AddItemState (
     val displayAddOptionView: Boolean = false,
     val showItemNameError: Boolean = false,
     val showItemPriceError: Boolean = false,
-    val showAddOptionError: Boolean = false
+    val showAddOptionError: Boolean = false,
+    val showValueError: Boolean = false
 )

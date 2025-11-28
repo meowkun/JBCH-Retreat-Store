@@ -7,7 +7,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.TextField
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,6 +26,14 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
+/**
+ * A composable that displays a variant value in a disabled text field with a remove button.
+ * Used in AddNewVariantView to show the list of added variant values.
+ *
+ * @param value The variant value to display
+ * @param onRemove Callback invoked when the remove button is clicked
+ * @param modifier Optional modifier for the component
+ */
 @Composable
 fun VariantValueItem(
     value: String,
@@ -35,12 +44,15 @@ fun VariantValueItem(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        TextField(
+        OutlinedTextField(
             value = value,
             onValueChange = {},
             modifier = Modifier.weight(1f),
             enabled = false,
             singleLine = true,
+            textStyle = MaterialTheme.typography.bodyLarge.copy(
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+            ),
             shape = RoundedCornerShape(corner_radius_percent_m),
             colors = TextFieldDefaults.colors(
                 disabledContainerColor = LightGrey,

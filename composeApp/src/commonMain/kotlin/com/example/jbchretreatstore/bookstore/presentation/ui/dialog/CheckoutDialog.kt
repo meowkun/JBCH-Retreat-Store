@@ -78,6 +78,9 @@ fun CheckoutDialog(
                 },
                 isError = showErrorState,
                 singleLine = true,
+                textStyle = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                ),
                 label = { Text(stringResource(Res.string.checkout_dialog_buyer_name_hint)) }
             )
         },

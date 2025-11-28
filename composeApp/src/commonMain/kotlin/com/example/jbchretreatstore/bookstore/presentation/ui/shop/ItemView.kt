@@ -9,7 +9,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -43,7 +42,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
@@ -204,30 +203,6 @@ fun PriceTag(
 }
 
 @Composable
-fun ItemOptionDescription(variant: DisplayItem.Variant) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = "${variant.key}: ",
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.labelLarge
-        )
-        FlowRow(
-            verticalArrangement = Arrangement.Center
-        ) {
-            variant.valueList.forEachIndexed { index, value ->
-                Text(
-                    text = if (index == variant.valueList.lastIndex) value else "$value, ",
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-        }
-    }
-}
-
-@Composable
 fun ItemExpandableView(
     displayItem: DisplayItem,
     checkoutItem: CheckoutItem,
@@ -240,7 +215,7 @@ fun ItemExpandableView(
         )
     ) {
         displayItem.variants.forEachIndexed { index, option ->
-            ItemOptionMenu(
+            ItemVariantMenu(
                 variant = option,
                 checkoutItem = checkoutItem,
                 updateCartItem = updateCartItem
@@ -298,6 +273,7 @@ fun ItemExpandableView(
                         append(" Total (${checkoutItem.totalPrice.toCurrency()})")
                     },
                     maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -307,7 +283,7 @@ fun ItemExpandableView(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ItemOptionMenu(
+fun ItemVariantMenu(
     variant: DisplayItem.Variant,
     checkoutItem: CheckoutItem,
     modifier: Modifier = Modifier,
@@ -327,6 +303,9 @@ fun ItemOptionMenu(
             modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable, true).wrapContentSize(),
             value = checkoutItem.variantsMap[variant.key] ?: variant.valueList.first(),
             onValueChange = { },
+            textStyle = MaterialTheme.typography.bodyLarge.copy(
+                fontWeight = FontWeight.Bold
+            ),
             label = {
                 Text(
                     stringResource(
@@ -362,7 +341,13 @@ fun ItemOptionMenu(
         ) {
             variant.valueList.forEach { value ->
                 DropdownMenuItem(
-                    text = { Text(value) },
+                    text = {
+                        Text(
+                            value, style = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    },
                     onClick = {
                         val updatedOptions = checkoutItem.variantsMap.toMutableMap()
                         updatedOptions[variant.key] = value

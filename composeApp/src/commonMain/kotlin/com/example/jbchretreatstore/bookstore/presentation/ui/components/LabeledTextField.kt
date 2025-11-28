@@ -18,6 +18,7 @@ import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreThe
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions.corner_radius_percent_m
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.LabelGray
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.LightGrey
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.White
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -51,6 +52,9 @@ fun LabeledTextField(
         enabled = enabled,
         isError = isError,
         singleLine = singleLine,
+        textStyle = MaterialTheme.typography.bodyLarge.copy(
+            fontWeight = FontWeight.Bold
+        ),
         placeholder = if (placeholder.isNotEmpty()) {
             {
                 Text(
@@ -70,7 +74,9 @@ fun LabeledTextField(
             focusedIndicatorColor = MaterialTheme.colorScheme.secondary,
             unfocusedIndicatorColor = MaterialTheme.colorScheme.secondary,
             focusedTextColor = Color.Black,
-            unfocusedTextColor = Color.Black
+            unfocusedTextColor = Color.Black,
+            disabledContainerColor = LightGrey,
+            disabledTextColor = Color.Black
         )
     )
 }
