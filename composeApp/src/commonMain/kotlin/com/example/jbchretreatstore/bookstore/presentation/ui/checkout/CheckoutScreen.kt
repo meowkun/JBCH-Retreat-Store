@@ -1,18 +1,19 @@
 package com.example.jbchretreatstore.bookstore.presentation.ui.checkout
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
@@ -38,11 +39,12 @@ import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewState
 import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavDestination
+import com.example.jbchretreatstore.bookstore.presentation.ui.components.BottomGradientOverlay
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.TitleView
 import com.example.jbchretreatstore.bookstore.presentation.ui.dialog.CheckoutDialog
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
-import com.example.jbchretreatstore.bookstore.presentation.ui.theme.LightBlue
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.MediumBlue
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Shapes
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.checkout_view_item_checkout
@@ -66,43 +68,47 @@ fun CheckoutScreen(
     var checkoutStatus by remember { mutableStateOf(CheckoutStatus.PENDING) }
     Surface(
         modifier = Modifier
-            .fillMaxWidth().statusBarsPadding(),
-        color = LightBlue,
-        shape = Shapes.topRounded
+            .fillMaxWidth(),
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize()
+                .navigationBarsPadding(),
+
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
 
             TitleView(stringResource(Res.string.checkout_view_item_title))
 
-            LazyColumn(
-                modifier = Modifier.padding(top = Dimensions.spacing_m).weight(1f),
-                verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_m),
-            ) {
-                items(
-                    items = state.currentCheckoutList.checkoutList,
-                    key = { "${it.id}_${it.variantsMap.hashCode()}" }) { item ->
-                    CheckoutItemView(
-                        checkoutItem = item,
-                        onUserIntent = onUserIntent
-                    )
+            Box(modifier = Modifier.weight(1f)) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_m),
+                    contentPadding = PaddingValues(bottom = Dimensions.gradient_overlay_height),
+                ) {
+                    items(
+                        items = state.currentCheckoutList.checkoutList,
+                        key = { "${it.id}_${it.variantsMap.hashCode()}" }) { item ->
+                        CheckoutItemView(
+                            checkoutItem = item,
+                            onUserIntent = onUserIntent
+                        )
+                    }
                 }
+                BottomGradientOverlay(modifier = Modifier.align(Alignment.BottomCenter))
             }
 
             Surface(
-                modifier = Modifier.fillMaxWidth().padding(top = Dimensions.spacing_m),
-                color = MaterialTheme.colorScheme.surface,
+                color = MediumBlue,
+                shape = Shapes.topRounded,
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    HorizontalDivider()
                     Row(
                         modifier = Modifier.fillMaxWidth()
                             .padding(Dimensions.spacing_m),
@@ -170,6 +176,7 @@ fun CheckoutScreen(
     if (state.displayCheckoutDialog) {
         CheckoutDialog(
             checkoutStatus = checkoutStatus,
+            paymentMethod = selectedOption.value,
             onUserIntent = onUserIntent
         )
     }
@@ -217,43 +224,42 @@ fun CheckoutScreenPreview() {
     BookStoreTheme {
         CheckoutScreen(
             state = BookStoreViewState(
-            currentCheckoutList = ReceiptData(
-                checkoutList = listOf(
-                    CheckoutItem(
-                        itemName = "Bible",
-                        totalPrice = 40.00,
-                    ),
-                    CheckoutItem(
-                        itemName = "T-shirt",
-                        totalPrice = 15.00,
-                    ),
-                    CheckoutItem(
-                        itemName = "a",
-                        totalPrice = 40.00,
-                    ),
-                    CheckoutItem(
-                        itemName = "b",
-                        totalPrice = 15.00,
-                    ),
-                    CheckoutItem(
-                        itemName = "x",
-                        totalPrice = 40.00,
-                    ),
-                    CheckoutItem(
-                        itemName = "c",
-                        totalPrice = 15.00,
-                    ),
-                    CheckoutItem(
-                        itemName = "d",
-                        totalPrice = 40.00,
-                    ),
-                    CheckoutItem(
-                        itemName = "e",
-                        totalPrice = 15.00,
+                currentCheckoutList = ReceiptData(
+                    checkoutList = listOf(
+                        CheckoutItem(
+                            itemName = "Holy Bible - NIV",
+                            totalPrice = 45.99,
+                            variantsMap = mapOf("Language" to "English", "Version" to "NIV")
+                        ),
+                        CheckoutItem(
+                            itemName = "Christian T-Shirt - Faith",
+                            totalPrice = 24.99,
+                            variantsMap = mapOf("Size" to "L", "Color" to "Blue")
+                        ),
+                        CheckoutItem(
+                            itemName = "Devotional Journal",
+                            totalPrice = 18.50,
+                            variantsMap = mapOf("Cover" to "Leather", "Pages" to "200")
+                        ),
+                        CheckoutItem(
+                            itemName = "Children's Bible Stories",
+                            totalPrice = 32.00,
+                            variantsMap = mapOf("Age Group" to "5-8 years", "Format" to "Hardcover")
+                        ),
+                        CheckoutItem(
+                            itemName = "Worship CD Collection",
+                            totalPrice = 29.99,
+                            variantsMap = mapOf("Genre" to "Contemporary", "Artist" to "Various")
+                        ),
+                        CheckoutItem(
+                            itemName = "Prayer Book",
+                            totalPrice = 16.75,
+                            variantsMap = mapOf("Type" to "Daily Prayers", "Language" to "English")
+                        )
                     )
                 )
-            )
-        ),
-        ) {}
+            ),
+            onUserIntent = {}
+        )
     }
 }

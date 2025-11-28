@@ -41,6 +41,7 @@ val GrayBlue = Color(0xFF868C9C) // Gray-blue color for UI elements
 val LabelGray = Color(0xFF6A6A6A) // Gray color for labels and text
 val LightGrey = Color(0xFFD3D3D3) // Light grey for disabled text field backgrounds
 val DarkBlue = Color(0xFF243664) // Dark blue for button text
+val LightGrayBlue = Color(0xFFECEFF4) // Light gray-blue color
 
 val LightColorScheme = lightColorScheme(
     primary = Primary,
@@ -77,4 +78,3 @@ val DarkColorScheme = darkColorScheme(
     error = Color(0xFFCF6679),
     onError = Color(0xFF000000)
 )
-

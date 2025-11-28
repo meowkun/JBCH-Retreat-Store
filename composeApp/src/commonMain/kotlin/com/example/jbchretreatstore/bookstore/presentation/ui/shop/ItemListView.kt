@@ -32,7 +32,7 @@ fun ItemListView(
         modifier = modifier,
         state = scrollState,
         verticalArrangement = Arrangement.spacedBy(Dimensions.item_spacing),
-        contentPadding = PaddingValues(bottom = Dimensions.spacing_xl)
+        contentPadding = PaddingValues(bottom = Dimensions.gradient_overlay_height)
     ) {
         items(items = displayItemList, key = { it.id }) { item ->
             ItemView(

@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
+import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
@@ -37,6 +38,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun CheckoutDialog(
     checkoutStatus: CheckoutStatus,
+    paymentMethod: PaymentMethod,
     onUserIntent: (BookStoreIntent) -> Unit
 ) {
     var showErrorState by remember { mutableStateOf(false) }
@@ -93,7 +95,8 @@ fun CheckoutDialog(
                         onUserIntent.invoke(
                             BookStoreIntent.OnCheckout(
                                 buyerName = buyerName,
-                                checkoutStatus = checkoutStatus
+                                checkoutStatus = checkoutStatus,
+                                paymentMethod = paymentMethod
                             )
                         )
                     }
@@ -129,7 +132,8 @@ fun CheckoutDialog(
 fun CheckoutDialogPreview() {
     BookStoreTheme {
         CheckoutDialog(
-            checkoutStatus = CheckoutStatus.CHECKED_OUT
+            checkoutStatus = CheckoutStatus.CHECKED_OUT,
+            paymentMethod = PaymentMethod.CASH
         ) {}
     }
 }

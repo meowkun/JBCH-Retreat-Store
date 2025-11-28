@@ -23,7 +23,8 @@ class CheckoutUseCase(
     suspend fun processCheckout(
         cart: ReceiptData,
         buyerName: String,
-        checkoutStatus: CheckoutStatus
+        checkoutStatus: CheckoutStatus,
+        paymentMethod: com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod
     ): Result<ReceiptData> {
         // Validate buyer name
         if (buyerName.isBlank()) {
@@ -48,6 +49,7 @@ class CheckoutUseCase(
         val receipt = cart.copy(
             buyerName = buyerName,
             checkoutStatus = checkoutStatus,
+            paymentMethod = paymentMethod,
             dateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         )
 
@@ -67,7 +69,12 @@ class CheckoutUseCase(
         cart: ReceiptData,
         buyerName: String
     ): Result<ReceiptData> {
-        return processCheckout(cart, buyerName, CheckoutStatus.SAVE_FOR_LATER)
+        return processCheckout(
+            cart,
+            buyerName,
+            CheckoutStatus.SAVE_FOR_LATER,
+            com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod.CASH
+        )
     }
 
     /**
@@ -77,4 +84,3 @@ class CheckoutUseCase(
         return cart.checkoutList.sumOf { it.totalPrice }
     }
 }
-

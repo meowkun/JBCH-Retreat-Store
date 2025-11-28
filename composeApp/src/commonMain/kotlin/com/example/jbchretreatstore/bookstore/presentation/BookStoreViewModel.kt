@@ -121,7 +121,8 @@ class BookStoreViewModel(
                     val result = checkoutUseCase.processCheckout(
                         state.value.currentCheckoutList,
                         intent.buyerName,
-                        intent.checkoutStatus
+                        intent.checkoutStatus,
+                        intent.paymentMethod
                     )
                     result.onSuccess {
                         _state.update {
