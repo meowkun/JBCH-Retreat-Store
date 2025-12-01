@@ -74,7 +74,7 @@ fun CheckoutDialog(
                 value = buyerName,
                 onValueChange = {
                     buyerName = it
-                    if (it.isNotEmpty()) {
+                    if (it.trim().isNotEmpty()) {
                         showErrorState = false
                     }
                 },
@@ -83,18 +83,22 @@ fun CheckoutDialog(
                 textStyle = MaterialTheme.typography.bodyLarge.copy(
                     fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
                 ),
-                label = { Text(stringResource(Res.string.checkout_dialog_buyer_name_hint)) }
+                label = { Text(stringResource(Res.string.checkout_dialog_buyer_name_hint)) },
+                supportingText = if (showErrorState) {
+                    { Text("Buyer name is required", color = MaterialTheme.colorScheme.error) }
+                } else null
             )
         },
         confirmButton = {
             TextButton(
                 onClick = {
-                    if (buyerName.isEmpty()) {
+                    val trimmedName = buyerName.trim()
+                    if (trimmedName.isEmpty()) {
                         showErrorState = true
                     } else {
                         onUserIntent.invoke(
                             BookStoreIntent.OnCheckout(
-                                buyerName = buyerName,
+                                buyerName = trimmedName,
                                 checkoutStatus = checkoutStatus,
                                 paymentMethod = paymentMethod
                             )

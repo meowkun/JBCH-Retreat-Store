@@ -1,6 +1,8 @@
 package com.example.jbchretreatstore.bookstore.presentation.utils
 
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.number
 
 /**
  * Formats a Double price value to a string with 2 decimal places.
@@ -16,6 +18,16 @@ fun Double.toCurrency(): String {
         else -> rawPrice[1]
     }
     return "$$priceInteger.$priceDecimal"
+}
+
+/**
+ * Formats a LocalDate to a readable date string.
+ * Format: MM/DD/YYYY
+ */
+fun LocalDate.toFormattedDateString(): String {
+    val month = month.number.toString().padStart(2, '0')
+    val day = day.toString().padStart(2, '0')
+    return "$month/$day/$year"
 }
 
 /**

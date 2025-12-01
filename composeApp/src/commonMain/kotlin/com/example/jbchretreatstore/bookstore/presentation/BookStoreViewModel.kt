@@ -8,11 +8,15 @@ import com.example.jbchretreatstore.bookstore.domain.usecase.ManageCartUseCase
 import com.example.jbchretreatstore.bookstore.domain.usecase.ManageDisplayItemsUseCase
 import com.example.jbchretreatstore.bookstore.domain.usecase.PurchaseHistoryUseCase
 import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
+import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavDestination
 import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavigator
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.added_to_cart
+import jbchretreatstore.composeapp.generated.resources.checkout_failed
 import jbchretreatstore.composeapp.generated.resources.checkout_success
+import jbchretreatstore.composeapp.generated.resources.item_add_failed
 import jbchretreatstore.composeapp.generated.resources.item_added_success
+import jbchretreatstore.composeapp.generated.resources.item_remove_failed
 import jbchretreatstore.composeapp.generated.resources.item_removed_success
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -70,9 +74,11 @@ class BookStoreViewModel(
                             )
                         }
                     }.onFailure { error ->
+                        println("Failed to add item: ${error.message}")
                         _state.update {
                             it.copy(
-                                displayAddDisplayItemDialog = false
+                                displayAddDisplayItemDialog = false,
+                                snackbarMessage = Res.string.item_add_failed
                             )
                         }
                     }
@@ -90,9 +96,11 @@ class BookStoreViewModel(
                             )
                         }
                     }.onFailure { error ->
+                        println("Failed to remove item: ${error.message}")
                         _state.update {
                             it.copy(
-                                displayRemoveDisplayItemDialog = false
+                                displayRemoveDisplayItemDialog = false,
+                                snackbarMessage = Res.string.item_remove_failed
                             )
                         }
                     }
@@ -111,8 +119,11 @@ class BookStoreViewModel(
                             snackbarMessage = Res.string.added_to_cart
                         )
                     }
-                }.onFailure {
-                    // Validation failed - use case handles validation
+                }.onFailure { error ->
+                    println("Failed to add to cart: ${error.message}")
+                    _state.update {
+                        it.copy(snackbarMessage = Res.string.checkout_failed)
+                    }
                 }
             }
 
@@ -132,8 +143,16 @@ class BookStoreViewModel(
                                 snackbarMessage = Res.string.checkout_success
                             )
                         }
-                    }.onFailure {
-                        // Validation failed - use case handles validation
+                        // Navigate to receipt screen after successful checkout
+                        navigator.navigateTo(BookStoreNavDestination.ReceiptScreen)
+                    }.onFailure { error ->
+                        println("Checkout failed: ${error.message}")
+                        _state.update {
+                            it.copy(
+                                displayCheckoutDialog = false,
+                                snackbarMessage = Res.string.checkout_failed
+                            )
+                        }
                     }
                 }
             }

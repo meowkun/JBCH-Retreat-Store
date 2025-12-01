@@ -95,8 +95,18 @@ class ManageCartUseCase {
 
         val item = currentCart.checkoutList[itemIndex]
 
-        // Calculate price per unit
+        // Prevent division by zero
+        if (item.quantity <= 0) {
+            return Result.failure(IllegalStateException("Cart item has invalid quantity"))
+        }
+
+        // Calculate price per unit (safe from division by zero)
         val pricePerUnit = item.totalPrice / item.quantity
+
+        // Validate price is positive
+        if (pricePerUnit <= 0) {
+            return Result.failure(IllegalStateException("Cart item has invalid price"))
+        }
 
         // Update item with new quantity and recalculate total price
         val updatedItem = item.copy(

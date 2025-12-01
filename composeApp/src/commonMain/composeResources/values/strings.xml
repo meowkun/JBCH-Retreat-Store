@@ -63,7 +63,6 @@
     <!--  Purchase history view  -->
     <string name="purchase_history_view_title">Purchase History</string>
 
-    <!--  ViewModel toast/snackbar messages  -->
     <!-- Display item messages -->
     <string name="item_added_success">Item added successfully</string>
     <string name="item_add_failed">Failed to add item</string>
@@ -79,6 +78,7 @@
     <!-- Checkout messages -->
     <string name="checkout_success">Checkout completed successfully</string>
     <string name="checkout_failed">Checkout failed</string>
+    <string name="checkout_error">An error occurred. Please try again</string>
 
     <!-- Validation messages -->
     <string name="cart_empty">Cart is empty</string>

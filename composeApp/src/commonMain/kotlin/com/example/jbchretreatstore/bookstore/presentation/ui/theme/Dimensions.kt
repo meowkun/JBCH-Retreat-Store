@@ -59,6 +59,9 @@ object Dimensions {
     // Gradient Overlay
     val gradient_overlay_height: Dp = 200.dp
 
+    // Date slider indicator height
+    val date_slider_height: Dp = 300.dp
+
     // Layout Constraints
     val max_content_width: Dp = 500.dp
     val min_touch_target_size: Dp = 48.dp

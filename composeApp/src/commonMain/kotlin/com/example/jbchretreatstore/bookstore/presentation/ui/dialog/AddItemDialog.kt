@@ -83,14 +83,7 @@ fun AddItemDialog(
     var viewState by remember { mutableStateOf(AddItemState()) }
 
     AlertDialog(
-        onDismissRequest = {
-            onUserIntent(
-                BookStoreIntent.OnUpdateDialogVisibility(
-                    alertDialogType = AlertDialogType.ADD_ITEM,
-                    isVisible = false
-                )
-            )
-        },
+        onDismissRequest = {},
         containerColor = White,
         title = {
             DialogTitle(

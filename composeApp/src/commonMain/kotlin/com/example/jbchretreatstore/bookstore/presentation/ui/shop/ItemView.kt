@@ -393,6 +393,76 @@ fun QuantityStepper(
 }
 
 
+@Preview(showBackground = true)
+@Composable
+fun PriceTagPreview() {
+    BookStoreTheme {
+        PriceTag(price = 45.99)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ItemDescriptionViewPreview() {
+    BookStoreTheme {
+        ItemDescriptionView(
+            displayItem = DisplayItem(
+                name = "Holy Bible - NIV",
+                price = 45.99,
+                variants = listOf(
+                    DisplayItem.Variant(
+                        key = "Language",
+                        valueList = listOf("English", "French", "Spanish")
+                    )
+                )
+            ),
+            checkoutItem = CheckoutItem(
+                itemName = "Holy Bible - NIV",
+                totalPrice = 45.99
+            ),
+            expanded = true,
+            onItemClicked = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ItemVariantMenuPreview() {
+    BookStoreTheme {
+        ItemVariantMenu(
+            variant = DisplayItem.Variant(
+                key = "Size",
+                valueList = listOf("S", "M", "L", "XL")
+            ),
+            checkoutItem = CheckoutItem(
+                itemName = "T-Shirt",
+                totalPrice = 25.00
+            ),
+            updateCartItem = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun QuantityStepperPreview() {
+    BookStoreTheme {
+        QuantityStepper(
+            displayItem = DisplayItem(
+                name = "Bible",
+                price = 40.00
+            ),
+            checkoutItem = CheckoutItem(
+                itemName = "Bible",
+                quantity = 2,
+                totalPrice = 80.00
+            ),
+            updateCartItem = {}
+        )
+    }
+}
+
 @Preview
 @Composable
 fun ItemViewPreview() {
