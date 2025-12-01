@@ -29,6 +29,9 @@ object Dimensions {
     val corner_radius_xxl: Dp = 32.dp
     val corner_radius_full: Dp = 100.dp
 
+    // Corner Radius Percentages
+    const val corner_radius_percent_m: Int = 40 // For pill-shaped elements
+    const val corner_radius_percent_l: Int = 50 // For pill-shaped elements
     // Elevation
     val elevation_none: Dp = 0.dp
     val elevation_xs: Dp = 1.dp
@@ -53,6 +56,12 @@ object Dimensions {
     val button_horizontal_padding: Dp = 24.dp
     val button_vertical_padding: Dp = 8.dp
 
+    // Gradient Overlay
+    val gradient_overlay_height: Dp = 200.dp
+
+    // Date slider indicator height
+    val date_slider_height: Dp = 300.dp
+
     // Layout Constraints
     val max_content_width: Dp = 500.dp
     val min_touch_target_size: Dp = 48.dp
@@ -60,6 +69,11 @@ object Dimensions {
     // Divider
     val divider_thickness: Dp = 1.dp
     val divider_thickness_thick: Dp = 2.dp
+
+    // Border
+    val border_width_thin: Dp = 0.5.dp
+    val border_width: Dp = 1.5.dp
+    val border_width_thick: Dp = 2.dp
 
     // Cards
     val card_elevation: Dp = 6.dp
@@ -73,7 +87,7 @@ object Dimensions {
 
     // Item List
     val item_card_elevation: Dp = 6.dp
-    val item_card_corner_radius: Dp = 12.dp
+    val item_card_corner_radius: Dp = 14.5.dp
     val item_card_padding: Dp = 16.dp
     val item_spacing: Dp = 12.dp
 
@@ -105,4 +119,3 @@ object Dimensions {
     val counter_text_width: Dp = 40.dp
     val counter_spacing: Dp = 8.dp
 }
-

@@ -5,7 +5,11 @@ import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
 import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
 import kotlinx.datetime.LocalDateTime
-import kotlin.test.*
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -37,7 +41,7 @@ class ManageCartUseCaseTest {
             id = Uuid.random(),
             itemName = "Test Item",
             quantity = 2,
-            optionsMap = emptyMap(),
+            variantsMap = emptyMap(),
             totalPrice = 20.0
         )
 
@@ -61,7 +65,7 @@ class ManageCartUseCaseTest {
             id = Uuid.random(),
             itemName = "",
             quantity = 1,
-            optionsMap = emptyMap(),
+            variantsMap = emptyMap(),
             totalPrice = 10.0
         )
 
@@ -80,7 +84,7 @@ class ManageCartUseCaseTest {
             id = Uuid.random(),
             itemName = "Item",
             quantity = 0,
-            optionsMap = emptyMap(),
+            variantsMap = emptyMap(),
             totalPrice = 10.0
         )
 
@@ -99,7 +103,7 @@ class ManageCartUseCaseTest {
             id = Uuid.random(),
             itemName = "Item",
             quantity = -1,
-            optionsMap = emptyMap(),
+            variantsMap = emptyMap(),
             totalPrice = 10.0
         )
 
@@ -118,7 +122,7 @@ class ManageCartUseCaseTest {
             id = Uuid.random(),
             itemName = "Item",
             quantity = 1,
-            optionsMap = emptyMap(),
+            variantsMap = emptyMap(),
             totalPrice = 0.0
         )
 
@@ -137,7 +141,7 @@ class ManageCartUseCaseTest {
             id = Uuid.random(),
             itemName = "Item",
             quantity = 1,
-            optionsMap = emptyMap(),
+            variantsMap = emptyMap(),
             totalPrice = -10.0
         )
 
@@ -156,7 +160,7 @@ class ManageCartUseCaseTest {
             id = Uuid.random(),
             itemName = "Coffee",
             quantity = 2,
-            optionsMap = mapOf("size" to "Large"),
+            variantsMap = mapOf("size" to "Large"),
             totalPrice = 10.0
         )
         val cart = emptyCart.copy(checkoutList = listOf(existingItem))
@@ -165,7 +169,7 @@ class ManageCartUseCaseTest {
             id = Uuid.random(),
             itemName = "Coffee",
             quantity = 1,
-            optionsMap = mapOf("size" to "Large"),
+            variantsMap = mapOf("size" to "Large"),
             totalPrice = 5.0
         )
 
@@ -188,7 +192,7 @@ class ManageCartUseCaseTest {
             id = Uuid.random(),
             itemName = "Coffee",
             quantity = 1,
-            optionsMap = mapOf("size" to "Small"),
+            variantsMap = mapOf("size" to "Small"),
             totalPrice = 5.0
         )
         val cart = emptyCart.copy(checkoutList = listOf(existingItem))
@@ -197,7 +201,7 @@ class ManageCartUseCaseTest {
             id = Uuid.random(),
             itemName = "Coffee",
             quantity = 1,
-            optionsMap = mapOf("size" to "Large"),
+            variantsMap = mapOf("size" to "Large"),
             totalPrice = 7.0
         )
 
@@ -221,7 +225,7 @@ class ManageCartUseCaseTest {
             id = itemId,
             itemName = "Item",
             quantity = 1,
-            optionsMap = emptyMap(),
+            variantsMap = emptyMap(),
             totalPrice = 10.0
         )
         val cart = emptyCart.copy(checkoutList = listOf(item))
@@ -243,7 +247,7 @@ class ManageCartUseCaseTest {
             id = Uuid.random(),
             itemName = "Item",
             quantity = 1,
-            optionsMap = emptyMap(),
+            variantsMap = emptyMap(),
             totalPrice = 10.0
         )
 
@@ -262,14 +266,14 @@ class ManageCartUseCaseTest {
             id = Uuid.random(),
             itemName = "Item 1",
             quantity = 1,
-            optionsMap = emptyMap(),
+            variantsMap = emptyMap(),
             totalPrice = 10.0
         )
         val item2 = CheckoutItem(
             id = Uuid.random(),
             itemName = "Item 2",
             quantity = 1,
-            optionsMap = emptyMap(),
+            variantsMap = emptyMap(),
             totalPrice = 20.0
         )
         val cart = emptyCart.copy(checkoutList = listOf(item1, item2))
@@ -295,7 +299,7 @@ class ManageCartUseCaseTest {
             id = itemId,
             itemName = "Item",
             quantity = 2,
-            optionsMap = emptyMap(),
+            variantsMap = emptyMap(),
             totalPrice = 20.0
         )
         val cart = emptyCart.copy(checkoutList = listOf(item))
@@ -319,7 +323,7 @@ class ManageCartUseCaseTest {
             id = itemId,
             itemName = "Item",
             quantity = 2,
-            optionsMap = emptyMap(),
+            variantsMap = emptyMap(),
             totalPrice = 20.0
         )
         val cart = emptyCart.copy(checkoutList = listOf(item))
@@ -340,7 +344,7 @@ class ManageCartUseCaseTest {
             id = itemId,
             itemName = "Item",
             quantity = 2,
-            optionsMap = emptyMap(),
+            variantsMap = emptyMap(),
             totalPrice = 20.0
         )
         val cart = emptyCart.copy(checkoutList = listOf(item))

@@ -6,7 +6,7 @@ class BookStoreNavigator(private val navController: NavHostController) {
     fun navigateTo(destination: BookStoreNavDestination) {
         when (destination) {
             is BookStoreNavDestination.CheckoutScreen -> navController.navigate(BookStoreNavDestination.CheckoutScreen.route)
-            is BookStoreNavDestination.ItemListScreen -> navController.navigate(BookStoreNavDestination.ItemListScreen.route)
+            is BookStoreNavDestination.ShopScreen -> navController.navigate(BookStoreNavDestination.ShopScreen.route)
             is BookStoreNavDestination.ReceiptScreen -> navController.navigate(BookStoreNavDestination.ReceiptScreen.route)
         }
     }

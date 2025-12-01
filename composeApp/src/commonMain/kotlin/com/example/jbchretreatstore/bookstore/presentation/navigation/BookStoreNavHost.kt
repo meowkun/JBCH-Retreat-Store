@@ -1,11 +1,14 @@
 package com.example.jbchretreatstore.bookstore.presentation.navigation
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -14,7 +17,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,11 +29,16 @@ import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewModel
 import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.presentation.ui.checkout.CheckoutScreen
-import com.example.jbchretreatstore.bookstore.presentation.ui.itemlist.AddItemDialog
-import com.example.jbchretreatstore.bookstore.presentation.ui.itemlist.BottomNavigationBar
-import com.example.jbchretreatstore.bookstore.presentation.ui.itemlist.ItemListScreen
+import com.example.jbchretreatstore.bookstore.presentation.ui.components.BottomNavigationBar
+import com.example.jbchretreatstore.bookstore.presentation.ui.components.CustomFloatingActionButton
+import com.example.jbchretreatstore.bookstore.presentation.ui.dialog.AddItemDialog
 import com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory.PurchaseHistoryScreen
-import com.example.jbchretreatstore.core.presentation.DarkBlue
+import com.example.jbchretreatstore.bookstore.presentation.ui.shop.ShopScreen
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
+import jbchretreatstore.composeapp.generated.resources.Res
+import jbchretreatstore.composeapp.generated.resources.app_logo_description
+import jbchretreatstore.composeapp.generated.resources.ic_app_logo
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -44,7 +54,7 @@ fun BookStoreNavHost(viewModel: BookStoreViewModel) {
     val currentDestination = when (navBackStackEntry?.destination?.route) {
         BookStoreNavDestination.CheckoutScreen.route -> BookStoreNavDestination.CheckoutScreen
         BookStoreNavDestination.ReceiptScreen.route -> BookStoreNavDestination.ReceiptScreen
-        else -> BookStoreNavDestination.ItemListScreen
+        else -> BookStoreNavDestination.ShopScreen
     }
 
     // Show snackbar when snackbarMessage is not null
@@ -62,44 +72,73 @@ fun BookStoreNavHost(viewModel: BookStoreViewModel) {
     }
 
     Scaffold(
-        containerColor = DarkBlue,
+        topBar = {
+            Image(
+                modifier = Modifier.fillMaxWidth()
+                    .statusBarsPadding(),
+                painter = painterResource(Res.drawable.ic_app_logo),
+                contentDescription = stringResource(Res.string.app_logo_description),
+                contentScale = ContentScale.Inside,
+                alignment = Alignment.Center
+            )
+        },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
-            if (currentDestination == BookStoreNavDestination.ItemListScreen) {
-                FloatingActionButton(
-                    onClick = {
-                        viewModel.onUserIntent(
-                            BookStoreIntent.OnUpdateDialogVisibility(
-                                AlertDialogType.ADD_ITEM,
-                                true
-                            ),
-                            navigator
-                        )
-                    },
-                    containerColor = MaterialTheme.colorScheme.primary
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = null)
+            Column(
+                modifier = Modifier.padding(horizontal = Dimensions.spacing_m),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_m)
+            ) {
+                // Row containing Add Item button and Checkout button - only one displays at a time
+                val showButtons = currentDestination != BookStoreNavDestination.CheckoutScreen
+                val hasItemsInCart = state.currentCheckoutList.checkoutList.isNotEmpty()
+                val isOnShopScreen = currentDestination == BookStoreNavDestination.ShopScreen
+
+                AnimatedVisibility(visible = showButtons) {
+                    CustomFloatingActionButton(
+                        hasItemsInCart = hasItemsInCart,
+                        isOnShopScreen = isOnShopScreen,
+                        itemCount = state.currentCheckoutList.checkoutList.sumOf { it.quantity },
+                        onCheckoutClick = {
+                            viewModel.onUserIntent(
+                                BookStoreIntent.OnNavigate(BookStoreNavDestination.CheckoutScreen),
+                                navigator
+                            )
+                        },
+                        onAddItemClick = {
+                            viewModel.onUserIntent(
+                                BookStoreIntent.OnUpdateDialogVisibility(
+                                    AlertDialogType.ADD_ITEM,
+                                    true
+                                ),
+                                navigator
+                            )
+                        }
+                    )
+                }
+
+                // Bottom Navigation Bar - visible when not on checkout screen
+                AnimatedVisibility(visible = showButtons) {
+                    BottomNavigationBar(
+                        currentDestination = currentDestination,
+                        onUserIntent = { intent ->
+                            viewModel.onUserIntent(intent, navigator)
+                        },
+                        modifier = Modifier.padding(bottom = Dimensions.spacing_xxl)
+                    )
                 }
             }
         },
-        bottomBar = {
-            if (currentDestination != BookStoreNavDestination.CheckoutScreen) {
-                BottomNavigationBar(
-                    saveForLaterCount = state.saveForLaterList.size,
-                    currentDestination = currentDestination
-                ) { intent ->
-                    viewModel.onUserIntent(intent, navigator)
-                }
-            }
-        }
+        floatingActionButtonPosition = FabPosition.Center
     ) { innerPadding ->
         NavHost(
             modifier = Modifier.padding(innerPadding),
             navController = navController,
-            startDestination = BookStoreNavDestination.ItemListScreen.route
+            startDestination = BookStoreNavDestination.ShopScreen.route
         ) {
-            composable(BookStoreNavDestination.ItemListScreen.route) {
-                ItemListScreen(
+            composable(BookStoreNavDestination.ShopScreen.route) {
+                ShopScreen(
                     state = state,
                 ) { intent ->
                     viewModel.onUserIntent(intent, navigator)

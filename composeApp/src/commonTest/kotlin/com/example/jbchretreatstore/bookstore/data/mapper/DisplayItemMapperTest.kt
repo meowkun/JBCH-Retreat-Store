@@ -2,7 +2,11 @@ package com.example.jbchretreatstore.bookstore.data.mapper
 
 import com.example.jbchretreatstore.bookstore.data.model.DisplayItemDto
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -35,9 +39,9 @@ class DisplayItemMapperTest {
         assertEquals(id, domain.id)
         assertEquals("Test Item", domain.name)
         assertEquals(29.99, domain.price)
-        assertEquals(1, domain.options.size)
-        assertEquals("size", domain.options[0].optionKey)
-        assertEquals(3, domain.options[0].optionValueList.size)
+        assertEquals(1, domain.variants.size)
+        assertEquals("size", domain.variants[0].key)
+        assertEquals(3, domain.variants[0].valueList.size)
         assertTrue(domain.isInCart)
     }
 
@@ -56,7 +60,7 @@ class DisplayItemMapperTest {
         val domain = DisplayItemMapper.toDomain(dto)
 
         // Then
-        assertEquals(0, domain.options.size)
+        assertEquals(0, domain.variants.size)
         assertFalse(domain.isInCart)
     }
 
@@ -79,10 +83,10 @@ class DisplayItemMapperTest {
         val domain = DisplayItemMapper.toDomain(dto)
 
         // Then
-        assertEquals(3, domain.options.size)
-        assertEquals("size", domain.options[0].optionKey)
-        assertEquals("color", domain.options[1].optionKey)
-        assertEquals("material", domain.options[2].optionKey)
+        assertEquals(3, domain.variants.size)
+        assertEquals("size", domain.variants[0].key)
+        assertEquals("color", domain.variants[1].key)
+        assertEquals("material", domain.variants[2].key)
     }
 
     @Test
@@ -97,7 +101,7 @@ class DisplayItemMapperTest {
         assertNotNull(domain.id)
         assertEquals("", domain.name)
         assertEquals(0.0, domain.price)
-        assertEquals(0, domain.options.size)
+        assertEquals(0, domain.variants.size)
         assertFalse(domain.isInCart)
     }
 
@@ -111,10 +115,10 @@ class DisplayItemMapperTest {
             id = id,
             name = "Test Item",
             price = 29.99,
-            options = listOf(
-                DisplayItem.Option(
-                    optionKey = "size",
-                    optionValueList = listOf("Small", "Medium", "Large")
+            variants = listOf(
+                DisplayItem.Variant(
+                    key = "size",
+                    valueList = listOf("Small", "Medium", "Large")
                 )
             ),
             isInCart = true
@@ -140,7 +144,7 @@ class DisplayItemMapperTest {
             id = Uuid.random(),
             name = "Simple Item",
             price = 10.0,
-            options = emptyList(),
+            variants = emptyList(),
             isInCart = false
         )
 
@@ -159,10 +163,10 @@ class DisplayItemMapperTest {
             id = Uuid.random(),
             name = "Complex Item",
             price = 50.0,
-            options = listOf(
-                DisplayItem.Option("size", listOf("S", "M", "L")),
-                DisplayItem.Option("color", listOf("Red", "Blue")),
-                DisplayItem.Option("material", listOf("Cotton", "Polyester"))
+            variants = listOf(
+                DisplayItem.Variant("size", listOf("S", "M", "L")),
+                DisplayItem.Variant("color", listOf("Red", "Blue")),
+                DisplayItem.Variant("material", listOf("Cotton", "Polyester"))
             ),
             isInCart = true
         )
@@ -211,8 +215,8 @@ class DisplayItemMapperTest {
             id = Uuid.random(),
             name = "Original Item",
             price = 99.99,
-            options = listOf(
-                DisplayItem.Option("color", listOf("Red", "Blue"))
+            variants = listOf(
+                DisplayItem.Variant("color", listOf("Red", "Blue"))
             ),
             isInCart = true
         )
@@ -225,7 +229,7 @@ class DisplayItemMapperTest {
         assertEquals(originalDomain.id, resultDomain.id)
         assertEquals(originalDomain.name, resultDomain.name)
         assertEquals(originalDomain.price, resultDomain.price)
-        assertEquals(originalDomain.options.size, resultDomain.options.size)
+        assertEquals(originalDomain.variants.size, resultDomain.variants.size)
         assertEquals(originalDomain.isInCart, resultDomain.isInCart)
     }
 
@@ -346,7 +350,7 @@ class DisplayItemMapperTest {
         val domain = DisplayItemMapper.toDomain(dto)
 
         // Then
-        assertEquals(100, domain.options[0].optionValueList.size)
+        assertEquals(100, domain.variants[0].valueList.size)
     }
 }
 

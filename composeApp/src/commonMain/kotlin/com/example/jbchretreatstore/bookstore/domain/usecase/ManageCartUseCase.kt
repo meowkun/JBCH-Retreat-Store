@@ -33,13 +33,13 @@ class ManageCartUseCase {
 
         // Check if item with same name and options already exists
         val existingItem = currentCart.checkoutList.find {
-            it.itemName == newItem.itemName && it.optionsMap == newItem.optionsMap
+            it.itemName == newItem.itemName && it.variantsMap == newItem.variantsMap
         }
 
         val updatedList = if (existingItem != null) {
             // Update existing item quantity and price
             currentCart.checkoutList.map { item ->
-                if (item.itemName == newItem.itemName && item.optionsMap == newItem.optionsMap) {
+                if (item.itemName == newItem.itemName && item.variantsMap == newItem.variantsMap) {
                     item.copy(
                         quantity = item.quantity + newItem.quantity,
                         totalPrice = item.totalPrice + newItem.totalPrice
@@ -95,8 +95,18 @@ class ManageCartUseCase {
 
         val item = currentCart.checkoutList[itemIndex]
 
-        // Calculate price per unit
+        // Prevent division by zero
+        if (item.quantity <= 0) {
+            return Result.failure(IllegalStateException("Cart item has invalid quantity"))
+        }
+
+        // Calculate price per unit (safe from division by zero)
         val pricePerUnit = item.totalPrice / item.quantity
+
+        // Validate price is positive
+        if (pricePerUnit <= 0) {
+            return Result.failure(IllegalStateException("Cart item has invalid price"))
+        }
 
         // Update item with new quantity and recalculate total price
         val updatedItem = item.copy(
@@ -165,7 +175,7 @@ class ManageCartUseCase {
      */
     fun containsItem(cart: ReceiptData, itemName: String, options: Map<String, String>): Boolean {
         return cart.checkoutList.any {
-            it.itemName == itemName && it.optionsMap == options
+            it.itemName == itemName && it.variantsMap == options
         }
     }
 

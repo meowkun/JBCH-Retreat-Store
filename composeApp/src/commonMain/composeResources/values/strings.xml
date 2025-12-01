@@ -1,27 +1,42 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
+    <!--  App branding  -->
+    <string name="app_logo_description">JBCH Market Manager</string>
+
+    <!--  Search bar  -->
+    <string name="search_placeholder">Search For Books</string>
+    <string name="search_icon_description">Search icon</string>
+    <string name="clear_search_description">Clear search</string>
+
     <!--  Item view  -->
     <string name="search_hint">Find item...</string>
     <string name="clear_hint">Clear search</string>
     <string name="item_arrow_up_content_description">Collapse item</string>
     <string name="item_arrow_down_content_description">Expend item</string>
     <string name="drop_down_content_description">Drop down</string>
-    <string name="item_price_per_unit">Price: $%1$d/each</string>
+    <string name="item_price_per_unit">%1$d/each</string>
     <string name="item_option_menu_selection_hint">Select %1$d</string>
     <string name="quantity_label">Quantity</string>
-    <string name="total_price_text">Total: $%1$d</string>
+    <string name="total_price_text">Total: %1$d</string>
     <string name="add_to_cart">Add to cart</string>
 
     <!--  Add item dialog  -->
     <string name="add_item_dialog_title">Add New Item</string>
-    <string name="add_item_name_label">Item name</string>
-    <string name="add_item_price_label">Item price</string>
-    <string name="add_item_options_label">Add Item options:</string>
-    <string name="add_item_options_key">Option key</string>
-    <string name="add_item_options_value">Option value</string>
+    <string name="add_item_name_label">Name</string>
+    <string name="add_item_name_place_holder">e.g. The Bible</string>
+    <string name="add_item_price_label">Price</string>
+    <string name="add_item_price_place_holder">e.g. 37.99</string>
+    <string name="add_item_options_label">Item variants:</string>
+    <string name="add_item_options_key">Variant key</string>
+    <string name="add_item_options_key_placeholder">e.g. Size, Color, Language</string>
+    <string name="add_item_options_value">Variant value</string>
+    <string name="add_item_options_value_placeholder">e.g. Large, Blue, English</string>
+    <string name="add_item_add_more_value">Add more variant value</string>
+    <string name="add_item_add_variant">Add variant</string>
     <string name="add_item_cancel">Cancel</string>
     <string name="add_item_add">Add</string>
     <string name="add_item_save">Save</string>
+    <string name="add_item_back">Back</string>
 
     <!--  Remove item dialog  -->
     <string name="remove_item_dialog_title">Remove Item</string>
@@ -31,10 +46,10 @@
 
     <!--  Cart view  -->
     <string name="checkout_view_item_title">Shopping Cart</string>
-    <string name="checkout_view_item_price">$%1$d</string>
+    <string name="checkout_view_item_price">%1$d</string>
     <string name="checkout_view_item_description">%1$d,%2$d</string>
     <string name="checkout_view_item_option"> (%1$d - %2$d)</string>
-    <string name="checkout_view_item_quantity">Quantity %1$d</string>
+    <string name="checkout_view_item_quantity">Quantity: %1$d</string>
     <string name="checkout_view_item_remove">Remove</string>
     <string name="checkout_view_item_subtotal">Subtotal: </string>
     <string name="checkout_view_item_checkout">Checkout</string>
@@ -48,7 +63,6 @@
     <!--  Purchase history view  -->
     <string name="purchase_history_view_title">Purchase History</string>
 
-    <!--  ViewModel toast/snackbar messages  -->
     <!-- Display item messages -->
     <string name="item_added_success">Item added successfully</string>
     <string name="item_add_failed">Failed to add item</string>
@@ -64,7 +78,24 @@
     <!-- Checkout messages -->
     <string name="checkout_success">Checkout completed successfully</string>
     <string name="checkout_failed">Checkout failed</string>
+    <string name="checkout_error">An error occurred. Please try again</string>
 
     <!-- Validation messages -->
     <string name="cart_empty">Cart is empty</string>
+
+    <!-- Stepper component -->
+    <string name="stepper_decrease">Decrease</string>
+    <string name="stepper_increase">Increase</string>
+
+    <!-- Checkout button -->
+    <string name="check_cart_button">Check Cart</string>
+    <string name="cart_icon_description">Cart icon</string>
+
+    <!-- Bottom Navigation -->
+    <string name="bottom_nav_shop">Shop</string>
+    <string name="bottom_nav_receipt">Receipt</string>
+
+    <!-- Content Descriptions -->
+    <string name="close_dialog_description">Close dialog</string>
+    <string name="remove_variant_value_description">Remove variant value</string>
 </resources>

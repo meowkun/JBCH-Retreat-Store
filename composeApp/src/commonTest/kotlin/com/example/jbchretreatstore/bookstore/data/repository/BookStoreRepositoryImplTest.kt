@@ -70,8 +70,8 @@ class BookStoreRepositoryImplTest {
                 id = Uuid.random(),
                 name = "Item with Options",
                 price = 30.0,
-                options = listOf(
-                    DisplayItem.Option("size", listOf("S", "M", "L"))
+                variants = listOf(
+                    DisplayItem.Variant("size", listOf("S", "M", "L"))
                 ),
                 isInCart = false
             )
@@ -130,9 +130,9 @@ class BookStoreRepositoryImplTest {
 
         // When & Then
         val items = repository.fetchDisplayItems().first()
-        assertEquals(1, items[0].options.size)
-        assertEquals("color", items[0].options[0].optionKey)
-        assertEquals(2, items[0].options[0].optionValueList.size)
+        assertEquals(1, items[0].variants.size)
+        assertEquals("color", items[0].variants[0].key)
+        assertEquals(2, items[0].variants[0].valueList.size)
     }
 
     // ========== ReceiptList Tests ==========
@@ -256,7 +256,7 @@ class BookStoreRepositoryImplTest {
         assertEquals(2, receipts[0].checkoutList.size)
         assertEquals("Item 1", receipts[0].checkoutList[0].itemName)
         assertEquals(2, receipts[0].checkoutList[0].quantity)
-        assertEquals(1, receipts[0].checkoutList[0].optionsMap.size)
+        assertEquals(1, receipts[0].checkoutList[0].variantsMap.size)
     }
 
     // ========== Integration Tests ==========

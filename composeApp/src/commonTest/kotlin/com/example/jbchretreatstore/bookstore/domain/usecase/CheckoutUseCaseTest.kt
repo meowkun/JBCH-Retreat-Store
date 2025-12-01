@@ -39,7 +39,7 @@ class CheckoutUseCaseTest {
                     id = Uuid.random(),
                     itemName = "Test Item",
                     quantity = 2,
-                    optionsMap = emptyMap(),
+                    variantsMap = emptyMap(),
                     totalPrice = 20.0
                 )
             ),
@@ -108,7 +108,7 @@ class CheckoutUseCaseTest {
                     id = Uuid.random(),
                     itemName = "Item",
                     quantity = 0,
-                    optionsMap = emptyMap(),
+                    variantsMap = emptyMap(),
                     totalPrice = 10.0
                 )
             )
@@ -131,7 +131,7 @@ class CheckoutUseCaseTest {
                     id = Uuid.random(),
                     itemName = "Item",
                     quantity = -1,
-                    optionsMap = emptyMap(),
+                    variantsMap = emptyMap(),
                     totalPrice = 10.0
                 )
             )
@@ -154,7 +154,7 @@ class CheckoutUseCaseTest {
                     id = Uuid.random(),
                     itemName = "Item",
                     quantity = 1,
-                    optionsMap = emptyMap(),
+                    variantsMap = emptyMap(),
                     totalPrice = 0.0
                 )
             )
@@ -177,7 +177,7 @@ class CheckoutUseCaseTest {
                     id = Uuid.random(),
                     itemName = "Item",
                     quantity = 1,
-                    optionsMap = emptyMap(),
+                    variantsMap = emptyMap(),
                     totalPrice = -10.0
                 )
             )

@@ -24,31 +24,53 @@ class BookStoreLocalDataSourceImpl(
     }
 
     override suspend fun saveDisplayItems(items: List<DisplayItemDto>) {
-        val jsonString = json.encodeToString(items)
-        dataStore.edit { prefs ->
-            prefs[displayItemsKey] = jsonString
+        try {
+            val jsonString = json.encodeToString(items)
+            dataStore.edit { prefs ->
+                prefs[displayItemsKey] = jsonString
+            }
+        } catch (e: Exception) {
+            println("Error saving display items: ${e.message}")
+            throw IllegalStateException("Failed to save display items", e)
         }
     }
 
     override fun getDisplayItems(): Flow<List<DisplayItemDto>> =
         dataStore.data.map { prefs ->
-            prefs[displayItemsKey]?.let {
-                json.decodeFromString<List<DisplayItemDto>>(it)
-            } ?: emptyList()
+            try {
+                prefs[displayItemsKey]?.let {
+                    json.decodeFromString<List<DisplayItemDto>>(it)
+                } ?: emptyList()
+            } catch (e: Exception) {
+                println("Error loading display items: ${e.message}")
+                // Return empty list instead of crashing
+                emptyList()
+            }
         }
 
     override suspend fun saveReceipts(receipts: List<ReceiptDataDto>) {
-        val jsonString = json.encodeToString(receipts)
-        dataStore.edit { prefs ->
-            prefs[receiptsKey] = jsonString
+        try {
+            val jsonString = json.encodeToString(receipts)
+            dataStore.edit { prefs ->
+                prefs[receiptsKey] = jsonString
+            }
+        } catch (e: Exception) {
+            println("Error saving receipts: ${e.message}")
+            throw IllegalStateException("Failed to save receipts", e)
         }
     }
 
     override fun getReceipts(): Flow<List<ReceiptDataDto>> =
         dataStore.data.map { prefs ->
-            prefs[receiptsKey]?.let {
-                json.decodeFromString<List<ReceiptDataDto>>(it)
-            } ?: emptyList()
+            try {
+                prefs[receiptsKey]?.let {
+                    json.decodeFromString<List<ReceiptDataDto>>(it)
+                } ?: emptyList()
+            } catch (e: Exception) {
+                println("Error loading receipts: ${e.message}")
+                // Return empty list instead of crashing
+                emptyList()
+            }
         }
 }
 
