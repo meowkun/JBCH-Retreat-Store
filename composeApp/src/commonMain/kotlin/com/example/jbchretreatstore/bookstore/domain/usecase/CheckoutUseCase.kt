@@ -1,8 +1,8 @@
 package com.example.jbchretreatstore.bookstore.domain.usecase
 
-import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
 import com.example.jbchretreatstore.bookstore.domain.repository.BookStoreRepository
+import com.example.jbchretreatstore.bookstore.presentation.CheckoutState
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -22,12 +22,10 @@ class CheckoutUseCase(
     @OptIn(ExperimentalTime::class)
     suspend fun processCheckout(
         cart: ReceiptData,
-        buyerName: String,
-        checkoutStatus: CheckoutStatus,
-        paymentMethod: com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod
+        checkoutState: CheckoutState
     ): Result<ReceiptData> {
         // Validate buyer name
-        if (buyerName.isBlank()) {
+        if (checkoutState.buyerName.isBlank()) {
             return Result.failure(IllegalArgumentException("Buyer name cannot be empty"))
         }
 
@@ -47,9 +45,9 @@ class CheckoutUseCase(
 
         // Create receipt with timestamp
         val receipt = cart.copy(
-            buyerName = buyerName,
-            checkoutStatus = checkoutStatus,
-            paymentMethod = paymentMethod,
+            buyerName = checkoutState.buyerName,
+            checkoutStatus = checkoutState.checkoutStatus,
+            paymentMethod = checkoutState.paymentMethod,
             dateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         )
 
@@ -67,13 +65,11 @@ class CheckoutUseCase(
     @OptIn(ExperimentalTime::class)
     suspend fun saveForLater(
         cart: ReceiptData,
-        buyerName: String
+        checkoutState: CheckoutState
     ): Result<ReceiptData> {
         return processCheckout(
             cart,
-            buyerName,
-            CheckoutStatus.SAVE_FOR_LATER,
-            com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod.CASH
+            checkoutState
         )
     }
 

@@ -38,6 +38,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
+import com.example.jbchretreatstore.bookstore.presentation.DialogVisibilityState
 import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.DialogTitle
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.LabeledTextField
@@ -102,8 +103,10 @@ fun AddItemDialog(
                         // Close the dialog
                         onUserIntent(
                             BookStoreIntent.OnUpdateDialogVisibility(
-                                alertDialogType = AlertDialogType.ADD_ITEM,
-                                isVisible = false
+                                dialogState = DialogVisibilityState(
+                                    alertDialogType = AlertDialogType.ADD_ITEM,
+                                    isVisible = false
+                                )
                             )
                         )
                     }

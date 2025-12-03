@@ -27,6 +27,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewModel
+import com.example.jbchretreatstore.bookstore.presentation.DialogVisibilityState
 import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.presentation.ui.checkout.CheckoutScreen
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.BottomNavigationBar
@@ -109,8 +110,10 @@ fun BookStoreNavHost(viewModel: BookStoreViewModel) {
                         onAddItemClick = {
                             viewModel.onUserIntent(
                                 BookStoreIntent.OnUpdateDialogVisibility(
-                                    AlertDialogType.ADD_ITEM,
-                                    true
+                                    dialogState = DialogVisibilityState(
+                                        alertDialogType = AlertDialogType.ADD_ITEM,
+                                        isVisible = true
+                                    )
                                 ),
                                 navigator
                             )

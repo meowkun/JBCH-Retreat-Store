@@ -48,6 +48,7 @@ import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewState
+import com.example.jbchretreatstore.bookstore.presentation.DialogVisibilityState
 import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.Stepper
 import com.example.jbchretreatstore.bookstore.presentation.ui.dialog.RemoveItemDialog
@@ -240,8 +241,10 @@ fun ItemExpandableView(
                 onClick = {
                     onUserIntent(
                         BookStoreIntent.OnUpdateDialogVisibility(
-                            AlertDialogType.REMOVE_ITEM,
-                            true
+                            dialogState = DialogVisibilityState(
+                                alertDialogType = AlertDialogType.REMOVE_ITEM,
+                                isVisible = true
+                            )
                         )
                     )
                 }

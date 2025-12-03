@@ -23,6 +23,8 @@ import androidx.compose.ui.Modifier
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
 import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
+import com.example.jbchretreatstore.bookstore.presentation.CheckoutState
+import com.example.jbchretreatstore.bookstore.presentation.DialogVisibilityState
 import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import jbchretreatstore.composeapp.generated.resources.Res
@@ -45,8 +47,10 @@ fun CheckoutDialog(
     val onDismissHandler = {
         onUserIntent.invoke(
             BookStoreIntent.OnUpdateDialogVisibility(
-                alertDialogType = AlertDialogType.CHECKOUT,
-                isVisible = false
+                dialogState = DialogVisibilityState(
+                    alertDialogType = AlertDialogType.CHECKOUT,
+                    isVisible = false
+                )
             )
         )
     }
@@ -98,9 +102,11 @@ fun CheckoutDialog(
                     } else {
                         onUserIntent.invoke(
                             BookStoreIntent.OnCheckout(
-                                buyerName = trimmedName,
-                                checkoutStatus = checkoutStatus,
-                                paymentMethod = paymentMethod
+                                CheckoutState(
+                                    buyerName = trimmedName,
+                                    checkoutStatus = checkoutStatus,
+                                    paymentMethod = paymentMethod
+                                )
                             )
                         )
                     }

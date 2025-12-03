@@ -43,6 +43,7 @@ import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod.ZELLE
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewState
+import com.example.jbchretreatstore.bookstore.presentation.DialogVisibilityState
 import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavDestination
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.TitleView
@@ -120,8 +121,10 @@ fun CheckoutScreen(
                     checkoutStatus = CheckoutStatus.SAVE_FOR_LATER
                     onUserIntent.invoke(
                         BookStoreIntent.OnUpdateDialogVisibility(
-                            alertDialogType = AlertDialogType.CHECKOUT,
-                            isVisible = true
+                            dialogState = DialogVisibilityState(
+                                alertDialogType = AlertDialogType.CHECKOUT,
+                                isVisible = true
+                            )
                         )
                     )
                 },
@@ -129,8 +132,10 @@ fun CheckoutScreen(
                     checkoutStatus = CheckoutStatus.CHECKED_OUT
                     onUserIntent.invoke(
                         BookStoreIntent.OnUpdateDialogVisibility(
-                            alertDialogType = AlertDialogType.CHECKOUT,
-                            isVisible = true
+                            dialogState = DialogVisibilityState(
+                                alertDialogType = AlertDialogType.CHECKOUT,
+                                isVisible = true
+                            )
                         )
                     )
                 }

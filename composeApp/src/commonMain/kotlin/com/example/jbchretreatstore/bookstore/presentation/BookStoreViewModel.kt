@@ -131,9 +131,7 @@ class BookStoreViewModel(
                 viewModelScope.launch {
                     val result = checkoutUseCase.processCheckout(
                         state.value.currentCheckoutList,
-                        intent.buyerName,
-                        intent.checkoutStatus,
-                        intent.paymentMethod
+                        intent.checkoutState
                     )
                     result.onSuccess {
                         _state.update {
@@ -180,11 +178,11 @@ class BookStoreViewModel(
             }
 
             is BookStoreIntent.OnUpdateDialogVisibility -> {
-                when (intent.alertDialogType) {
+                when (intent.dialogState.alertDialogType) {
                     AlertDialogType.CHECKOUT -> {
                         _state.update {
                             it.copy(
-                                displayCheckoutDialog = intent.isVisible
+                                displayCheckoutDialog = intent.dialogState.isVisible
                             )
                         }
                     }
@@ -192,7 +190,7 @@ class BookStoreViewModel(
                     AlertDialogType.ADD_ITEM -> {
                         _state.update {
                             it.copy(
-                                displayAddDisplayItemDialog = intent.isVisible
+                                displayAddDisplayItemDialog = intent.dialogState.isVisible
                             )
                         }
                     }
@@ -200,7 +198,7 @@ class BookStoreViewModel(
                     AlertDialogType.REMOVE_ITEM -> {
                         _state.update {
                             it.copy(
-                                displayRemoveDisplayItemDialog = intent.isVisible
+                                displayRemoveDisplayItemDialog = intent.dialogState.isVisible
                             )
                         }
                     }

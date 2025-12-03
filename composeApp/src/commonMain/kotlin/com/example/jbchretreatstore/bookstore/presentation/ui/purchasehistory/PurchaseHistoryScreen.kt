@@ -158,7 +158,7 @@ fun PurchaseHistoryScreen(
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
                     .padding(
-                        top = Dimensions.date_slider_height,
+                        bottom = Dimensions.date_slider_height,
                         end = Dimensions.spacing_m
                     )
             ) {
