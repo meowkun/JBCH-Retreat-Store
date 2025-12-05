@@ -10,6 +10,8 @@ import com.example.jbchretreatstore.bookstore.domain.usecase.PurchaseHistoryUseC
 import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavDestination
 import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavigator
+import com.example.jbchretreatstore.bookstore.presentation.share.ShareManager
+import com.example.jbchretreatstore.bookstore.presentation.utils.convertReceiptsToCsv
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.added_to_cart
 import jbchretreatstore.composeapp.generated.resources.checkout_failed
@@ -22,12 +24,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Clock
 
 class BookStoreViewModel(
     private val manageDisplayItemsUseCase: ManageDisplayItemsUseCase,
     private val manageCartUseCase: ManageCartUseCase,
     private val checkoutUseCase: CheckoutUseCase,
-    private val purchaseHistoryUseCase: PurchaseHistoryUseCase
+    private val purchaseHistoryUseCase: PurchaseHistoryUseCase,
+    private val shareManager: ShareManager
 ) : ViewModel() {
 
     init {
@@ -201,6 +205,20 @@ class BookStoreViewModel(
                                 displayRemoveDisplayItemDialog = intent.dialogState.isVisible
                             )
                         }
+                    }
+                }
+            }
+
+            is BookStoreIntent.OnSharePurchaseHistory -> {
+                viewModelScope.launch {
+                    @OptIn(kotlin.time.ExperimentalTime::class)
+                    try {
+                        val csvContent = convertReceiptsToCsv(state.value.purchasedHistory)
+                        val fileName =
+                            "purchase_history_${Clock.System.now().toEpochMilliseconds()}.csv"
+                        shareManager.shareCsv(csvContent, fileName)
+                    } catch (e: Exception) {
+                        println("Failed to share purchase history: ${e.message}")
                     }
                 }
             }

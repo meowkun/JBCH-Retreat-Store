@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
@@ -39,8 +40,10 @@ import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreThe
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.DarkBlue
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Secondary
+import com.example.jbchretreatstore.bookstore.presentation.utils.toCurrency
 import com.example.jbchretreatstore.bookstore.presentation.utils.toFormattedDateString
 import jbchretreatstore.composeapp.generated.resources.Res
+import jbchretreatstore.composeapp.generated.resources.checkout_view_item_total_price
 import jbchretreatstore.composeapp.generated.resources.purchase_history_view_title
 import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDate
@@ -148,6 +151,20 @@ fun PurchaseHistoryScreen(
                         }
                     }
                 }
+
+                HorizontalDivider()
+                Text(
+                    modifier = Modifier.fillMaxWidth().padding(Dimensions.spacing_m),
+                    textAlign = TextAlign.End,
+                    text = stringResource(
+                        Res.string.checkout_view_item_total_price,
+                        state.purchasedHistory.sumOf { it.checkoutList.sumOf { it.totalPrice } }
+                            .toCurrency()
+                    ),
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                )
             }
 
             // Date slider indicator on the right

@@ -16,4 +16,5 @@ sealed interface BookStoreIntent {
     data class OnNavigate(val destination: BookStoreNavDestination) : BookStoreIntent
     data class OnUpdateDialogVisibility(val dialogState: DialogVisibilityState) : BookStoreIntent
     data object OnSnackbarDismissed : BookStoreIntent
+    data object OnSharePurchaseHistory : BookStoreIntent
 }

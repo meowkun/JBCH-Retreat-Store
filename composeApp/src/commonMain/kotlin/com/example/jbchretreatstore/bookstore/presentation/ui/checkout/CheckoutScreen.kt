@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
 import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod
@@ -56,10 +57,9 @@ import com.example.jbchretreatstore.bookstore.presentation.utils.toCurrency
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.cart_icon_description
 import jbchretreatstore.composeapp.generated.resources.checkout_view_item_checkout
-import jbchretreatstore.composeapp.generated.resources.checkout_view_item_price
 import jbchretreatstore.composeapp.generated.resources.checkout_view_item_save_to_waitlist
-import jbchretreatstore.composeapp.generated.resources.checkout_view_item_subtotal
 import jbchretreatstore.composeapp.generated.resources.checkout_view_item_title
+import jbchretreatstore.composeapp.generated.resources.checkout_view_item_total_price
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -113,7 +113,7 @@ fun CheckoutScreen(
 
             // Bottom checkout panel
             CheckoutPanel(
-                subtotal = state.currentCheckoutList.checkoutList.sumOf { it.totalPrice },
+                totalPrice = state.currentCheckoutList.checkoutList.sumOf { it.totalPrice },
                 radioOptions = radioOptions,
                 selectedOption = selectedOption.value,
                 onOptionSelected = { selectedOption.value = it },
@@ -155,7 +155,7 @@ fun CheckoutScreen(
 
 @Composable
 fun CheckoutPanel(
-    subtotal: Double,
+    totalPrice: Double,
     radioOptions: List<PaymentMethod>,
     selectedOption: PaymentMethod,
     onOptionSelected: (PaymentMethod) -> Unit,
@@ -176,28 +176,17 @@ fun CheckoutPanel(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_s)
         ) {
-            // Subtotal row
-            Row(
+            Text(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(Res.string.checkout_view_item_subtotal),
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold
-                    ),
-                )
-                Text(
-                    text = stringResource(
-                        Res.string.checkout_view_item_price,
-                        subtotal.toCurrency()
-                    ),
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.ExtraBold
-                    ),
-                )
-            }
+                textAlign = TextAlign.End,
+                text = stringResource(
+                    Res.string.checkout_view_item_total_price,
+                    totalPrice.toCurrency()
+                ),
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.ExtraBold
+                ),
+            )
 
             // Payment method selection (horizontal)
             RadioButtonHorizontalSelection(
@@ -289,7 +278,7 @@ fun RadioButtonHorizontalSelection(
 fun CheckoutPanelPreview() {
     BookStoreTheme {
         CheckoutPanel(
-            subtotal = 139.23,
+            totalPrice = 139.23,
             radioOptions = listOf(ZELLE, VENMO, CASH),
             selectedOption = CASH,
             onOptionSelected = {},
