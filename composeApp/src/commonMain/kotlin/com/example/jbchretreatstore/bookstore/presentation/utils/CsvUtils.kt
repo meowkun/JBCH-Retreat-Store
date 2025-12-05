@@ -30,10 +30,10 @@ private object CsvConstants {
     const val EMPTY_CELL = ""
     const val GRAND_TOTAL_LABEL = "Grand Total"
 
-    // Flexible header (without Receipt ID, combined Date Time)
+    // Flexible header (without Receipt ID, combined Date Time, Payment Method after Item Name)
     const val DATETIME = "Date Time"
     val HEADER_COLUMNS = listOf(
-        DATETIME, ITEM_NAME, QUANTITY, UNIT_PRICE, BUYER_NAME, PAYMENT_METHOD, TOTAL_PRICE
+        DATETIME, BUYER_NAME, ITEM_NAME, QUANTITY, UNIT_PRICE, PAYMENT_METHOD, TOTAL_PRICE
     )
     val HEADER: String = HEADER_COLUMNS.joinToString(COMMA) + NEWLINE
 }
@@ -86,10 +86,10 @@ fun convertReceiptsToCsv(receipts: List<ReceiptData>): String {
             csvBuilder.append(
                 "${CsvConstants.QUOTE}$dateTime${CsvConstants.QUOTE}${CsvConstants.COMMA}" +
                         "${CsvConstants.QUOTE}$buyerName${CsvConstants.QUOTE}${CsvConstants.COMMA}" +
-                        "${CsvConstants.QUOTE}$paymentMethod${CsvConstants.QUOTE}${CsvConstants.COMMA}" +
                         "${CsvConstants.QUOTE}${CsvConstants.EMPTY_VALUE}${CsvConstants.QUOTE}${CsvConstants.COMMA}" +
                         "${CsvConstants.ZERO}${CsvConstants.COMMA}" +
                         "${CsvConstants.ZERO_DECIMAL}${CsvConstants.COMMA}" +
+                        "${CsvConstants.QUOTE}$paymentMethod${CsvConstants.QUOTE}${CsvConstants.COMMA}" +
                         "${CsvConstants.ZERO_DECIMAL}${CsvConstants.NEWLINE}"
             )
         } else {
@@ -105,10 +105,10 @@ fun convertReceiptsToCsv(receipts: List<ReceiptData>): String {
                 csvBuilder.append(
                     "${CsvConstants.QUOTE}$dateTime${CsvConstants.QUOTE}${CsvConstants.COMMA}" +
                             "${CsvConstants.QUOTE}$buyerName${CsvConstants.QUOTE}${CsvConstants.COMMA}" +
-                            "${CsvConstants.QUOTE}$paymentMethod${CsvConstants.QUOTE}${CsvConstants.COMMA}" +
                             "${CsvConstants.QUOTE}$itemName${CsvConstants.QUOTE}${CsvConstants.COMMA}" +
                             "$quantity${CsvConstants.COMMA}" +
                             "$unitPrice${CsvConstants.COMMA}" +
+                            "${CsvConstants.QUOTE}$paymentMethod${CsvConstants.QUOTE}${CsvConstants.COMMA}" +
                             "$totalPrice${CsvConstants.NEWLINE}"
                 )
             }

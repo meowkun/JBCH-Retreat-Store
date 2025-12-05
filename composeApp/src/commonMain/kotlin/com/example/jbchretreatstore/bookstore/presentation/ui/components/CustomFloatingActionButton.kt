@@ -22,15 +22,17 @@ fun CustomFloatingActionButton(
     itemCount: Int,
     onCheckoutClick: () -> Unit,
     onAddItemClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    showShareButton: Boolean = false,
+    onShareClick: () -> Unit = {}
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Checkout button in center - only visible when there are items in cart
-        AnimatedVisibility(visible = hasItemsInCart) {
+        // Checkout button in center - only visible when there are items in cart on ShopScreen
+        AnimatedVisibility(visible = isOnShopScreen && hasItemsInCart) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
@@ -55,6 +57,20 @@ fun CustomFloatingActionButton(
                 Spacer(modifier = Modifier.weight(1f))
                 AddDisplayItemButton(
                     onClick = onAddItemClick
+                )
+            }
+        }
+
+        // Share button on the right - only visible on Receipt screen
+        AnimatedVisibility(visible = showShareButton) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Spacer(modifier = Modifier.weight(1f))
+                ShareButton(
+                    onClick = onShareClick
                 )
             }
         }
@@ -87,6 +103,19 @@ fun CustomFloatingActionButtonPreview() {
                 itemCount = 5,
                 onCheckoutClick = {},
                 onAddItemClick = {}
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Preview with Share button (on receipt screen with data)
+            CustomFloatingActionButton(
+                hasItemsInCart = false,
+                isOnShopScreen = false,
+                itemCount = 0,
+                showShareButton = true,
+                onCheckoutClick = {},
+                onAddItemClick = {},
+                onShareClick = {}
             )
         }
     }

@@ -8,12 +8,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.FabPosition
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -96,38 +91,21 @@ fun BookStoreNavHost(viewModel: BookStoreViewModel) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_m)
             ) {
-                // Share button - only visible on PurchaseHistoryScreen when there's receipt data
-                val isOnReceiptScreen = currentDestination == BookStoreNavDestination.ReceiptScreen
-                val hasReceiptData = state.purchasedHistory.isNotEmpty() &&
-                        state.purchasedHistory.any { it.checkoutList.isNotEmpty() }
-                AnimatedVisibility(visible = isOnReceiptScreen && hasReceiptData) {
-                    FloatingActionButton(
-                        onClick = {
-                            viewModel.onUserIntent(
-                                BookStoreIntent.OnSharePurchaseHistory,
-                                navigator
-                            )
-                        },
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Share,
-                            contentDescription = "Share Purchase History"
-                        )
-                    }
-                }
-
-                // Row containing Add Item button and Checkout button - only one displays at a time
+                // Determine button visibility states
                 val showButtons = currentDestination != BookStoreNavDestination.CheckoutScreen
                 val hasItemsInCart = state.currentCheckoutList.checkoutList.isNotEmpty()
                 val isOnShopScreen = currentDestination == BookStoreNavDestination.ShopScreen
+                val isOnReceiptScreen = currentDestination == BookStoreNavDestination.ReceiptScreen
+                val hasReceiptData = state.purchasedHistory.isNotEmpty() &&
+                        state.purchasedHistory.any { it.checkoutList.isNotEmpty() }
 
+                // Unified FloatingActionButton - handles Add Item, Checkout, and Share
                 AnimatedVisibility(visible = showButtons) {
                     CustomFloatingActionButton(
                         hasItemsInCart = hasItemsInCart,
                         isOnShopScreen = isOnShopScreen,
                         itemCount = state.currentCheckoutList.checkoutList.sumOf { it.quantity },
+                        showShareButton = isOnReceiptScreen && hasReceiptData,
                         onCheckoutClick = {
                             viewModel.onUserIntent(
                                 BookStoreIntent.OnNavigate(BookStoreNavDestination.CheckoutScreen),
@@ -142,6 +120,12 @@ fun BookStoreNavHost(viewModel: BookStoreViewModel) {
                                         isVisible = true
                                     )
                                 ),
+                                navigator
+                            )
+                        },
+                        onShareClick = {
+                            viewModel.onUserIntent(
+                                BookStoreIntent.OnSharePurchaseHistory,
                                 navigator
                             )
                         }
