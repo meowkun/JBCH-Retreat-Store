@@ -35,6 +35,7 @@ import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewState
+import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavDestination
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.TitleView
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.DarkBlue
@@ -123,7 +124,12 @@ fun PurchaseHistoryScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                TitleView(stringResource(Res.string.purchase_history_view_title))
+                TitleView(
+                    title = stringResource(Res.string.purchase_history_view_title),
+                    onBackClick = {
+                        onUserIntent.invoke(BookStoreIntent.OnNavigate(BookStoreNavDestination.ShopScreen))
+                    }
+                )
 
                 LazyColumn(
                     state = listState,

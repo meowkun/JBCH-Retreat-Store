@@ -92,48 +92,61 @@ fun BookStoreNavHost(viewModel: BookStoreViewModel) {
                 verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_m)
             ) {
                 // Determine button visibility states
-                val showButtons = currentDestination != BookStoreNavDestination.CheckoutScreen
                 val hasItemsInCart = state.currentCheckoutList.checkoutList.isNotEmpty()
                 val isOnShopScreen = currentDestination == BookStoreNavDestination.ShopScreen
+                val isOnCheckoutScreen =
+                    currentDestination == BookStoreNavDestination.CheckoutScreen
                 val isOnReceiptScreen = currentDestination == BookStoreNavDestination.ReceiptScreen
                 val hasReceiptData = state.purchasedHistory.isNotEmpty() &&
                         state.purchasedHistory.any { it.checkoutList.isNotEmpty() }
+                val totalPrice = state.currentCheckoutList.checkoutList.sumOf { it.totalPrice }
 
-                // Unified FloatingActionButton - handles Add Item, Checkout, and Share
-                AnimatedVisibility(visible = showButtons) {
-                    CustomFloatingActionButton(
-                        hasItemsInCart = hasItemsInCart,
-                        isOnShopScreen = isOnShopScreen,
-                        itemCount = state.currentCheckoutList.checkoutList.sumOf { it.quantity },
-                        showShareButton = isOnReceiptScreen && hasReceiptData,
-                        onCheckoutClick = {
-                            viewModel.onUserIntent(
-                                BookStoreIntent.OnNavigate(BookStoreNavDestination.CheckoutScreen),
-                                navigator
-                            )
-                        },
-                        onAddItemClick = {
-                            viewModel.onUserIntent(
-                                BookStoreIntent.OnUpdateDialogVisibility(
-                                    dialogState = DialogVisibilityState(
-                                        alertDialogType = AlertDialogType.ADD_ITEM,
-                                        isVisible = true
-                                    )
-                                ),
-                                navigator
-                            )
-                        },
-                        onShareClick = {
-                            viewModel.onUserIntent(
-                                BookStoreIntent.OnSharePurchaseHistory,
-                                navigator
-                            )
-                        }
-                    )
-                }
+                // Unified FloatingActionButton - handles Add Item, Checkout, CheckoutButton, and Share
+                CustomFloatingActionButton(
+                    hasItemsInCart = hasItemsInCart,
+                    isOnShopScreen = isOnShopScreen,
+                    isOnCheckoutScreen = isOnCheckoutScreen,
+                    itemCount = state.currentCheckoutList.checkoutList.sumOf { it.quantity },
+                    totalPrice = totalPrice,
+                    showShareButton = isOnReceiptScreen && hasReceiptData,
+                    onCheckoutClick = {
+                        viewModel.onUserIntent(
+                            BookStoreIntent.OnNavigate(BookStoreNavDestination.CheckoutScreen),
+                            navigator
+                        )
+                    },
+                    onCheckoutButtonClick = {
+                        viewModel.onUserIntent(
+                            BookStoreIntent.OnUpdateDialogVisibility(
+                                dialogState = DialogVisibilityState(
+                                    alertDialogType = AlertDialogType.CHECKOUT,
+                                    isVisible = true
+                                )
+                            ),
+                            navigator
+                        )
+                    },
+                    onAddItemClick = {
+                        viewModel.onUserIntent(
+                            BookStoreIntent.OnUpdateDialogVisibility(
+                                dialogState = DialogVisibilityState(
+                                    alertDialogType = AlertDialogType.ADD_ITEM,
+                                    isVisible = true
+                                )
+                            ),
+                            navigator
+                        )
+                    },
+                    onShareClick = {
+                        viewModel.onUserIntent(
+                            BookStoreIntent.OnSharePurchaseHistory,
+                            navigator
+                        )
+                    }
+                )
 
                 // Bottom Navigation Bar - visible when not on checkout screen
-                AnimatedVisibility(visible = showButtons) {
+                AnimatedVisibility(visible = !isOnCheckoutScreen) {
                     BottomNavigationBar(
                         currentDestination = currentDestination,
                         onUserIntent = { intent ->

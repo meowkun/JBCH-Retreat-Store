@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -23,16 +21,17 @@ import androidx.compose.ui.text.withStyle
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Primary
-import com.example.jbchretreatstore.bookstore.presentation.utils.toCurrency
 import jbchretreatstore.composeapp.generated.resources.Res
-import jbchretreatstore.composeapp.generated.resources.checkout_button_description
-import jbchretreatstore.composeapp.generated.resources.checkout_button_text
+import jbchretreatstore.composeapp.generated.resources.cart_icon_description
+import jbchretreatstore.composeapp.generated.resources.check_cart_button
+import jbchretreatstore.composeapp.generated.resources.ic_cart
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun CheckoutButton(
-    totalPrice: Double,
+fun CheckCartButton(
+    itemCount: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -52,19 +51,19 @@ fun CheckoutButton(
             horizontalArrangement = Arrangement.Center
         ) {
             Icon(
-                imageVector = Icons.Default.Payments,
-                contentDescription = stringResource(Res.string.checkout_button_description),
+                painter = painterResource(Res.drawable.ic_cart),
+                contentDescription = stringResource(Res.string.cart_icon_description),
                 modifier = Modifier.size(Dimensions.spacing_xxl)
             )
             Spacer(modifier = Modifier.width(Dimensions.spacing_xs))
             Text(
+                style = MaterialTheme.typography.titleLarge,
                 text = buildAnnotatedString {
                     withStyle(style = SpanStyle(fontWeight = FontWeight.ExtraBold)) {
-                        append(stringResource(Res.string.checkout_button_text))
+                        append(stringResource(Res.string.check_cart_button))
                     }
-                    append("  (${totalPrice.toCurrency()})")
-                },
-                style = MaterialTheme.typography.titleLarge
+                    append("  ($itemCount)")
+                }
             )
         }
     }
@@ -72,10 +71,10 @@ fun CheckoutButton(
 
 @Preview
 @Composable
-fun CheckoutButtonComponentPreview() {
+fun CheckoutButtonPreview() {
     BookStoreTheme {
-        CheckoutButton(
-            totalPrice = 99.99,
+        CheckCartButton(
+            itemCount = 5,
             onClick = { }
         )
     }

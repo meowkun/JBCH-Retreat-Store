@@ -90,6 +90,8 @@
     <!-- Checkout button -->
     <string name="check_cart_button">Check Cart</string>
     <string name="cart_icon_description">Cart icon</string>
+    <string name="checkout_button_description">Checkout</string>
+    <string name="checkout_button_text">Checkout</string>
 
     <!-- Bottom Navigation -->
     <string name="bottom_nav_shop">Shop</string>
