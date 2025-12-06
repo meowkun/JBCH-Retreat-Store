@@ -169,13 +169,5 @@ fun BookStoreNavHost() {
                 )
             }
         }
-
-        // Show add item dialog
-        if (shopState.showAddItemDialog) {
-            com.example.jbchretreatstore.bookstore.presentation.ui.dialog.AddItemDialog(
-                onDismiss = { shopViewModel.showAddItemDialog(false) },
-                onAddItem = { newItem -> shopViewModel.onAddDisplayItem(newItem) }
-            )
-        }
     }
 }

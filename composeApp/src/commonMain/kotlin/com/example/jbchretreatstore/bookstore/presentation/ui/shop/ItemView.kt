@@ -47,7 +47,6 @@ import androidx.compose.ui.text.withStyle
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.Stepper
-import com.example.jbchretreatstore.bookstore.presentation.ui.dialog.RemoveItemDialog
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Black
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
@@ -76,7 +75,6 @@ fun ItemView(
     onDeleteItem: (DisplayItem) -> Unit
 ) {
     var expanded by remember { mutableStateOf(true) }
-    var showRemoveDialog by remember { mutableStateOf(false) }
     var checkoutItem by remember {
         mutableStateOf(
             CheckoutItem(
@@ -89,16 +87,6 @@ fun ItemView(
         )
     }
 
-    if (showRemoveDialog) {
-        RemoveItemDialog(
-            displayItem = displayItem,
-            onDismiss = { showRemoveDialog = false },
-            onConfirm = {
-                onDeleteItem(displayItem)
-                showRemoveDialog = false
-            }
-        )
-    }
 
     ElevatedCard(
         shape = Shapes.itemCard,
@@ -137,7 +125,7 @@ fun ItemView(
                     checkoutItem = it
                 },
                 onAddToCart = onAddToCart,
-                onDeleteClick = { showRemoveDialog = true }
+                onDeleteClick = { onDeleteItem(displayItem) }
             )
         }
     }

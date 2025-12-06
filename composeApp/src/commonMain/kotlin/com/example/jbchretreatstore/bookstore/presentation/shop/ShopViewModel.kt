@@ -112,8 +112,8 @@ class ShopViewModel(
         _uiState.update { it.copy(showAddItemDialog = show) }
     }
 
-    fun showRemoveItemDialog(show: Boolean) {
-        _uiState.update { it.copy(showRemoveItemDialog = show) }
+    fun showRemoveItemDialog(show: Boolean, item: DisplayItem? = null) {
+        _uiState.update { it.copy(showRemoveItemDialog = show, itemToRemove = item) }
     }
 }
 
