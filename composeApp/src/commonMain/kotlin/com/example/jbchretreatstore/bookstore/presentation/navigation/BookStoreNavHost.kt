@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -75,7 +74,7 @@ fun BookStoreNavHost() {
         snackbarText?.let { message ->
             snackbarHostState.showSnackbar(
                 message = message,
-                duration = SnackbarDuration.Short
+                withDismissAction = true
             )
             snackbarManager.dismissSnackbar()
         }
