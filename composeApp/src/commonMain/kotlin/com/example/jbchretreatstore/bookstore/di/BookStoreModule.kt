@@ -10,6 +10,7 @@ import com.example.jbchretreatstore.bookstore.domain.usecase.ManageCartUseCase
 import com.example.jbchretreatstore.bookstore.domain.usecase.ManageDisplayItemsUseCase
 import com.example.jbchretreatstore.bookstore.domain.usecase.PurchaseHistoryUseCase
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewModel
+import com.example.jbchretreatstore.bookstore.presentation.share.getShareManager
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
@@ -18,6 +19,9 @@ import org.koin.dsl.module
 val bookStoreModule = module {
     // DataStore
     single { createDataStore() }
+
+    // Share Manager
+    single { getShareManager() }
 
     // Data Sources
     singleOf(::BookStoreLocalDataSourceImpl) bind BookStoreLocalDataSource::class

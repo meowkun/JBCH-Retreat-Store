@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
+import com.example.jbchretreatstore.bookstore.presentation.DialogVisibilityState
 import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Black
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
@@ -36,7 +37,13 @@ fun RemoveItemDialog(
     onUserIntent: (BookStoreIntent) -> Unit
 ) {
     AlertDialog(
-        onDismissRequest = { onUserIntent(BookStoreIntent.OnUpdateDialogVisibility(AlertDialogType.REMOVE_ITEM, false)) },
+        onDismissRequest = {
+            onUserIntent(
+                BookStoreIntent.OnUpdateDialogVisibility(
+                    DialogVisibilityState(AlertDialogType.REMOVE_ITEM, false)
+                )
+            )
+        },
         containerColor = MaterialTheme.colorScheme.primaryContainer,
         title = {
             Row(
@@ -49,8 +56,10 @@ fun RemoveItemDialog(
                     onClick = {
                         onUserIntent(
                             BookStoreIntent.OnUpdateDialogVisibility(
-                                AlertDialogType.REMOVE_ITEM,
-                                false
+                                dialogState = DialogVisibilityState(
+                                    alertDialogType = AlertDialogType.REMOVE_ITEM,
+                                    isVisible = false
+                                )
                             )
                         )
                     }
@@ -79,8 +88,10 @@ fun RemoveItemDialog(
                     onUserIntent(BookStoreIntent.OnDeleteDisplayItem(displayItem))
                     onUserIntent(
                         BookStoreIntent.OnUpdateDialogVisibility(
-                            AlertDialogType.REMOVE_ITEM,
-                            false
+                            dialogState = DialogVisibilityState(
+                                alertDialogType = AlertDialogType.REMOVE_ITEM,
+                                isVisible = false
+                            )
                         )
                     )
                 },
@@ -96,8 +107,10 @@ fun RemoveItemDialog(
                 onClick = {
                     onUserIntent(
                         BookStoreIntent.OnUpdateDialogVisibility(
-                            AlertDialogType.REMOVE_ITEM,
-                            false
+                            dialogState = DialogVisibilityState(
+                                alertDialogType = AlertDialogType.REMOVE_ITEM,
+                                isVisible = false
+                            )
                         )
                     )
                 },

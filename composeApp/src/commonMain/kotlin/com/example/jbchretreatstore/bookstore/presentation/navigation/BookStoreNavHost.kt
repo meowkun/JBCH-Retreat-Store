@@ -27,6 +27,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewModel
+import com.example.jbchretreatstore.bookstore.presentation.DialogVisibilityState
 import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.presentation.ui.checkout.CheckoutScreen
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.BottomNavigationBar
@@ -90,16 +91,21 @@ fun BookStoreNavHost(viewModel: BookStoreViewModel) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_m)
             ) {
-                // Row containing Add Item button and Checkout button - only one displays at a time
+                // Determine button visibility states
                 val showButtons = currentDestination != BookStoreNavDestination.CheckoutScreen
                 val hasItemsInCart = state.currentCheckoutList.checkoutList.isNotEmpty()
                 val isOnShopScreen = currentDestination == BookStoreNavDestination.ShopScreen
+                val isOnReceiptScreen = currentDestination == BookStoreNavDestination.ReceiptScreen
+                val hasReceiptData = state.purchasedHistory.isNotEmpty() &&
+                        state.purchasedHistory.any { it.checkoutList.isNotEmpty() }
 
+                // Unified FloatingActionButton - handles Add Item, Checkout, and Share
                 AnimatedVisibility(visible = showButtons) {
                     CustomFloatingActionButton(
                         hasItemsInCart = hasItemsInCart,
                         isOnShopScreen = isOnShopScreen,
                         itemCount = state.currentCheckoutList.checkoutList.sumOf { it.quantity },
+                        showShareButton = isOnReceiptScreen && hasReceiptData,
                         onCheckoutClick = {
                             viewModel.onUserIntent(
                                 BookStoreIntent.OnNavigate(BookStoreNavDestination.CheckoutScreen),
@@ -109,9 +115,17 @@ fun BookStoreNavHost(viewModel: BookStoreViewModel) {
                         onAddItemClick = {
                             viewModel.onUserIntent(
                                 BookStoreIntent.OnUpdateDialogVisibility(
-                                    AlertDialogType.ADD_ITEM,
-                                    true
+                                    dialogState = DialogVisibilityState(
+                                        alertDialogType = AlertDialogType.ADD_ITEM,
+                                        isVisible = true
+                                    )
                                 ),
+                                navigator
+                            )
+                        },
+                        onShareClick = {
+                            viewModel.onUserIntent(
+                                BookStoreIntent.OnSharePurchaseHistory,
                                 navigator
                             )
                         }
