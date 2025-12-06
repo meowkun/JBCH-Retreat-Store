@@ -46,10 +46,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
-import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
-import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewState
-import com.example.jbchretreatstore.bookstore.presentation.DialogVisibilityState
-import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.Stepper
 import com.example.jbchretreatstore.bookstore.presentation.ui.dialog.RemoveItemDialog
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Black
@@ -74,12 +70,13 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemView(
-    state: BookStoreViewState,
     displayItem: DisplayItem,
     modifier: Modifier = Modifier,
-    onUserIntent: (BookStoreIntent) -> Unit
+    onAddToCart: (CheckoutItem) -> Unit,
+    onDeleteItem: (DisplayItem) -> Unit
 ) {
     var expanded by remember { mutableStateOf(true) }
+    var showRemoveDialog by remember { mutableStateOf(false) }
     var checkoutItem by remember {
         mutableStateOf(
             CheckoutItem(
@@ -92,10 +89,14 @@ fun ItemView(
         )
     }
 
-    if (state.displayRemoveDisplayItemDialog) {
+    if (showRemoveDialog) {
         RemoveItemDialog(
             displayItem = displayItem,
-            onUserIntent = onUserIntent
+            onDismiss = { showRemoveDialog = false },
+            onConfirm = {
+                onDeleteItem(displayItem)
+                showRemoveDialog = false
+            }
         )
     }
 
@@ -135,7 +136,8 @@ fun ItemView(
                 updateCartItem = {
                     checkoutItem = it
                 },
-                onUserIntent = onUserIntent
+                onAddToCart = onAddToCart,
+                onDeleteClick = { showRemoveDialog = true }
             )
         }
     }
@@ -208,7 +210,8 @@ fun ItemExpandableView(
     displayItem: DisplayItem,
     checkoutItem: CheckoutItem,
     updateCartItem: (CheckoutItem) -> Unit,
-    onUserIntent: (BookStoreIntent) -> Unit,
+    onAddToCart: (CheckoutItem) -> Unit,
+    onDeleteClick: () -> Unit
 ) {
     Column(
         modifier = Modifier.background(color = White).padding(
@@ -237,18 +240,7 @@ fun ItemExpandableView(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(
-                onClick = {
-                    onUserIntent(
-                        BookStoreIntent.OnUpdateDialogVisibility(
-                            dialogState = DialogVisibilityState(
-                                alertDialogType = AlertDialogType.REMOVE_ITEM,
-                                isVisible = true
-                            )
-                        )
-                    )
-                }
-            ) {
+            IconButton(onClick = onDeleteClick) {
                 Image(
                     painter = painterResource(Res.drawable.ic_trash_can),
                     contentDescription = "Delete item"
@@ -261,9 +253,7 @@ fun ItemExpandableView(
                     .weight(1f)
                     .heightIn(min = Dimensions.button_height_l)
                     .padding(start = Dimensions.spacing_m),
-                onClick = {
-                    onUserIntent(BookStoreIntent.OnAddToCheckoutItem(checkoutItem))
-                },
+                onClick = { onAddToCart(checkoutItem) },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary
                 )
@@ -474,7 +464,6 @@ fun ItemViewPreview() {
             modifier = Modifier.background(color = White)
         ) {
             ItemView(
-                state = BookStoreViewState(),
                 displayItem = DisplayItem(
                     price = 40.00,
                     name = "Bible",
@@ -487,10 +476,11 @@ fun ItemViewPreview() {
                             key = "Version",
                             valueList = listOf("KJV", "NKJV", "NIV")
                         ),
-                    ),
-                    isInCart = false
-                )
-            ) {}
+                    )
+                ),
+                onAddToCart = {},
+                onDeleteItem = {}
+            )
         }
     }
 }

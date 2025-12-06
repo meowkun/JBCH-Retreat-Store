@@ -37,9 +37,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
-import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
-import com.example.jbchretreatstore.bookstore.presentation.DialogVisibilityState
-import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.DialogTitle
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.LabeledTextField
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.VariantValueItem
@@ -75,11 +72,13 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  * Dialog for adding a new item to the store.
  * Supports adding basic item information (name, price) and optional variants.
  *
- * @param onUserIntent Callback for handling user intents
+ * @param onDismiss Callback when dialog is dismissed
+ * @param onAddItem Callback when item is added
  */
 @Composable
 fun AddItemDialog(
-    onUserIntent: (BookStoreIntent) -> Unit
+    onDismiss: () -> Unit,
+    onAddItem: (DisplayItem) -> Unit
 ) {
     var viewState by remember { mutableStateOf(AddItemState()) }
 
@@ -101,14 +100,7 @@ fun AddItemDialog(
                         )
                     } else {
                         // Close the dialog
-                        onUserIntent(
-                            BookStoreIntent.OnUpdateDialogVisibility(
-                                dialogState = DialogVisibilityState(
-                                    alertDialogType = AlertDialogType.ADD_ITEM,
-                                    isVisible = false
-                                )
-                            )
-                        )
+                        onDismiss()
                     }
                 }
             )
@@ -121,7 +113,7 @@ fun AddItemDialog(
             } else {
                 viewState.AddItemContent(
                     updateViewState = { viewState = it },
-                    onUserIntent = onUserIntent
+                    onAddItem = onAddItem
                 )
             }
         },
@@ -137,7 +129,7 @@ fun AddItemDialog(
 @Composable
 private fun AddItemState.AddItemContent(
     updateViewState: (AddItemState) -> Unit,
-    onUserIntent: (BookStoreIntent) -> Unit
+    onAddItem: (DisplayItem) -> Unit
 ) {
     var displayPrice by remember {
         mutableStateOf(
@@ -259,7 +251,7 @@ private fun AddItemState.AddItemContent(
                 val isPriceValid = newItem.price > 0.0
 
                 if (isNameValid && isPriceValid) {
-                    onUserIntent(BookStoreIntent.OnAddDisplayItem(newItem))
+                    onAddItem(newItem)
                 } else {
                     updateViewState(
                         this@AddItemContent.copy(
@@ -576,6 +568,9 @@ fun VariantDisplayItemPreview() {
 @Composable
 fun AddItemDialogPreview() {
     BookStoreTheme {
-        AddItemDialog { }
+        AddItemDialog(
+            onDismiss = {},
+            onAddItem = {}
+        )
     }
 }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
@@ -26,12 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
-import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
 import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod
-import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
-import com.example.jbchretreatstore.bookstore.presentation.CheckoutState
-import com.example.jbchretreatstore.bookstore.presentation.DialogVisibilityState
-import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import jbchretreatstore.composeapp.generated.resources.Res
@@ -39,33 +35,23 @@ import jbchretreatstore.composeapp.generated.resources.checkout_dialog_buyer_nam
 import jbchretreatstore.composeapp.generated.resources.checkout_dialog_buyer_name_title
 import jbchretreatstore.composeapp.generated.resources.checkout_dialog_cancel_button
 import jbchretreatstore.composeapp.generated.resources.checkout_dialog_checkout_button
-import jbchretreatstore.composeapp.generated.resources.checkout_dialog_save_button
 import jbchretreatstore.composeapp.generated.resources.close_dialog_description
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun CheckoutDialog(
-    checkoutStatus: CheckoutStatus,
     paymentMethod: PaymentMethod,
     onPaymentMethodSelected: (PaymentMethod) -> Unit,
-    onUserIntent: (BookStoreIntent) -> Unit
+    onDismiss: () -> Unit,
+    onCheckout: (buyerName: String) -> Unit
 ) {
     var showErrorState by remember { mutableStateOf(false) }
     val radioOptions = listOf(PaymentMethod.ZELLE, PaymentMethod.VENMO, PaymentMethod.CASH)
-    val onDismissHandler = {
-        onUserIntent.invoke(
-            BookStoreIntent.OnUpdateDialogVisibility(
-                dialogState = DialogVisibilityState(
-                    alertDialogType = AlertDialogType.CHECKOUT,
-                    isVisible = false
-                )
-            )
-        )
-    }
     var buyerName by remember { mutableStateOf("") }
+
     AlertDialog(
-        onDismissRequest = onDismissHandler,
+        onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.primaryContainer,
         title = {
             Row(
@@ -74,7 +60,7 @@ fun CheckoutDialog(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(stringResource(Res.string.checkout_dialog_buyer_name_title))
-                IconButton(onClick = onDismissHandler) {
+                IconButton(onClick = onDismiss) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = stringResource(Res.string.close_dialog_description)
@@ -120,33 +106,19 @@ fun CheckoutDialog(
                     if (trimmedName.isEmpty()) {
                         showErrorState = true
                     } else {
-                        onUserIntent.invoke(
-                            BookStoreIntent.OnCheckout(
-                                CheckoutState(
-                                    buyerName = trimmedName,
-                                    checkoutStatus = checkoutStatus,
-                                    paymentMethod = paymentMethod
-                                )
-                            )
-                        )
+                        onCheckout(trimmedName)
                     }
                 },
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = MaterialTheme.colorScheme.primary
                 )
             ) {
-                Text(
-                    when (checkoutStatus) {
-                        CheckoutStatus.CHECKED_OUT -> stringResource(Res.string.checkout_dialog_checkout_button)
-                        CheckoutStatus.SAVE_FOR_LATER -> stringResource(Res.string.checkout_dialog_save_button)
-                        else -> ""
-                    }
-                )
+                Text(stringResource(Res.string.checkout_dialog_checkout_button))
             }
         },
         dismissButton = {
             TextButton(
-                onClick = onDismissHandler,
+                onClick = onDismiss,
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = MaterialTheme.colorScheme.primary
                 )
@@ -177,7 +149,8 @@ fun RadioButtonVerticalSelection(
                         selected = paymentMethod == selectedOption,
                         onClick = { onOptionSelected(paymentMethod) },
                         role = Role.RadioButton
-                    ),
+                    )
+                    .padding(Dimensions.spacing_xs),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioButton(
@@ -200,9 +173,10 @@ fun RadioButtonVerticalSelection(
 fun CheckoutDialogPreview() {
     BookStoreTheme {
         CheckoutDialog(
-            checkoutStatus = CheckoutStatus.CHECKED_OUT,
             paymentMethod = PaymentMethod.CASH,
-            onPaymentMethodSelected = {}
-        ) {}
+            onPaymentMethodSelected = {},
+            onDismiss = {},
+            onCheckout = {}
+        )
     }
 }

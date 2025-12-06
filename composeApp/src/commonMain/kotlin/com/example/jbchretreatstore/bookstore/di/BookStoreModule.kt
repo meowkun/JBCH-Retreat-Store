@@ -9,8 +9,12 @@ import com.example.jbchretreatstore.bookstore.domain.usecase.CheckoutUseCase
 import com.example.jbchretreatstore.bookstore.domain.usecase.ManageCartUseCase
 import com.example.jbchretreatstore.bookstore.domain.usecase.ManageDisplayItemsUseCase
 import com.example.jbchretreatstore.bookstore.domain.usecase.PurchaseHistoryUseCase
-import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewModel
+import com.example.jbchretreatstore.bookstore.presentation.checkout.CheckoutViewModel
+import com.example.jbchretreatstore.bookstore.presentation.purchasehistory.PurchaseHistoryViewModel
 import com.example.jbchretreatstore.bookstore.presentation.share.getShareManager
+import com.example.jbchretreatstore.bookstore.presentation.shared.CartStateHolder
+import com.example.jbchretreatstore.bookstore.presentation.shared.SnackbarManager
+import com.example.jbchretreatstore.bookstore.presentation.shop.ShopViewModel
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
@@ -22,6 +26,10 @@ val bookStoreModule = module {
 
     // Share Manager
     single { getShareManager() }
+
+    // Shared State Holders
+    single { CartStateHolder() }
+    single { SnackbarManager() }
 
     // Data Sources
     singleOf(::BookStoreLocalDataSourceImpl) bind BookStoreLocalDataSource::class
@@ -36,6 +44,8 @@ val bookStoreModule = module {
     singleOf(::PurchaseHistoryUseCase)
 
     // ViewModels
-    viewModelOf(::BookStoreViewModel)
+    viewModelOf(::ShopViewModel)
+    viewModelOf(::CheckoutViewModel)
+    viewModelOf(::PurchaseHistoryViewModel)
 }
 

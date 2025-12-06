@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory
+package com.example.jbchretreatstore.bookstore.presentation.purchasehistory
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -30,14 +30,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
-import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
-import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
-import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
-import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewState
-import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavDestination
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.TitleView
-import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
+import com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory.PurchaseHistoryItemView
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.DarkBlue
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Secondary
@@ -49,22 +44,20 @@ import jbchretreatstore.composeapp.generated.resources.purchase_history_view_tit
 import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun PurchaseHistoryScreen(
-    state: BookStoreViewState,
-    onUserIntent: (BookStoreIntent) -> Unit
+    viewModel: PurchaseHistoryViewModel,
+    onNavigateBack: () -> Unit
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
 
     // Group receipts by date
-    val groupedReceipts = remember(state.purchasedHistory) {
-        state.purchasedHistory
+    val groupedReceipts = remember(uiState.purchasedHistory) {
+        uiState.purchasedHistory
             .sortedByDescending { it.dateTime }
-            .groupBy { receipt ->
-                receipt.dateTime.date
-            }
+            .groupBy { receipt -> receipt.dateTime.date }
             .toList()
             .sortedByDescending { it.first }
     }
@@ -75,9 +68,7 @@ fun PurchaseHistoryScreen(
 
     // Detect scroll state
     val isListScrolling by remember {
-        derivedStateOf {
-            listState.isScrollInProgress
-        }
+        derivedStateOf { listState.isScrollInProgress }
     }
 
     // Show date indicator when scrolling
@@ -103,11 +94,10 @@ fun PurchaseHistoryScreen(
             var currentIndex = 0
 
             for ((date, receipts) in groupedReceipts) {
-                // +1 for date header
                 if (firstVisibleIndex <= currentIndex) {
                     return@derivedStateOf date
                 }
-                currentIndex++ // date header
+                currentIndex++
                 currentIndex += receipts.size
             }
 
@@ -115,9 +105,7 @@ fun PurchaseHistoryScreen(
         }
     }
 
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
+    Surface(modifier = Modifier.fillMaxWidth()) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -126,9 +114,7 @@ fun PurchaseHistoryScreen(
             ) {
                 TitleView(
                     title = stringResource(Res.string.purchase_history_view_title),
-                    onBackClick = {
-                        onUserIntent.invoke(BookStoreIntent.OnNavigate(BookStoreNavDestination.ShopScreen))
-                    }
+                    onBackClick = onNavigateBack
                 )
 
                 LazyColumn(
@@ -140,20 +126,15 @@ fun PurchaseHistoryScreen(
                     contentPadding = PaddingValues(bottom = Dimensions.gradient_overlay_height)
                 ) {
                     groupedReceipts.forEach { (date, receipts) ->
-                        // Date header
                         item(key = "header_$date") {
                             DateHeader(date = date)
                         }
 
-                        // Items for this date
                         items(
                             count = receipts.size,
                             key = { index -> "${receipts[index].id}_${receipts[index].dateTime}" }
                         ) { index ->
-                            PurchaseHistoryItemView(
-                                receipt = receipts[index],
-                                onUserIntent = onUserIntent
-                            )
+                            PurchaseHistoryItemView(receipt = receipts[index])
                         }
                     }
                 }
@@ -164,8 +145,7 @@ fun PurchaseHistoryScreen(
                     textAlign = TextAlign.End,
                     text = stringResource(
                         Res.string.checkout_view_item_total_price,
-                        state.purchasedHistory.sumOf { it.checkoutList.sumOf { it.totalPrice } }
-                            .toCurrency()
+                        uiState.totalAmount.toCurrency()
                     ),
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.ExtraBold
@@ -201,9 +181,7 @@ private fun DateHeader(date: LocalDate) {
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        HorizontalDivider(
-            modifier = Modifier.weight(1f)
-        )
+        HorizontalDivider(modifier = Modifier.weight(1f))
         Text(
             modifier = Modifier.padding(horizontal = Dimensions.spacing_s),
             text = date.toFormattedDateString(),
@@ -212,17 +190,7 @@ private fun DateHeader(date: LocalDate) {
             ),
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
         )
-        HorizontalDivider(
-            modifier = Modifier.weight(1f)
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun DateHeaderPreview() {
-    BookStoreTheme {
-        DateHeader(date = LocalDate(2024, 11, 30))
+        HorizontalDivider(modifier = Modifier.weight(1f))
     }
 }
 
@@ -248,46 +216,3 @@ private fun DateSliderIndicator(date: LocalDate) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun DateSliderIndicatorPreview() {
-    BookStoreTheme {
-        DateSliderIndicator(date = LocalDate(2024, 11, 30))
-    }
-}
-
-@Preview
-@Composable
-fun PurchaseHistoryScreenPreview() {
-    BookStoreTheme {
-        PurchaseHistoryScreen(
-            state = BookStoreViewState(
-                receiptList = listOf(
-                    ReceiptData(
-                        buyerName = "Isaac",
-                        checkoutList = listOf(
-                            CheckoutItem(itemName = "Bible", totalPrice = 40.0),
-                            CheckoutItem(itemName = "T-shirt", totalPrice = 15.0)
-                        ),
-                        checkoutStatus = CheckoutStatus.CHECKED_OUT
-                    ),
-                    ReceiptData(
-                        buyerName = "John",
-                        checkoutList = listOf(
-                            CheckoutItem(itemName = "Prayer Book", totalPrice = 25.0)
-                        ),
-                        checkoutStatus = CheckoutStatus.CHECKED_OUT
-                    ),
-                    ReceiptData(
-                        buyerName = "Mary",
-                        checkoutList = listOf(
-                            CheckoutItem(itemName = "Cross Necklace", totalPrice = 35.0)
-                        ),
-                        checkoutStatus = CheckoutStatus.CHECKED_OUT
-                    )
-                )
-            ),
-            onUserIntent = {}
-        )
-    }
-}

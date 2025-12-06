@@ -29,7 +29,6 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.font.FontWeight
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
-import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.MediumBlue
@@ -43,8 +42,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun PurchaseHistoryItemView(
-    receipt: ReceiptData,
-    onUserIntent: (BookStoreIntent) -> Unit = {}
+    receipt: ReceiptData
 ) {
     var expanded by remember { mutableStateOf(false) }
     val rotation by animateFloatAsState(if (expanded) 180f else 0f)
@@ -233,8 +231,7 @@ fun PurchaseHistoryItemViewPreview() {
                         variantsMap = mapOf("Size" to "L", "Color" to "Blue")
                     )
                 )
-            ),
-            onUserIntent = {}
+            )
         )
     }
 }
