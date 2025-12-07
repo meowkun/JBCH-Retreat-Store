@@ -45,9 +45,11 @@ class PurchaseHistoryViewModel(
     fun sharePurchaseHistory() {
         viewModelScope.launch {
             try {
-                val csvContent = convertReceiptsToCsv(_uiState.value.purchasedHistory)
-                val fileName = "purchase_history_${Clock.System.now().toEpochMilliseconds()}.csv"
-                shareManager.shareCsv(csvContent, fileName)
+                val csvResult = convertReceiptsToCsv(_uiState.value.purchasedHistory)
+                val timestamp = Clock.System.now().toEpochMilliseconds()
+
+                // Share combined CSV with both detailed and summary sections
+                shareManager.shareCsv(csvResult.combinedCsv, "purchase_history_$timestamp.csv")
             } catch (e: Exception) {
                 println("Failed to share purchase history: ${e.message}")
             }

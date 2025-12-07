@@ -76,6 +76,8 @@ kotlin {
             implementation(libs.datetime)
 
             implementation(libs.uuid)
+
+            implementation(libs.reorderable)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

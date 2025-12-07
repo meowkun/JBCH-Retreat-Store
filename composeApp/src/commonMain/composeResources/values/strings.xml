@@ -38,6 +38,10 @@
     <string name="add_item_save">Save</string>
     <string name="add_item_back">Back</string>
 
+    <!--  Reorderable variants list  -->
+    <string name="reorderable_drag_handle_description">Reorder</string>
+    <string name="add_item_duplicate_variant_key_error">Variant with this name already exists</string>
+
     <!--  Remove item dialog  -->
     <string name="remove_item_dialog_title">Remove Item</string>
     <string name="remove_item_dialog_message">Are you sure you want to %1$d?</string>

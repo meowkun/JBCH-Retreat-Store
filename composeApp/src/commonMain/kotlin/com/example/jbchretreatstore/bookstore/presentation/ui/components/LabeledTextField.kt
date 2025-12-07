@@ -30,6 +30,7 @@ fun LabeledTextField(
     modifier: Modifier = Modifier,
     placeholder: String = "",
     isError: Boolean = false,
+    errorMessage: String = "",
     singleLine: Boolean = true,
     enabled: Boolean = true,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default
@@ -66,6 +67,15 @@ fun LabeledTextField(
                 )
             }
         } else null,
+        supportingText = if (isError && errorMessage.isNotEmpty()) {
+            {
+                Text(
+                    text = errorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        } else null,
         shape = RoundedCornerShape(corner_radius_percent_m),
         keyboardOptions = keyboardOptions,
         colors = TextFieldDefaults.colors(
@@ -93,3 +103,19 @@ fun LabeledTextFieldEmptyPreview() {
         )
     }
 }
+
+@Preview
+@Composable
+fun LabeledTextFieldErrorPreview() {
+    BookStoreTheme {
+        LabeledTextField(
+            value = "Size",
+            onValueChange = {},
+            label = "Variant Key",
+            placeholder = "e.g. Size, Color, Language",
+            isError = true,
+            errorMessage = "Variant with this name already exists"
+        )
+    }
+}
+

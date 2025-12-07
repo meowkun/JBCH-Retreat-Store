@@ -100,6 +100,13 @@ object Dimensions {
     val bottom_nav_icon_size: Dp = 24.dp
     val bottom_nav_item_spacing: Dp = 8.dp
 
+    // Reorderable Variants List
+    val reorderable_item_height: Dp = 64.dp
+    val reorderable_list_max_height: Dp = 256.dp
+    val reorderable_list_content_padding: Dp = 8.dp
+    val reorderable_list_item_spacing: Dp = 8.dp
+    val reorderable_item_drag_elevation: Dp = 4.dp
+
     // Badge
     val badge_size: Dp = 20.dp
     val badge_offset_x: Dp = 12.dp
