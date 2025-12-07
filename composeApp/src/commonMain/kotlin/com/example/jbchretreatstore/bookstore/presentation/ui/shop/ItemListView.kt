@@ -25,6 +25,7 @@ fun ItemListView(
     displayItemList: List<DisplayItem>,
     onAddToCart: (CheckoutItem) -> Unit,
     onDeleteItem: (DisplayItem) -> Unit,
+    onEditItem: (DisplayItem) -> Unit,
     scrollState: LazyListState = rememberLazyListState()
 ) {
     LazyColumn(
@@ -38,7 +39,8 @@ fun ItemListView(
                 displayItem = item,
                 modifier = Modifier.fillParentMaxWidth(),
                 onAddToCart = onAddToCart,
-                onDeleteItem = onDeleteItem
+                onDeleteItem = onDeleteItem,
+                onEditItem = onEditItem
             )
         }
     }
@@ -81,7 +83,8 @@ fun ItemListViewPreview() {
             ),
             modifier = Modifier.background(White),
             onAddToCart = {},
-            onDeleteItem = {}
+            onDeleteItem = {},
+            onEditItem = {}
         )
     }
 }

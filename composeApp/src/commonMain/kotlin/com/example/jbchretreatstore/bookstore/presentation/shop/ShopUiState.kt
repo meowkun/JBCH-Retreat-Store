@@ -8,7 +8,9 @@ data class ShopUiState(
     val isLoading: Boolean = true,
     val showAddItemDialog: Boolean = false,
     val showRemoveItemDialog: Boolean = false,
+    val showEditItemDialog: Boolean = false,
     val itemToRemove: DisplayItem? = null,
+    val itemToEdit: DisplayItem? = null,
     val cartItemCount: Int = 0,
     val hasItemsInCart: Boolean = false
 ) {

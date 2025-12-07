@@ -33,10 +33,16 @@
     <string name="add_item_options_value_placeholder">e.g. Large, Blue, English</string>
     <string name="add_item_add_more_value">Add more variant value</string>
     <string name="add_item_add_variant">Add variant</string>
+    <string name="edit_item_edit_variant">Edit variant</string>
     <string name="add_item_cancel">Cancel</string>
     <string name="add_item_add">Add</string>
     <string name="add_item_save">Save</string>
     <string name="add_item_back">Back</string>
+
+    <!--  Edit item dialog  -->
+    <string name="edit_item_dialog_title">Edit Item</string>
+    <string name="edit_item_update">Update</string>
+    <string name="edit_item_button_description">Edit item</string>
 
     <!--  Reorderable variants list  -->
     <string name="reorderable_drag_handle_description">Reorder</string>
@@ -72,6 +78,8 @@
     <string name="item_add_failed">Failed to add item</string>
     <string name="item_removed_success">Item removed successfully</string>
     <string name="item_remove_failed">Failed to remove item</string>
+    <string name="item_update_success">Item updated successfully</string>
+    <string name="item_update_failed">Failed to update item</string>
 
     <!-- Cart messages -->
     <string name="added_to_cart">Added to cart</string>

@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -25,6 +27,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -57,6 +60,7 @@ import com.example.jbchretreatstore.bookstore.presentation.ui.theme.White
 import com.example.jbchretreatstore.bookstore.presentation.utils.toCurrency
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.add_to_cart
+import jbchretreatstore.composeapp.generated.resources.edit_item_button_description
 import jbchretreatstore.composeapp.generated.resources.ic_chevron
 import jbchretreatstore.composeapp.generated.resources.ic_chevron_small
 import jbchretreatstore.composeapp.generated.resources.ic_trash_can
@@ -72,7 +76,8 @@ fun ItemView(
     displayItem: DisplayItem,
     modifier: Modifier = Modifier,
     onAddToCart: (CheckoutItem) -> Unit,
-    onDeleteItem: (DisplayItem) -> Unit
+    onDeleteItem: (DisplayItem) -> Unit,
+    onEditItem: (DisplayItem) -> Unit
 ) {
     var expanded by remember { mutableStateOf(true) }
     var checkoutItem by remember {
@@ -125,7 +130,8 @@ fun ItemView(
                     checkoutItem = it
                 },
                 onAddToCart = onAddToCart,
-                onDeleteClick = { onDeleteItem(displayItem) }
+                onDeleteClick = { onDeleteItem(displayItem) },
+                onEditClick = { onEditItem(displayItem) }
             )
         }
     }
@@ -199,7 +205,8 @@ fun ItemExpandableView(
     checkoutItem: CheckoutItem,
     updateCartItem: (CheckoutItem) -> Unit,
     onAddToCart: (CheckoutItem) -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    onEditClick: () -> Unit
 ) {
     Column(
         modifier = Modifier.background(color = White).padding(
@@ -215,11 +222,24 @@ fun ItemExpandableView(
             Spacer(Modifier.height(Dimensions.spacing_m))
         }
 
-        QuantityStepper(
-            displayItem = displayItem,
-            checkoutItem = checkoutItem,
-            updateCartItem = updateCartItem
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            QuantityStepper(
+                displayItem = displayItem,
+                checkoutItem = checkoutItem,
+                updateCartItem = updateCartItem
+            )
+
+            IconButton(onClick = onEditClick) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = stringResource(Res.string.edit_item_button_description)
+                )
+            }
+        }
 
         Spacer(Modifier.height(Dimensions.spacing_m))
 
@@ -467,7 +487,8 @@ fun ItemViewPreview() {
                     )
                 ),
                 onAddToCart = {},
-                onDeleteItem = {}
+                onDeleteItem = {},
+                onEditItem = {}
             )
         }
     }

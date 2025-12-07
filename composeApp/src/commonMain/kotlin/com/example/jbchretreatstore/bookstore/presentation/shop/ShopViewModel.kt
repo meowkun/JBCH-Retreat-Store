@@ -15,6 +15,8 @@ import jbchretreatstore.composeapp.generated.resources.item_add_failed
 import jbchretreatstore.composeapp.generated.resources.item_added_success
 import jbchretreatstore.composeapp.generated.resources.item_remove_failed
 import jbchretreatstore.composeapp.generated.resources.item_removed_success
+import jbchretreatstore.composeapp.generated.resources.item_update_failed
+import jbchretreatstore.composeapp.generated.resources.item_update_success
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -114,6 +116,24 @@ class ShopViewModel(
 
     fun showRemoveItemDialog(show: Boolean, item: DisplayItem? = null) {
         _uiState.update { it.copy(showRemoveItemDialog = show, itemToRemove = item) }
+    }
+
+    fun showEditItemDialog(show: Boolean, item: DisplayItem? = null) {
+        _uiState.update { it.copy(showEditItemDialog = show, itemToEdit = item) }
+    }
+
+    fun onUpdateDisplayItem(updatedItem: DisplayItem) {
+        viewModelScope.launch {
+            val result = manageDisplayItemsUseCase.updateDisplayItem(updatedItem)
+            result.onSuccess {
+                _uiState.update { it.copy(showEditItemDialog = false, itemToEdit = null) }
+                snackbarManager.showSnackbar(Res.string.item_update_success)
+            }.onFailure { error ->
+                println("Failed to update item: ${error.message}")
+                _uiState.update { it.copy(showEditItemDialog = false, itemToEdit = null) }
+                snackbarManager.showSnackbar(Res.string.item_update_failed)
+            }
+        }
     }
 }
 

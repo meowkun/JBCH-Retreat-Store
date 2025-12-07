@@ -47,7 +47,8 @@ fun ShopScreen(
                         .padding(Dimensions.spacing_m),
                     displayItemList = uiState.searchedItemList,
                     onAddToCart = { viewModel.onAddToCart(it) },
-                    onDeleteItem = { viewModel.showRemoveItemDialog(true, it) }
+                    onDeleteItem = { viewModel.showRemoveItemDialog(true, it) },
+                    onEditItem = { viewModel.showEditItemDialog(true, it) }
                 )
             }
 
@@ -72,6 +73,15 @@ fun ShopScreen(
             onConfirm = {
                 viewModel.onDeleteDisplayItem(uiState.itemToRemove!!)
             }
+        )
+    }
+
+    // Show edit item dialog
+    if (uiState.showEditItemDialog && uiState.itemToEdit != null) {
+        AddItemDialog(
+            onDismiss = { viewModel.showEditItemDialog(false) },
+            onAddItem = { updatedItem -> viewModel.onUpdateDisplayItem(updatedItem) },
+            initialItem = uiState.itemToEdit
         )
     }
 }
