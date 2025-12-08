@@ -4,6 +4,7 @@ import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
 import com.example.jbchretreatstore.bookstore.domain.repository.BookStoreRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 /**
@@ -68,11 +69,19 @@ class PurchaseHistoryUseCase(
     suspend fun getReceiptCount(): Int {
         return repository.fetchReceiptList().map { it.size }.first()
     }
-}
 
-private suspend fun <T> Flow<T>.first(): T {
-    var result: T? = null
-    map { result = it }.collect {}
-    return result!!
+    /**
+     * Remove a receipt from the purchase history
+     */
+    suspend fun removeReceipt(receipt: ReceiptData): Result<Unit> {
+        return try {
+            val currentReceipts = repository.fetchReceiptList().first()
+            val updatedReceipts = currentReceipts.filter { it.id != receipt.id }
+            repository.updateReceiptList(updatedReceipts)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
 

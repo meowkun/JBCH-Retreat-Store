@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.presentation.shop
+package com.example.jbchretreatstore.bookstore.presentation.ui.shop
 
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 

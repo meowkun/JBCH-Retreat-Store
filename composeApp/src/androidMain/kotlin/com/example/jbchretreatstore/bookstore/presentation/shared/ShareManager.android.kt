@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.presentation.share
+package com.example.jbchretreatstore.bookstore.presentation.shared
 
 import android.content.Context
 import android.content.Intent

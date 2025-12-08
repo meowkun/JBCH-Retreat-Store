@@ -72,6 +72,11 @@
 
     <!--  Purchase history view  -->
     <string name="purchase_history_view_title">Purchase History</string>
+    <string name="purchase_history_remove_title">Remove Purchase Record</string>
+    <string name="purchase_history_remove_message">Are you sure you want to remove this purchase record?</string>
+    <string name="purchase_history_remove_confirm">Yes, Remove</string>
+    <string name="purchase_history_remove_cancel">Cancel</string>
+    <string name="purchase_history_remove_button_description">Remove purchase record</string>
 
     <!-- Display item messages -->
     <string name="item_added_success">Item added successfully</string>

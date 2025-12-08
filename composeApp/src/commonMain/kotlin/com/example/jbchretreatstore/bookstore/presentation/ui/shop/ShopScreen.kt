@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.presentation.shop
+package com.example.jbchretreatstore.bookstore.presentation.ui.shop
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,8 +14,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.BottomGradientOverlay
 import com.example.jbchretreatstore.bookstore.presentation.ui.dialog.AddItemDialog
 import com.example.jbchretreatstore.bookstore.presentation.ui.dialog.RemoveItemDialog
-import com.example.jbchretreatstore.bookstore.presentation.ui.shop.ItemListView
-import com.example.jbchretreatstore.bookstore.presentation.ui.shop.ItemSearchBar
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 
 @Composable

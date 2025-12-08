@@ -1,10 +1,11 @@
-package com.example.jbchretreatstore.bookstore.presentation.purchasehistory
+package com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
+import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
 import com.example.jbchretreatstore.bookstore.domain.usecase.PurchaseHistoryUseCase
-import com.example.jbchretreatstore.bookstore.presentation.share.ShareManager
+import com.example.jbchretreatstore.bookstore.presentation.shared.ShareManager
 import com.example.jbchretreatstore.bookstore.presentation.utils.convertReceiptsToCsv
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -58,5 +59,37 @@ class PurchaseHistoryViewModel(
 
     fun hasReceiptData(): Boolean = _uiState.value.purchasedHistory.isNotEmpty() &&
             _uiState.value.purchasedHistory.any { it.checkoutList.isNotEmpty() }
+
+    fun showRemoveBottomSheet(show: Boolean, receipt: ReceiptData? = null) {
+        _uiState.update {
+            it.copy(
+                showRemoveBottomSheet = show,
+                receiptToRemove = receipt
+            )
+        }
+    }
+
+    fun removeReceipt(receipt: ReceiptData) {
+        viewModelScope.launch {
+            val result = purchaseHistoryUseCase.removeReceipt(receipt)
+            result.onSuccess {
+                _uiState.update { state ->
+                    state.copy(
+                        purchasedHistory = state.purchasedHistory.filter { it.id != receipt.id },
+                        showRemoveBottomSheet = false,
+                        receiptToRemove = null
+                    )
+                }
+            }.onFailure { error ->
+                println("Failed to remove receipt: ${error.message}")
+                _uiState.update {
+                    it.copy(
+                        showRemoveBottomSheet = false,
+                        receiptToRemove = null
+                    )
+                }
+            }
+        }
+    }
 }
 

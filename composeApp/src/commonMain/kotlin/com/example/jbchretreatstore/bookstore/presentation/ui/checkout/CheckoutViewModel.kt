@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.presentation.checkout
+package com.example.jbchretreatstore.bookstore.presentation.ui.checkout
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

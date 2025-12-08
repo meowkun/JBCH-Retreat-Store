@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.presentation.checkout
+package com.example.jbchretreatstore.bookstore.presentation.ui.checkout
 
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod

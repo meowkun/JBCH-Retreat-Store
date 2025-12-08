@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.presentation.purchasehistory
+package com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -31,8 +31,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
+import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.TitleView
-import com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory.PurchaseHistoryItemView
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.DarkBlue
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Secondary
@@ -44,6 +46,7 @@ import jbchretreatstore.composeapp.generated.resources.purchase_history_view_tit
 import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun PurchaseHistoryScreen(
@@ -134,7 +137,12 @@ fun PurchaseHistoryScreen(
                             count = receipts.size,
                             key = { index -> "${receipts[index].id}_${receipts[index].dateTime}" }
                         ) { index ->
-                            PurchaseHistoryItemView(receipt = receipts[index])
+                            PurchaseHistoryItemView(
+                                receipt = receipts[index],
+                                onRemoveClick = { receipt ->
+                                    viewModel.showRemoveBottomSheet(true, receipt)
+                                }
+                            )
                         }
                     }
                 }
@@ -170,6 +178,18 @@ fun PurchaseHistoryScreen(
                 }
             }
         }
+    }
+
+    // Remove confirmation bottom sheet
+    if (uiState.showRemoveBottomSheet && uiState.receiptToRemove != null) {
+        RemoveConfirmationBottomSheet(
+            onDismiss = { viewModel.showRemoveBottomSheet(false) },
+            onConfirm = {
+                uiState.receiptToRemove?.let { receipt ->
+                    viewModel.removeReceipt(receipt)
+                }
+            }
+        )
     }
 }
 
@@ -216,3 +236,48 @@ private fun DateSliderIndicator(date: LocalDate) {
     }
 }
 
+@Preview
+@Composable
+private fun DateHeaderPreview() {
+    BookStoreTheme {
+        DateHeader(
+            date = LocalDate(2025, 12, 7)
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun DateSliderIndicatorPreview() {
+    BookStoreTheme {
+        DateSliderIndicator(
+            date = LocalDate(2025, 12, 7)
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PurchaseHistoryItemViewPreview() {
+    BookStoreTheme {
+        PurchaseHistoryItemView(
+            receipt = ReceiptData(
+                buyerName = "John Doe",
+                checkoutList = listOf(
+                    CheckoutItem(
+                        itemName = "Bible",
+                        totalPrice = 40.0,
+                        quantity = 2,
+                        variantsMap = mapOf("Language" to "English", "Version" to "NIV")
+                    ),
+                    CheckoutItem(
+                        itemName = "T-shirt",
+                        totalPrice = 15.0,
+                        quantity = 1,
+                        variantsMap = mapOf("Size" to "L", "Color" to "Blue")
+                    )
+                )
+            )
+        )
+    }
+}

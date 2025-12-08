@@ -7,7 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.jbchretreatstore.bookstore.initDataStore
-import com.example.jbchretreatstore.bookstore.presentation.share.initShareManager
+import com.example.jbchretreatstore.bookstore.presentation.shared.initShareManager
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
