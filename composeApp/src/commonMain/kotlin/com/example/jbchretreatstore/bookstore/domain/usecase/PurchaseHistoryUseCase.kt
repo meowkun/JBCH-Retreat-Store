@@ -1,15 +1,18 @@
 package com.example.jbchretreatstore.bookstore.domain.usecase
 
+import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
 import com.example.jbchretreatstore.bookstore.domain.repository.BookStoreRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlin.uuid.ExperimentalUuidApi
 
 /**
  * Use case for managing purchase history
  */
+@OptIn(ExperimentalUuidApi::class)
 class PurchaseHistoryUseCase(
     private val repository: BookStoreRepository
 ) {
@@ -77,6 +80,74 @@ class PurchaseHistoryUseCase(
         return try {
             val currentReceipts = repository.fetchReceiptList().first()
             val updatedReceipts = currentReceipts.filter { it.id != receipt.id }
+            repository.updateReceiptList(updatedReceipts)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Update a checkout item within a receipt by matching itemName and variants.
+     * If the updated item's variants match an existing item, merge them by combining quantities.
+     */
+    suspend fun updateCheckoutItemByVariants(
+        receipt: ReceiptData,
+        originalItem: CheckoutItem,
+        updatedItem: CheckoutItem
+    ): Result<Unit> {
+        return try {
+            val currentReceipts = repository.fetchReceiptList().first()
+            val updatedReceipts = currentReceipts.map { r ->
+                if (r.id == receipt.id) {
+                    // Check if updated item's variants match an existing item (other than original)
+                    val existingItem = r.checkoutList.find { item ->
+                        item.itemName == updatedItem.itemName &&
+                                item.variantsMap == updatedItem.variantsMap &&
+                                // Make sure it's not the original item we're editing
+                                !(item.itemName == originalItem.itemName && item.variantsMap == originalItem.variantsMap)
+                    }
+
+                    val newCheckoutList = if (existingItem != null) {
+                        // Merge: combine quantities and remove the original item
+                        // Use updatedItem's quantity (what user set in the edit form)
+                        val unitPrice = if (updatedItem.quantity > 0) {
+                            updatedItem.totalPrice / updatedItem.quantity
+                        } else {
+                            updatedItem.totalPrice
+                        }
+                        r.checkoutList.mapNotNull { item ->
+                            when {
+                                // This is the existing item with matching variants - add updated item's quantity
+                                item.itemName == existingItem.itemName &&
+                                        item.variantsMap == existingItem.variantsMap -> {
+                                    val newQuantity = item.quantity + updatedItem.quantity
+                                    item.copy(
+                                        quantity = newQuantity,
+                                        totalPrice = unitPrice * newQuantity
+                                    )
+                                }
+                                // This is the original item being edited - remove it (merged into existing)
+                                item.itemName == originalItem.itemName &&
+                                        item.variantsMap == originalItem.variantsMap -> null
+                                // Other items - keep as is
+                                else -> item
+                            }
+                        }
+                    } else {
+                        // No merge needed - just update the item
+                        r.checkoutList.map { item ->
+                            if (item.itemName == originalItem.itemName &&
+                                item.variantsMap == originalItem.variantsMap
+                            ) {
+                                updatedItem
+                            } else item
+                        }
+                    }
+
+                    r.copy(checkoutList = newCheckoutList)
+                } else r
+            }
             repository.updateReceiptList(updatedReceipts)
             Result.success(Unit)
         } catch (e: Exception) {

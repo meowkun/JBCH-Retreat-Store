@@ -2,6 +2,7 @@ package com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
 import com.example.jbchretreatstore.bookstore.domain.usecase.PurchaseHistoryUseCase
@@ -13,7 +14,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
+import kotlin.uuid.ExperimentalUuidApi
 
+@OptIn(ExperimentalUuidApi::class)
 class PurchaseHistoryViewModel(
     private val purchaseHistoryUseCase: PurchaseHistoryUseCase,
     private val shareManager: ShareManager
@@ -86,6 +89,53 @@ class PurchaseHistoryViewModel(
                     it.copy(
                         showRemoveBottomSheet = false,
                         receiptToRemove = null
+                    )
+                }
+            }
+        }
+    }
+
+    fun showEditBottomSheet(
+        show: Boolean,
+        receipt: ReceiptData? = null,
+        purchaseHistoryItem: CheckoutItem? = null
+    ) {
+        _uiState.update {
+            it.copy(
+                showEditBottomSheet = show,
+                receiptToEdit = receipt,
+                purchaseHistoryItemToEdit = purchaseHistoryItem
+            )
+        }
+    }
+
+    fun updateCheckoutItem(
+        receipt: ReceiptData,
+        originalItem: CheckoutItem,
+        updatedItem: CheckoutItem
+    ) {
+        viewModelScope.launch {
+            val result = purchaseHistoryUseCase.updateCheckoutItemByVariants(
+                receipt,
+                originalItem,
+                updatedItem
+            )
+            result.onSuccess {
+                // Just dismiss the bottom sheet - the flow collection will update purchasedHistory
+                _uiState.update {
+                    it.copy(
+                        showEditBottomSheet = false,
+                        receiptToEdit = null,
+                        purchaseHistoryItemToEdit = null
+                    )
+                }
+            }.onFailure { error: Throwable ->
+                println("Failed to update checkout item: ${error.message}")
+                _uiState.update {
+                    it.copy(
+                        showEditBottomSheet = false,
+                        receiptToEdit = null,
+                        purchaseHistoryItemToEdit = null
                     )
                 }
             }

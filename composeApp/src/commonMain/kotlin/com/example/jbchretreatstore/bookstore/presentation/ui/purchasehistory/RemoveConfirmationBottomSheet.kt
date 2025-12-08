@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,7 +48,7 @@ fun RemoveConfirmationBottomSheet(
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = rememberModalBottomSheetState()
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ) {
         RemoveConfirmationContent(
             onDismiss = onDismiss,
@@ -74,7 +74,7 @@ fun RemoveConfirmationContent(
         verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_m)
     ) {
         Icon(
-            imageVector = Icons.Default.Delete,
+            imageVector = Icons.Default.Warning,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.error,
             modifier = Modifier.padding(bottom = Dimensions.spacing_s)

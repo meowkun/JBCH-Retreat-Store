@@ -141,6 +141,13 @@ fun PurchaseHistoryScreen(
                                 receipt = receipts[index],
                                 onRemoveClick = { receipt ->
                                     viewModel.showRemoveBottomSheet(true, receipt)
+                                },
+                                onEditClick = { receipt, purchaseHistoryItem ->
+                                    viewModel.showEditBottomSheet(
+                                        true,
+                                        receipt,
+                                        purchaseHistoryItem
+                                    )
                                 }
                             )
                         }
@@ -185,9 +192,22 @@ fun PurchaseHistoryScreen(
         RemoveConfirmationBottomSheet(
             onDismiss = { viewModel.showRemoveBottomSheet(false) },
             onConfirm = {
-                uiState.receiptToRemove?.let { receipt ->
-                    viewModel.removeReceipt(receipt)
-                }
+                viewModel.removeReceipt(uiState.receiptToRemove!!)
+            }
+        )
+    }
+
+    // Edit purchase history item bottom sheet
+    if (uiState.showEditBottomSheet && uiState.receiptToEdit != null && uiState.purchaseHistoryItemToEdit != null) {
+        EditPurchaseHistoryItemBottomSheet(
+            purchaseHistoryItem = uiState.purchaseHistoryItemToEdit!!,
+            onDismiss = { viewModel.showEditBottomSheet(false) },
+            onSave = { updatedItem ->
+                viewModel.updateCheckoutItem(
+                    receipt = uiState.receiptToEdit!!,
+                    originalItem = uiState.purchaseHistoryItemToEdit!!,
+                    updatedItem = updatedItem
+                )
             }
         )
     }
@@ -268,13 +288,23 @@ private fun PurchaseHistoryItemViewPreview() {
                         itemName = "Bible",
                         totalPrice = 40.0,
                         quantity = 2,
-                        variantsMap = mapOf("Language" to "English", "Version" to "NIV")
+                        variants = listOf(
+                            CheckoutItem.Variant(
+                                "Language",
+                                listOf("English", "Chinese"),
+                                "English"
+                            ),
+                            CheckoutItem.Variant("Version", listOf("NIV", "KJV"), "NIV")
+                        )
                     ),
                     CheckoutItem(
                         itemName = "T-shirt",
                         totalPrice = 15.0,
                         quantity = 1,
-                        variantsMap = mapOf("Size" to "L", "Color" to "Blue")
+                        variants = listOf(
+                            CheckoutItem.Variant("Size", listOf("S", "M", "L", "XL"), "L"),
+                            CheckoutItem.Variant("Color", listOf("Red", "Blue", "Green"), "Blue")
+                        )
                     )
                 )
             )

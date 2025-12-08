@@ -77,6 +77,11 @@
     <string name="purchase_history_remove_confirm">Yes, Remove</string>
     <string name="purchase_history_remove_cancel">Cancel</string>
     <string name="purchase_history_remove_button_description">Remove purchase record</string>
+    <string name="purchase_history_no_items">No items</string>
+    <string name="purchase_history_edit_item_description">Edit item</string>
+    <string name="purchase_history_edit_total">Total</string>
+    <string name="purchase_history_edit_save">Save</string>
+    <string name="purchase_history_edit_cancel">Cancel</string>
 
     <!-- Display item messages -->
     <string name="item_added_success">Item added successfully</string>

@@ -7,12 +7,15 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -40,7 +43,10 @@ import com.example.jbchretreatstore.bookstore.presentation.utils.toCurrency
 import com.example.jbchretreatstore.bookstore.presentation.utils.toFormattedDateString
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.checkout_view_item_price
+import jbchretreatstore.composeapp.generated.resources.checkout_view_item_quantity
 import jbchretreatstore.composeapp.generated.resources.ic_trash_can
+import jbchretreatstore.composeapp.generated.resources.purchase_history_edit_item_description
+import jbchretreatstore.composeapp.generated.resources.purchase_history_no_items
 import jbchretreatstore.composeapp.generated.resources.purchase_history_remove_button_description
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -50,7 +56,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun PurchaseHistoryItemView(
     receipt: ReceiptData,
-    onRemoveClick: (ReceiptData) -> Unit = {}
+    onRemoveClick: (ReceiptData) -> Unit = {},
+    onEditClick: (ReceiptData, CheckoutItem) -> Unit = { _, _ -> }
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -70,7 +77,8 @@ fun PurchaseHistoryItemView(
             if (expanded) {
                 PurchaseHistoryExpandedView(
                     receipt = receipt,
-                    onCollapseClick = { expanded = false }
+                    onCollapseClick = { expanded = false },
+                    onEditClick = onEditClick
                 )
             } else {
                 PurchaseHistoryCollapsedView(
@@ -165,7 +173,8 @@ private fun PurchaseHistoryCollapsedView(
 @Composable
 private fun PurchaseHistoryExpandedView(
     receipt: ReceiptData,
-    onCollapseClick: () -> Unit
+    onCollapseClick: () -> Unit,
+    onEditClick: (ReceiptData, CheckoutItem) -> Unit
 ) {
     val rotation by animateFloatAsState(180f)
 
@@ -215,13 +224,16 @@ private fun PurchaseHistoryExpandedView(
     // Items list
     if (receipt.checkoutList.isEmpty()) {
         Text(
-            text = "No items",
+            text = stringResource(Res.string.purchase_history_no_items),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
         )
     } else {
         receipt.checkoutList.forEach { item ->
-            PurchaseHistoryCheckoutItem(item)
+            PurchaseHistoryCheckoutItem(
+                item = item,
+                onEditClick = { onEditClick(receipt, item) }
+            )
         }
     }
 
@@ -250,50 +262,71 @@ private fun PurchaseHistoryExpandedView(
 }
 
 @Composable
-private fun PurchaseHistoryCheckoutItem(item: CheckoutItem) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Top
-    ) {
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_xs)
+private fun PurchaseHistoryCheckoutItem(
+    item: CheckoutItem,
+    onEditClick: () -> Unit = {}
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top
         ) {
-            Text(
-                text = item.itemName,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontWeight = FontWeight.Bold
-                ),
-            )
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_xs)
+            ) {
+                Text(
+                    text = item.itemName,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
+                )
 
-            // Display variants if they exist
-            if (item.variantsMap.isNotEmpty()) {
-                item.variantsMap.forEach { (key, value) ->
-                    Text(
-                        text = "$key: $value",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                // Display variants if they exist
+                if (item.variantsMap.isNotEmpty()) {
+                    item.variantsMap.forEach { (key, value) ->
+                        Text(
+                            text = "$key: $value",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                        )
+                    }
+                }
+
+                Text(
+                    text = stringResource(Res.string.checkout_view_item_quantity, item.quantity),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+            }
+
+            Column(
+                modifier = Modifier.fillMaxHeight(),
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(
+                        Res.string.checkout_view_item_price,
+                        item.totalPrice.toCurrency()
+                    ),
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
+                )
+
+                IconButton(onClick = onEditClick) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = stringResource(Res.string.purchase_history_edit_item_description),
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }
-
-            Text(
-                text = "Quantity: ${item.quantity}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
         }
-
-        Text(
-            text = stringResource(
-                Res.string.checkout_view_item_price,
-                item.totalPrice.toCurrency()
-            ),
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontWeight = FontWeight.Bold
-            ),
-        )
     }
 }
 
@@ -317,13 +350,21 @@ private fun PurchaseHistoryCollapsedViewPreview() {
                                 itemName = "Bible",
                                 totalPrice = 40.0,
                                 quantity = 2,
-                                variantsMap = mapOf("Language" to "English")
+                                variants = listOf(
+                                    CheckoutItem.Variant(
+                                        "Language",
+                                        listOf("English", "Chinese"),
+                                        "English"
+                                    )
+                                )
                             ),
                             CheckoutItem(
                                 itemName = "T-shirt",
                                 totalPrice = 15.0,
                                 quantity = 1,
-                                variantsMap = mapOf("Size" to "L")
+                                variants = listOf(
+                                    CheckoutItem.Variant("Size", listOf("S", "M", "L", "XL"), "L")
+                                )
                             )
                         )
                     ),
@@ -356,17 +397,36 @@ private fun PurchaseHistoryExpandedViewPreview() {
                                 itemName = "Bible",
                                 totalPrice = 40.0,
                                 quantity = 2,
-                                variantsMap = mapOf("Language" to "English", "Version" to "NIV")
+                                variants = listOf(
+                                    CheckoutItem.Variant(
+                                        "Language",
+                                        listOf("English", "Chinese"),
+                                        "English"
+                                    ),
+                                    CheckoutItem.Variant(
+                                        "Version",
+                                        listOf("NIV", "KJV", "ESV"),
+                                        "NIV"
+                                    )
+                                )
                             ),
                             CheckoutItem(
                                 itemName = "T-shirt",
                                 totalPrice = 15.0,
                                 quantity = 1,
-                                variantsMap = mapOf("Size" to "L", "Color" to "Blue")
+                                variants = listOf(
+                                    CheckoutItem.Variant("Size", listOf("S", "M", "L", "XL"), "L"),
+                                    CheckoutItem.Variant(
+                                        "Color",
+                                        listOf("Red", "Blue", "Green"),
+                                        "Blue"
+                                    )
+                                )
                             )
                         )
                     ),
-                    onCollapseClick = {}
+                    onCollapseClick = {},
+                    onEditClick = { _, _ -> }
                 )
             }
         }

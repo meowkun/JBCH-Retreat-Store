@@ -84,9 +84,13 @@ fun ItemView(
         mutableStateOf(
             CheckoutItem(
                 itemName = displayItem.name,
-                variantsMap = displayItem.variants.associate {
-                    it.key to it.valueList.first()
-                }.toMutableMap(),
+                variants = displayItem.variants.map { variant ->
+                    CheckoutItem.Variant(
+                        key = variant.key,
+                        valueList = variant.valueList,
+                        selectedValue = variant.valueList.firstOrNull() ?: ""
+                    )
+                },
                 totalPrice = displayItem.price
             )
         )
@@ -351,11 +355,14 @@ fun ItemVariantMenu(
                         )
                     },
                     onClick = {
-                        val updatedOptions = checkoutItem.variantsMap.toMutableMap()
-                        updatedOptions[variant.key] = value
+                        val updatedVariants = checkoutItem.variants.map { v ->
+                            if (v.key == variant.key) {
+                                v.copy(selectedValue = value)
+                            } else v
+                        }
 
                         updateCartItem.invoke(
-                            checkoutItem.copy(variantsMap = updatedOptions.toMap())
+                            checkoutItem.copy(variants = updatedVariants)
                         )
                         expanded = false
                     }

@@ -124,10 +124,10 @@ fun CheckoutItemViewPreview() {
                     itemName = "Christian T-Shirt - Faith",
                     quantity = 2,
                     totalPrice = 24.99,
-                    variantsMap = mapOf(
-                        "Size" to "Large",
-                        "Color" to "Blue",
-                        "Design" to "Cross"
+                    variants = listOf(
+                        CheckoutItem.Variant("Size", listOf("S", "M", "L", "XL"), "Large"),
+                        CheckoutItem.Variant("Color", listOf("Red", "Blue", "Green"), "Blue"),
+                        CheckoutItem.Variant("Design", listOf("Cross", "Fish", "Dove"), "Cross")
                     )
                 ),
                 onRemoveItem = {}
@@ -139,7 +139,7 @@ fun CheckoutItemViewPreview() {
                     itemName = "Holy Bible - NIV",
                     quantity = 1,
                     totalPrice = 45.99,
-                    variantsMap = emptyMap()
+                    variants = emptyList()
                 ),
                 onRemoveItem = {}
             )
