@@ -166,7 +166,11 @@ private fun generateDetailedCsv(receipts: List<ReceiptData>): String {
                 val itemName = item.itemName
                 val variants = formatVariants(item.variantsMap)
                 val quantity = item.quantity
-                val unitPrice = formatDecimal(item.totalPrice / item.quantity)
+                val unitPrice = if (quantity > 0) {
+                    formatDecimal(item.totalPrice / quantity)
+                } else {
+                    CsvConstants.ZERO_DECIMAL
+                }
                 val totalPrice = formatDecimal(item.totalPrice)
 
                 // Add to grand total

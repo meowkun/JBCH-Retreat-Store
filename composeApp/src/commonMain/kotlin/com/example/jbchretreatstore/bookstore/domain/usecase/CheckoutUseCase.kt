@@ -39,11 +39,7 @@ class CheckoutUseCase(
         }
 
         // Validate all items have positive quantities and prices
-        val hasInvalidItems = cart.checkoutList.any {
-            it.quantity <= 0 || it.totalPrice <= 0
-        }
-
-        if (hasInvalidItems) {
+        if (cart.checkoutList.any { it.quantity <= 0 || it.totalPrice <= 0 }) {
             return Result.failure(IllegalStateException("Cart contains invalid items"))
         }
 
@@ -89,10 +85,4 @@ class CheckoutUseCase(
         paymentMethod = PaymentMethod.CASH
     )
 
-    /**
-     * Calculate total amount for checkout
-     */
-    fun calculateCheckoutTotal(cart: ReceiptData): Double {
-        return cart.checkoutList.sumOf { it.totalPrice }
-    }
 }

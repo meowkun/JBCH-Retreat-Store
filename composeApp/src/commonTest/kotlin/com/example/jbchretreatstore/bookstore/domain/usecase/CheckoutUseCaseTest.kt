@@ -262,53 +262,6 @@ class CheckoutUseCaseTest {
         assertEquals("Cannot checkout with empty cart", result.exceptionOrNull()?.message)
     }
 
-    // ========== calculateCheckoutTotal Tests ==========
-
-    @Test
-    fun `calculateCheckoutTotal with empty cart should return zero`() = runTest {
-        // Given
-        val emptyCart = validCart.copy(checkoutList = emptyList())
-
-        // When
-        val total = useCase.calculateCheckoutTotal(emptyCart)
-
-        // Then
-        assertEquals(0.0, total)
-    }
-
-    @Test
-    fun `calculateCheckoutTotal should sum all item prices`() = runTest {
-        // Given
-        val cart = validCart.copy(
-            checkoutList = listOf(
-                CheckoutItem(Uuid.random(), "Item 1", 2, emptyMap(), 20.0),
-                CheckoutItem(Uuid.random(), "Item 2", 1, emptyMap(), 15.0),
-                CheckoutItem(Uuid.random(), "Item 3", 3, emptyMap(), 45.0)
-            )
-        )
-
-        // When
-        val total = useCase.calculateCheckoutTotal(cart)
-
-        // Then
-        assertEquals(80.0, total)
-    }
-
-    @Test
-    fun `calculateCheckoutTotal with single item should return item price`() = runTest {
-        // Given
-        val cart = validCart.copy(
-            checkoutList = listOf(
-                CheckoutItem(Uuid.random(), "Item", 5, emptyMap(), 100.0)
-            )
-        )
-
-        // When
-        val total = useCase.calculateCheckoutTotal(cart)
-
-        // Then
-        assertEquals(100.0, total)
-    }
 }
 
 // Fake repository for testing
