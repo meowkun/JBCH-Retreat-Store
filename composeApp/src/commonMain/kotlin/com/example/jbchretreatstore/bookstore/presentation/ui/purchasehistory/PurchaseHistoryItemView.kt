@@ -1,7 +1,6 @@
 package com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -100,8 +99,6 @@ private fun PurchaseHistoryCollapsedView(
     onExpandClick: () -> Unit,
     onRemoveClick: () -> Unit
 ) {
-    val rotation by animateFloatAsState(0f)
-
     Column {
         Row(
             modifier = Modifier
@@ -144,9 +141,7 @@ private fun PurchaseHistoryCollapsedView(
                 Icon(
                     imageVector = Icons.Default.ExpandMore,
                     contentDescription = "Expand",
-                    modifier = Modifier
-                        .padding(Dimensions.spacing_s)
-                        .rotate(rotation),
+                    modifier = Modifier.padding(Dimensions.spacing_s),
                     tint = MaterialTheme.colorScheme.onSurface
                 )
             }
@@ -176,8 +171,6 @@ private fun PurchaseHistoryExpandedView(
     onCollapseClick: () -> Unit,
     onEditClick: (ReceiptData, CheckoutItem) -> Unit
 ) {
-    val rotation by animateFloatAsState(180f)
-
     // Header: buyer name and total (clickable to collapse)
     Row(
         modifier = Modifier
@@ -205,7 +198,7 @@ private fun PurchaseHistoryExpandedView(
                 contentDescription = "Collapse",
                 modifier = Modifier
                     .padding(Dimensions.spacing_s)
-                    .rotate(rotation),
+                    .rotate(180f),
                 tint = MaterialTheme.colorScheme.onSurface
             )
         }

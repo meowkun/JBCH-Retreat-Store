@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -53,7 +54,7 @@ fun CustomFloatingActionButton(
         // CheckoutButton - only visible on CheckoutScreen
         AnimatedVisibility(visible = isOnCheckoutScreen) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(bottom = Dimensions.spacing_xxxxl),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {

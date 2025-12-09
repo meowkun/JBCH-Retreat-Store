@@ -14,12 +14,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
+import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.TitleView
 import com.example.jbchretreatstore.bookstore.presentation.ui.dialog.CheckoutDialog
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.checkout_view_item_title
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun CheckoutScreen(
@@ -29,13 +33,40 @@ fun CheckoutScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Navigate back if cart is empty
-    LaunchedEffect(viewModel.isCartEmpty()) {
-        if (viewModel.isCartEmpty()) {
+    // Navigate back if cart is empty (only on initial load, not after checkout)
+    LaunchedEffect(uiState.checkoutItems.isEmpty(), uiState.checkoutSuccess) {
+        if (uiState.checkoutItems.isEmpty() && !uiState.checkoutSuccess) {
             onNavigateBack()
         }
     }
 
+    // Handle checkout success navigation
+    LaunchedEffect(uiState.checkoutSuccess) {
+        if (uiState.checkoutSuccess) {
+            viewModel.onCheckoutSuccessHandled()
+            onCheckoutSuccess()
+        }
+    }
+
+    CheckoutScreenContent(
+        uiState = uiState,
+        onNavigateBack = onNavigateBack,
+        onRemoveItem = { viewModel.onRemoveFromCart(it) },
+        onPaymentMethodSelected = { viewModel.onPaymentMethodSelected(it) },
+        onDismissDialog = { viewModel.showCheckoutDialog(false) },
+        onCheckout = { buyerName -> viewModel.processCheckout(buyerName) }
+    )
+}
+
+@Composable
+private fun CheckoutScreenContent(
+    uiState: CheckoutUiState,
+    onNavigateBack: () -> Unit,
+    onRemoveItem: (CheckoutItem) -> Unit,
+    onPaymentMethodSelected: (PaymentMethod) -> Unit,
+    onDismissDialog: () -> Unit,
+    onCheckout: (String) -> Unit
+) {
     Surface(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -62,7 +93,7 @@ fun CheckoutScreen(
                 ) { item ->
                     CheckoutItemView(
                         checkoutItem = item,
-                        onRemoveItem = { viewModel.onRemoveFromCart(it) }
+                        onRemoveItem = onRemoveItem
                     )
                 }
             }
@@ -73,11 +104,112 @@ fun CheckoutScreen(
     if (uiState.showCheckoutDialog) {
         CheckoutDialog(
             paymentMethod = uiState.selectedPaymentMethod,
-            onPaymentMethodSelected = { viewModel.onPaymentMethodSelected(it) },
-            onDismiss = { viewModel.showCheckoutDialog(false) },
-            onCheckout = { buyerName ->
-                viewModel.processCheckout(buyerName, onCheckoutSuccess)
-            }
+            onPaymentMethodSelected = onPaymentMethodSelected,
+            onDismiss = onDismissDialog,
+            onCheckout = onCheckout
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun CheckoutScreenPreview() {
+    BookStoreTheme {
+        CheckoutScreenContent(
+            uiState = CheckoutUiState(
+                checkoutItems = listOf(
+                    CheckoutItem(
+                        itemName = "Holy Bible - NIV",
+                        quantity = 2,
+                        totalPrice = 91.98,
+                        variants = listOf(
+                            CheckoutItem.Variant(
+                                "Language",
+                                listOf("English", "Chinese"),
+                                "English"
+                            ),
+                            CheckoutItem.Variant(
+                                "Cover",
+                                listOf("Hardcover", "Paperback"),
+                                "Hardcover"
+                            )
+                        )
+                    ),
+                    CheckoutItem(
+                        itemName = "Christian T-Shirt",
+                        quantity = 3,
+                        totalPrice = 59.97,
+                        variants = listOf(
+                            CheckoutItem.Variant("Size", listOf("S", "M", "L", "XL"), "L"),
+                            CheckoutItem.Variant("Color", listOf("White", "Black", "Navy"), "Navy")
+                        )
+                    ),
+                    CheckoutItem(
+                        itemName = "Devotional Journal",
+                        quantity = 1,
+                        totalPrice = 24.99,
+                        variants = emptyList()
+                    )
+                ),
+                totalPrice = 176.94,
+                selectedPaymentMethod = PaymentMethod.CASH
+            ),
+            onNavigateBack = {},
+            onRemoveItem = {},
+            onPaymentMethodSelected = {},
+            onDismissDialog = {},
+            onCheckout = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun CheckoutScreenWithDialogPreview() {
+    BookStoreTheme {
+        CheckoutScreenContent(
+            uiState = CheckoutUiState(
+                checkoutItems = listOf(
+                    CheckoutItem(
+                        itemName = "Holy Bible - NIV",
+                        quantity = 1,
+                        totalPrice = 45.99,
+                        variants = listOf(
+                            CheckoutItem.Variant(
+                                "Language",
+                                listOf("English", "Chinese"),
+                                "English"
+                            )
+                        )
+                    )
+                ),
+                totalPrice = 45.99,
+                selectedPaymentMethod = PaymentMethod.ZELLE,
+                showCheckoutDialog = true
+            ),
+            onNavigateBack = {},
+            onRemoveItem = {},
+            onPaymentMethodSelected = {},
+            onDismissDialog = {},
+            onCheckout = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun CheckoutScreenEmptyPreview() {
+    BookStoreTheme {
+        CheckoutScreenContent(
+            uiState = CheckoutUiState(
+                checkoutItems = emptyList(),
+                totalPrice = 0.0
+            ),
+            onNavigateBack = {},
+            onRemoveItem = {},
+            onPaymentMethodSelected = {},
+            onDismissDialog = {},
+            onCheckout = {}
         )
     }
 }

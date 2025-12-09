@@ -61,7 +61,7 @@ class CheckoutViewModel(
         _uiState.update { it.copy(showCheckoutDialog = show) }
     }
 
-    fun processCheckout(buyerName: String, onSuccess: () -> Unit) {
+    fun processCheckout(buyerName: String) {
         viewModelScope.launch {
             val checkoutState = CheckoutState(
                 buyerName = buyerName,
@@ -80,17 +80,24 @@ class CheckoutViewModel(
                 _uiState.update {
                     it.copy(
                         showCheckoutDialog = false,
-                        selectedPaymentMethod = PaymentMethod.CASH
+                        selectedPaymentMethod = PaymentMethod.CASH,
+                        checkoutSuccess = true
                     )
                 }
                 snackbarManager.showSnackbar(Res.string.checkout_success)
-                onSuccess()
             }.onFailure { error ->
                 println("Checkout failed: ${error.message}")
                 _uiState.update { it.copy(showCheckoutDialog = false) }
                 snackbarManager.showSnackbar(Res.string.checkout_failed)
             }
         }
+    }
+
+    /**
+     * Reset checkout success state after navigation is handled
+     */
+    fun onCheckoutSuccessHandled() {
+        _uiState.update { it.copy(checkoutSuccess = false) }
     }
 
     fun isCartEmpty(): Boolean = cartStateHolder.cartState.value.checkoutList.isEmpty()

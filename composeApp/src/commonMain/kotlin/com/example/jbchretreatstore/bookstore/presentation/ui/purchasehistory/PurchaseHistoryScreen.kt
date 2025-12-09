@@ -188,24 +188,26 @@ fun PurchaseHistoryScreen(
     }
 
     // Remove confirmation bottom sheet
-    if (uiState.showRemoveBottomSheet && uiState.receiptToRemove != null) {
-        RemoveConfirmationBottomSheet(
-            onDismiss = { viewModel.showRemoveBottomSheet(false) },
-            onConfirm = {
-                viewModel.removeReceipt(uiState.receiptToRemove!!)
-            }
-        )
+    uiState.receiptToRemove?.let { receipt ->
+        if (uiState.showRemoveBottomSheet) {
+            RemoveConfirmationBottomSheet(
+                onDismiss = { viewModel.showRemoveBottomSheet(false) },
+                onConfirm = { viewModel.removeReceipt(receipt) }
+            )
+        }
     }
 
     // Edit purchase history item bottom sheet
-    if (uiState.showEditBottomSheet && uiState.receiptToEdit != null && uiState.purchaseHistoryItemToEdit != null) {
+    val receiptToEdit = uiState.receiptToEdit
+    val itemToEdit = uiState.purchaseHistoryItemToEdit
+    if (uiState.showEditBottomSheet && receiptToEdit != null && itemToEdit != null) {
         EditPurchaseHistoryItemBottomSheet(
-            purchaseHistoryItem = uiState.purchaseHistoryItemToEdit!!,
+            purchaseHistoryItem = itemToEdit,
             onDismiss = { viewModel.showEditBottomSheet(false) },
             onSave = { updatedItem ->
                 viewModel.updateCheckoutItem(
-                    receipt = uiState.receiptToEdit!!,
-                    originalItem = uiState.purchaseHistoryItemToEdit!!,
+                    receipt = receiptToEdit,
+                    originalItem = itemToEdit,
                     updatedItem = updatedItem
                 )
             }

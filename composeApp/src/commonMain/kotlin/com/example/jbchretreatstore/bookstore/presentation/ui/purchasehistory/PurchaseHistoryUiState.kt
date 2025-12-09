@@ -16,5 +16,9 @@ data class PurchaseHistoryUiState(
         get() = purchasedHistory.sumOf { receipt ->
             receipt.checkoutList.sumOf { it.totalPrice }
         }
+
+    val hasReceiptData: Boolean
+        get() = purchasedHistory.isNotEmpty() &&
+                purchasedHistory.any { it.checkoutList.isNotEmpty() }
 }
 

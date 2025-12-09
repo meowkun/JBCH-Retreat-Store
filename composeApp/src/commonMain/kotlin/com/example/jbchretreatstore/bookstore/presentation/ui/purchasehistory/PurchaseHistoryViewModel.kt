@@ -3,7 +3,6 @@ package com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
-import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
 import com.example.jbchretreatstore.bookstore.domain.usecase.PurchaseHistoryUseCase
 import com.example.jbchretreatstore.bookstore.presentation.shared.ShareManager
@@ -26,20 +25,14 @@ class PurchaseHistoryViewModel(
     val uiState = _uiState.asStateFlow()
 
     init {
-        loadPurchaseHistory()
+        observePurchaseHistory()
     }
 
-    private fun loadPurchaseHistory() {
+    private fun observePurchaseHistory() {
         viewModelScope.launch {
-            purchaseHistoryUseCase.getAllReceipts().collect { receipts ->
-                val purchasedHistory = receipts.filter {
-                    it.checkoutStatus == CheckoutStatus.CHECKED_OUT
-                }
+            purchaseHistoryUseCase.getPurchaseHistory().collect { purchasedHistory ->
                 _uiState.update {
-                    it.copy(
-                        purchasedHistory = purchasedHistory,
-                        isLoading = false
-                    )
+                    it.copy(purchasedHistory = purchasedHistory, isLoading = false)
                 }
             }
         }
@@ -51,8 +44,6 @@ class PurchaseHistoryViewModel(
             try {
                 val csvResult = convertReceiptsToCsv(_uiState.value.purchasedHistory)
                 val timestamp = Clock.System.now().toEpochMilliseconds()
-
-                // Share combined CSV with both detailed and summary sections
                 shareManager.shareCsv(csvResult.combinedCsv, "purchase_history_$timestamp.csv")
             } catch (e: Exception) {
                 println("Failed to share purchase history: ${e.message}")
@@ -60,38 +51,18 @@ class PurchaseHistoryViewModel(
         }
     }
 
-    fun hasReceiptData(): Boolean = _uiState.value.purchasedHistory.isNotEmpty() &&
-            _uiState.value.purchasedHistory.any { it.checkoutList.isNotEmpty() }
-
     fun showRemoveBottomSheet(show: Boolean, receipt: ReceiptData? = null) {
         _uiState.update {
-            it.copy(
-                showRemoveBottomSheet = show,
-                receiptToRemove = receipt
-            )
+            it.copy(showRemoveBottomSheet = show, receiptToRemove = receipt)
         }
     }
 
     fun removeReceipt(receipt: ReceiptData) {
         viewModelScope.launch {
-            val result = purchaseHistoryUseCase.removeReceipt(receipt)
-            result.onSuccess {
-                _uiState.update { state ->
-                    state.copy(
-                        purchasedHistory = state.purchasedHistory.filter { it.id != receipt.id },
-                        showRemoveBottomSheet = false,
-                        receiptToRemove = null
-                    )
-                }
-            }.onFailure { error ->
-                println("Failed to remove receipt: ${error.message}")
-                _uiState.update {
-                    it.copy(
-                        showRemoveBottomSheet = false,
-                        receiptToRemove = null
-                    )
-                }
-            }
+            purchaseHistoryUseCase.removeReceipt(receipt)
+                .onFailure { println("Failed to remove receipt: ${it.message}") }
+            // Always dismiss - flow collection handles UI update
+            dismissRemoveBottomSheet()
         }
     }
 
@@ -115,31 +86,32 @@ class PurchaseHistoryViewModel(
         updatedItem: CheckoutItem
     ) {
         viewModelScope.launch {
-            val result = purchaseHistoryUseCase.updateCheckoutItemByVariants(
-                receipt,
-                originalItem,
-                updatedItem
-            )
-            result.onSuccess {
-                // Just dismiss the bottom sheet - the flow collection will update purchasedHistory
-                _uiState.update {
-                    it.copy(
-                        showEditBottomSheet = false,
-                        receiptToEdit = null,
-                        purchaseHistoryItemToEdit = null
-                    )
-                }
-            }.onFailure { error: Throwable ->
-                println("Failed to update checkout item: ${error.message}")
-                _uiState.update {
-                    it.copy(
-                        showEditBottomSheet = false,
-                        receiptToEdit = null,
-                        purchaseHistoryItemToEdit = null
-                    )
-                }
-            }
+            purchaseHistoryUseCase.updateCheckoutItemByVariants(receipt, originalItem, updatedItem)
+                .onFailure { println("Failed to update checkout item: ${it.message}") }
+            // Always dismiss - flow collection handles UI update
+            dismissEditBottomSheet()
         }
     }
+
+    private fun dismissRemoveBottomSheet() {
+        _uiState.update {
+            it.copy(showRemoveBottomSheet = false, receiptToRemove = null)
+        }
+    }
+
+    private fun dismissEditBottomSheet() {
+        _uiState.update {
+            it.copy(
+                showEditBottomSheet = false,
+                receiptToEdit = null,
+                purchaseHistoryItemToEdit = null
+            )
+        }
+    }
+
+    /**
+     * Check if there is any receipt data to display/share
+     */
+    fun hasReceiptData(): Boolean = uiState.value.hasReceiptData
 }
 

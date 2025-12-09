@@ -7,6 +7,7 @@ data class CheckoutUiState(
     val checkoutItems: List<CheckoutItem> = emptyList(),
     val totalPrice: Double = 0.0,
     val selectedPaymentMethod: PaymentMethod = PaymentMethod.CASH,
-    val showCheckoutDialog: Boolean = false
+    val showCheckoutDialog: Boolean = false,
+    val checkoutSuccess: Boolean = false
 )
 

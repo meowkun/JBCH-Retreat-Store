@@ -46,13 +46,9 @@ class PurchaseHistoryUseCase(
      * Calculate total revenue from all purchases
      */
     suspend fun calculateTotalRevenue(): Double {
-        return repository.fetchReceiptList().map { receipts ->
-            receipts
-                .filter { it.checkoutStatus == CheckoutStatus.CHECKED_OUT }
-                .sumOf { receipt ->
-                    receipt.checkoutList.sumOf { it.totalPrice }
-                }
-        }.map { it }.first()
+        return repository.fetchReceiptList().first()
+            .filter { it.checkoutStatus == CheckoutStatus.CHECKED_OUT }
+            .sumOf { receipt -> receipt.checkoutList.sumOf { it.totalPrice } }
     }
 
     /**
