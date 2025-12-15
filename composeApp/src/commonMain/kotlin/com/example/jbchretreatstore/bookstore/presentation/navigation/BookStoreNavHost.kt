@@ -5,7 +5,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.FabPosition
@@ -81,10 +83,13 @@ fun BookStoreNavHost() {
     }
 
     Scaffold(
+        modifier = Modifier.fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding(),
         topBar = {
             Image(
                 modifier = Modifier.fillMaxWidth()
-                    .statusBarsPadding(),
+                    .padding(top = Dimensions.spacing_m),
                 painter = painterResource(Res.drawable.ic_app_logo),
                 contentDescription = stringResource(Res.string.app_logo_description),
                 contentScale = ContentScale.Inside,
@@ -131,7 +136,7 @@ fun BookStoreNavHost() {
                         onNavigate = { destination ->
                             navigator.navigateTo(destination)
                         },
-                        modifier = Modifier.padding(bottom = Dimensions.spacing_xxl)
+                        modifier = Modifier.padding(bottom = Dimensions.spacing_xxxl)
                     )
                 }
             }

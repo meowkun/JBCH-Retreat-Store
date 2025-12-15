@@ -37,6 +37,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,6 +72,42 @@ import jbchretreatstore.composeapp.generated.resources.item_price_per_unit
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
+
+/**
+ * Saver for CheckoutItem to persist state across LazyColumn item disposal
+ */
+@OptIn(ExperimentalUuidApi::class)
+private val CheckoutItemSaver: Saver<CheckoutItem, Any> = listSaver(
+    save = { item ->
+        listOf(
+            item.id.toString(),
+            item.itemName,
+            item.quantity,
+            item.variants.map { variant ->
+                listOf(variant.key, variant.valueList, variant.selectedValue)
+            },
+            item.totalPrice
+        )
+    },
+    restore = { list ->
+        @Suppress("UNCHECKED_CAST")
+        CheckoutItem(
+            id = Uuid.parse(list[0] as String),
+            itemName = list[1] as String,
+            quantity = list[2] as Int,
+            variants = (list[3] as List<List<Any>>).map { variantList ->
+                CheckoutItem.Variant(
+                    key = variantList[0] as String,
+                    valueList = variantList[1] as List<String>,
+                    selectedValue = variantList[2] as String
+                )
+            },
+            totalPrice = list[4] as Double
+        )
+    }
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,8 +118,10 @@ fun ItemView(
     onDeleteItem: (DisplayItem) -> Unit,
     onEditItem: (DisplayItem) -> Unit
 ) {
-    var expanded by remember { mutableStateOf(true) }
-    var checkoutItem by remember {
+    var expanded by rememberSaveable { mutableStateOf(true) }
+    var checkoutItem by rememberSaveable(
+        stateSaver = CheckoutItemSaver
+    ) {
         mutableStateOf(
             CheckoutItem(
                 itemName = displayItem.name,

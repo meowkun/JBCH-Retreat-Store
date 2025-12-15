@@ -6,6 +6,7 @@ import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.domain.usecase.ManageCartUseCase
 import com.example.jbchretreatstore.bookstore.domain.usecase.ManageDisplayItemsUseCase
+import com.example.jbchretreatstore.bookstore.domain.usecase.PurchaseHistoryUseCase
 import com.example.jbchretreatstore.bookstore.presentation.shared.CartStateHolder
 import com.example.jbchretreatstore.bookstore.presentation.shared.SnackbarManager
 import jbchretreatstore.composeapp.generated.resources.Res
@@ -27,6 +28,7 @@ import kotlinx.coroutines.launch
 class ShopViewModel(
     private val manageDisplayItemsUseCase: ManageDisplayItemsUseCase,
     private val manageCartUseCase: ManageCartUseCase,
+    private val purchaseHistoryUseCase: PurchaseHistoryUseCase,
     private val cartStateHolder: CartStateHolder,
     private val snackbarManager: SnackbarManager
 ) : ViewModel() {
@@ -48,7 +50,22 @@ class ShopViewModel(
     )
 
     init {
+//        loadTestDataOnce()
         loadDisplayItems()
+    }
+
+    /**
+     * Load test data only on first app run
+     */
+    private fun loadTestDataOnce() {
+        viewModelScope.launch {
+            // Load both display items and purchase history test data if not already loaded
+            val wasLoaded = manageDisplayItemsUseCase.loadTestDataIfNeeded()
+            if (wasLoaded) {
+                // Also load purchase history test data
+                purchaseHistoryUseCase.loadTestData()
+            }
+        }
     }
 
     private fun loadDisplayItems() {
@@ -133,6 +150,15 @@ class ShopViewModel(
                 _uiState.update { it.copy(showEditItemDialog = false, itemToEdit = null) }
                 snackbarManager.showSnackbar(Res.string.item_update_failed)
             }
+        }
+    }
+
+    /**
+     * Load sample test data for development/testing purposes
+     */
+    fun loadTestData() {
+        viewModelScope.launch {
+            manageDisplayItemsUseCase.loadTestData()
         }
     }
 }

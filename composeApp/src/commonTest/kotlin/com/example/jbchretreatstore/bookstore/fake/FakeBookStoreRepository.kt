@@ -15,6 +15,7 @@ class FakeBookStoreRepository : BookStoreRepository {
 
     private val _displayItems = MutableStateFlow<List<DisplayItem>>(emptyList())
     private val _receipts = MutableStateFlow<List<ReceiptData>>(emptyList())
+    private var _testDataLoaded = false
 
     // Track calls for verification
     var updateDisplayItemsCalled = false
@@ -60,6 +61,14 @@ class FakeBookStoreRepository : BookStoreRepository {
         return _receipts.asStateFlow()
     }
 
+    override suspend fun isTestDataLoaded(): Boolean {
+        return _testDataLoaded
+    }
+
+    override suspend fun setTestDataLoaded(loaded: Boolean) {
+        _testDataLoaded = loaded
+    }
+
     // Helper methods for test setup
 
     fun setDisplayItems(items: List<DisplayItem>) {
@@ -73,6 +82,7 @@ class FakeBookStoreRepository : BookStoreRepository {
     fun reset() {
         _displayItems.value = emptyList()
         _receipts.value = emptyList()
+        _testDataLoaded = false
         updateDisplayItemsCalled = false
         updateReceiptListCalled = false
         lastSavedDisplayItems = null

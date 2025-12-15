@@ -1,13 +1,16 @@
 package com.example.jbchretreatstore.bookstore.domain.usecase
 
+import com.example.jbchretreatstore.bookstore.data.testdata.SampleTestData
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.domain.repository.BookStoreRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlin.uuid.ExperimentalUuidApi
 
 /**
  * Use case for managing display items with business logic
  */
+@OptIn(ExperimentalUuidApi::class)
 class ManageDisplayItemsUseCase(
     private val repository: BookStoreRepository
 ) {
@@ -96,6 +99,34 @@ class ManageDisplayItemsUseCase(
         return repository.fetchDisplayItems().first().filter { item ->
             item.name.contains(query, ignoreCase = true)
         }
+    }
+
+    /**
+     * Load sample test data (for development/testing purposes)
+     * This replaces existing items with sample data
+     */
+    suspend fun loadTestData() {
+        repository.updateDisplayItems(SampleTestData.sampleDisplayItems)
+    }
+
+    /**
+     * Load sample test data only if it hasn't been loaded before (one-time initialization)
+     * @return true if test data was loaded, false if it was already loaded previously
+     */
+    suspend fun loadTestDataIfNeeded(): Boolean {
+        if (!repository.isTestDataLoaded()) {
+            repository.updateDisplayItems(SampleTestData.sampleDisplayItems)
+            repository.setTestDataLoaded(true)
+            return true
+        }
+        return false
+    }
+
+    /**
+     * Clear all display items
+     */
+    suspend fun clearAllItems() {
+        repository.updateDisplayItems(emptyList())
     }
 }
 

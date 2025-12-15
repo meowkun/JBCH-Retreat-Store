@@ -1,5 +1,6 @@
 package com.example.jbchretreatstore.bookstore.domain.usecase
 
+import com.example.jbchretreatstore.bookstore.data.testdata.SampleTestData
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
@@ -149,6 +150,21 @@ class PurchaseHistoryUseCase(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    /**
+     * Load sample test data (for development/testing purposes)
+     * This replaces existing receipts with sample data
+     */
+    suspend fun loadTestData() {
+        repository.updateReceiptList(SampleTestData.samplePurchaseHistory)
+    }
+
+    /**
+     * Clear all receipts
+     */
+    suspend fun clearAllReceipts() {
+        repository.updateReceiptList(emptyList())
     }
 }
 
