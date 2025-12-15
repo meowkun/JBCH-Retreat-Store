@@ -34,6 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.TitleView
+import com.example.jbchretreatstore.bookstore.presentation.ui.dialog.EditBuyerNameDialog
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.DarkBlue
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
@@ -148,6 +149,9 @@ fun PurchaseHistoryScreen(
                                         receipt,
                                         purchaseHistoryItem
                                     )
+                                },
+                                onEditBuyerNameClick = { receipt ->
+                                    viewModel.showEditBuyerNameDialog(true, receipt)
                                 }
                             )
                         }
@@ -210,6 +214,18 @@ fun PurchaseHistoryScreen(
                     originalItem = itemToEdit,
                     updatedItem = updatedItem
                 )
+            }
+        )
+    }
+
+    // Edit buyer name dialog
+    val receiptToEditBuyerName = uiState.receiptToEditBuyerName
+    if (uiState.showEditBuyerNameDialog && receiptToEditBuyerName != null) {
+        EditBuyerNameDialog(
+            currentBuyerName = receiptToEditBuyerName.buyerName,
+            onDismiss = { viewModel.showEditBuyerNameDialog(false) },
+            onSave = { newBuyerName ->
+                viewModel.updateBuyerName(receiptToEditBuyerName, newBuyerName)
             }
         )
     }

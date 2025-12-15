@@ -56,7 +56,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun PurchaseHistoryItemView(
     receipt: ReceiptData,
     onRemoveClick: (ReceiptData) -> Unit = {},
-    onEditClick: (ReceiptData, CheckoutItem) -> Unit = { _, _ -> }
+    onEditClick: (ReceiptData, CheckoutItem) -> Unit = { _, _ -> },
+    onEditBuyerNameClick: (ReceiptData) -> Unit = {}
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -77,7 +78,8 @@ fun PurchaseHistoryItemView(
                 PurchaseHistoryExpandedView(
                     receipt = receipt,
                     onCollapseClick = { expanded = false },
-                    onEditClick = onEditClick
+                    onEditClick = onEditClick,
+                    onEditBuyerNameClick = { onEditBuyerNameClick(receipt) }
                 )
             } else {
                 PurchaseHistoryCollapsedView(
@@ -169,9 +171,10 @@ private fun PurchaseHistoryCollapsedView(
 private fun PurchaseHistoryExpandedView(
     receipt: ReceiptData,
     onCollapseClick: () -> Unit,
-    onEditClick: (ReceiptData, CheckoutItem) -> Unit
+    onEditClick: (ReceiptData, CheckoutItem) -> Unit,
+    onEditBuyerNameClick: () -> Unit
 ) {
-    // Header: buyer name and total (clickable to collapse)
+    // Header: buyer name with edit button and total (clickable to collapse)
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -179,12 +182,23 @@ private fun PurchaseHistoryExpandedView(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.Top
     ) {
-        Text(
-            text = receipt.buyerName.ifBlank { "Unknown Buyer" },
-            style = MaterialTheme.typography.titleLarge.copy(
-                fontWeight = FontWeight.Bold
-            ),
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = receipt.buyerName.ifBlank { "Unknown Buyer" },
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold
+                ),
+            )
+            IconButton(onClick = onEditBuyerNameClick) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = stringResource(Res.string.purchase_history_edit_item_description),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
@@ -419,7 +433,8 @@ private fun PurchaseHistoryExpandedViewPreview() {
                         )
                     ),
                     onCollapseClick = {},
-                    onEditClick = { _, _ -> }
+                    onEditClick = { _, _ -> },
+                    onEditBuyerNameClick = {}
                 )
             }
         }

@@ -28,10 +28,8 @@ class CheckoutUseCase(
         checkoutStatus: CheckoutStatus,
         paymentMethod: PaymentMethod = PaymentMethod.CASH
     ): Result<ReceiptData> {
-        // Validate buyer name
-        if (buyerName.isBlank()) {
-            return Result.failure(IllegalArgumentException("Buyer name cannot be empty"))
-        }
+        // Use "Unknown" if buyer name is empty
+        val finalBuyerName = buyerName.ifBlank { "Unknown" }
 
         // Validate cart is not empty
         if (cart.checkoutList.isEmpty()) {
@@ -45,7 +43,7 @@ class CheckoutUseCase(
 
         // Create receipt with timestamp
         val receipt = cart.copy(
-            buyerName = buyerName,
+            buyerName = finalBuyerName,
             checkoutStatus = checkoutStatus,
             paymentMethod = paymentMethod,
             dateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())

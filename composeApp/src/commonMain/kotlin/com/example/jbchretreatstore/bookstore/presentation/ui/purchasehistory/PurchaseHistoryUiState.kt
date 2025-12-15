@@ -10,7 +10,9 @@ data class PurchaseHistoryUiState(
     val receiptToRemove: ReceiptData? = null,
     val showEditBottomSheet: Boolean = false,
     val receiptToEdit: ReceiptData? = null,
-    val purchaseHistoryItemToEdit: CheckoutItem? = null
+    val purchaseHistoryItemToEdit: CheckoutItem? = null,
+    val showEditBuyerNameDialog: Boolean = false,
+    val receiptToEditBuyerName: ReceiptData? = null
 ) {
     val totalAmount: Double
         get() = purchasedHistory.sumOf { receipt ->

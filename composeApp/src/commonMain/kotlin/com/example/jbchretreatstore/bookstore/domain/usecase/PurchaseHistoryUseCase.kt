@@ -153,6 +153,24 @@ class PurchaseHistoryUseCase(
     }
 
     /**
+     * Update the buyer name for a receipt
+     */
+    suspend fun updateBuyerName(receipt: ReceiptData, newBuyerName: String): Result<Unit> {
+        return try {
+            val currentReceipts = repository.fetchReceiptList().first()
+            val updatedReceipts = currentReceipts.map { r ->
+                if (r.id == receipt.id) {
+                    r.copy(buyerName = newBuyerName.ifBlank { "Unknown" })
+                } else r
+            }
+            repository.updateReceiptList(updatedReceipts)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
      * Load sample test data (for development/testing purposes)
      * This replaces existing receipts with sample data
      */

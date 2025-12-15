@@ -109,6 +109,32 @@ class PurchaseHistoryViewModel(
         }
     }
 
+    fun showEditBuyerNameDialog(show: Boolean, receipt: ReceiptData? = null) {
+        _uiState.update {
+            it.copy(
+                showEditBuyerNameDialog = show,
+                receiptToEditBuyerName = receipt
+            )
+        }
+    }
+
+    fun updateBuyerName(receipt: ReceiptData, newBuyerName: String) {
+        viewModelScope.launch {
+            purchaseHistoryUseCase.updateBuyerName(receipt, newBuyerName)
+                .onFailure { println("Failed to update buyer name: ${it.message}") }
+            dismissEditBuyerNameDialog()
+        }
+    }
+
+    private fun dismissEditBuyerNameDialog() {
+        _uiState.update {
+            it.copy(
+                showEditBuyerNameDialog = false,
+                receiptToEditBuyerName = null
+            )
+        }
+    }
+
     /**
      * Check if there is any receipt data to display/share
      */

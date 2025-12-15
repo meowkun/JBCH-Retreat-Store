@@ -4,9 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
@@ -15,7 +12,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -25,29 +21,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
-import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
-import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.checkout_dialog_buyer_name_hint
-import jbchretreatstore.composeapp.generated.resources.checkout_dialog_buyer_name_title
 import jbchretreatstore.composeapp.generated.resources.checkout_dialog_cancel_button
-import jbchretreatstore.composeapp.generated.resources.checkout_dialog_checkout_button
 import jbchretreatstore.composeapp.generated.resources.close_dialog_description
+import jbchretreatstore.composeapp.generated.resources.purchase_history_edit_buyer_name_title
+import jbchretreatstore.composeapp.generated.resources.purchase_history_edit_save
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun CheckoutDialog(
-    paymentMethod: PaymentMethod,
-    onPaymentMethodSelected: (PaymentMethod) -> Unit,
+fun EditBuyerNameDialog(
+    currentBuyerName: String,
     onDismiss: () -> Unit,
-    onCheckout: (buyerName: String) -> Unit
+    onSave: (newBuyerName: String) -> Unit
 ) {
-    val radioOptions = listOf(PaymentMethod.ZELLE, PaymentMethod.VENMO, PaymentMethod.CASH)
-    var buyerName by remember { mutableStateOf("") }
+    var buyerName by remember { mutableStateOf(currentBuyerName) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -58,7 +49,7 @@ fun CheckoutDialog(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(stringResource(Res.string.checkout_dialog_buyer_name_title))
+                Text(stringResource(Res.string.purchase_history_edit_buyer_name_title))
                 IconButton(onClick = onDismiss) {
                     Icon(
                         imageVector = Icons.Default.Close,
@@ -68,9 +59,7 @@ fun CheckoutDialog(
             }
         },
         text = {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_s)
-            ) {
+            Column {
                 OutlinedTextField(
                     value = buyerName,
                     onValueChange = { buyerName = it },
@@ -80,23 +69,16 @@ fun CheckoutDialog(
                     ),
                     label = { Text(stringResource(Res.string.checkout_dialog_buyer_name_hint)) }
                 )
-
-                // Payment method vertical selection
-                RadioButtonVerticalSelection(
-                    radioOptions = radioOptions,
-                    selectedOption = paymentMethod,
-                    onOptionSelected = onPaymentMethodSelected
-                )
             }
         },
         confirmButton = {
             TextButton(
-                onClick = { onCheckout(buyerName.trim()) },
+                onClick = { onSave(buyerName.trim()) },
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = MaterialTheme.colorScheme.primary
                 )
             ) {
-                Text(stringResource(Res.string.checkout_dialog_checkout_button))
+                Text(stringResource(Res.string.purchase_history_edit_save))
             }
         },
         dismissButton = {
@@ -112,54 +94,15 @@ fun CheckoutDialog(
     )
 }
 
-@Composable
-fun RadioButtonVerticalSelection(
-    radioOptions: List<PaymentMethod>,
-    selectedOption: PaymentMethod,
-    onOptionSelected: (PaymentMethod) -> Unit,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .selectableGroup(),
-        verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_xs)
-    ) {
-        radioOptions.forEach { paymentMethod ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .selectable(
-                        selected = paymentMethod == selectedOption,
-                        onClick = { onOptionSelected(paymentMethod) },
-                        role = Role.RadioButton
-                    )
-                    .padding(Dimensions.spacing_xs),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RadioButton(
-                    selected = paymentMethod == selectedOption,
-                    onClick = { onOptionSelected(paymentMethod) }
-                )
-                Text(
-                    text = paymentMethod.methodName,
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-            }
-        }
-    }
-}
-
 @Preview
 @Composable
-fun CheckoutDialogPreview() {
+fun EditBuyerNameDialogPreview() {
     BookStoreTheme {
-        CheckoutDialog(
-            paymentMethod = PaymentMethod.CASH,
-            onPaymentMethodSelected = {},
+        EditBuyerNameDialog(
+            currentBuyerName = "John Doe",
             onDismiss = {},
-            onCheckout = {}
+            onSave = {}
         )
     }
 }
+
