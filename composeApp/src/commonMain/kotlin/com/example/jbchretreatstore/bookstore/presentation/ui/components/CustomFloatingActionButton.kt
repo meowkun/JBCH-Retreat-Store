@@ -13,14 +13,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun CustomFloatingActionButton(
     hasItemsInCart: Boolean,
     isOnShopScreen: Boolean,
+    isOnCheckoutScreen: Boolean,
     itemCount: Int,
+    totalPrice: Double,
     onCheckoutClick: () -> Unit,
+    onCheckoutButtonClick: () -> Unit,
     onAddItemClick: () -> Unit,
     modifier: Modifier = Modifier,
     showShareButton: Boolean = false,
@@ -39,9 +43,25 @@ fun CustomFloatingActionButton(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Spacer(modifier = Modifier.weight(1f))
-                CheckoutButton(
+                CheckCartButton(
                     itemCount = itemCount,
                     onClick = onCheckoutClick
+                )
+                Spacer(modifier = Modifier.weight(1f))
+            }
+        }
+
+        // CheckoutButton - only visible on CheckoutScreen
+        AnimatedVisibility(visible = isOnCheckoutScreen) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(bottom = Dimensions.spacing_xxxxl),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Spacer(modifier = Modifier.weight(1f))
+                CheckoutButton(
+                    totalPrice = totalPrice,
+                    onClick = onCheckoutButtonClick
                 )
                 Spacer(modifier = Modifier.weight(1f))
             }
@@ -89,8 +109,11 @@ fun CustomFloatingActionButtonPreview() {
             CustomFloatingActionButton(
                 hasItemsInCart = false,
                 isOnShopScreen = true,
+                isOnCheckoutScreen = false,
                 itemCount = 0,
+                totalPrice = 0.0,
                 onCheckoutClick = {},
+                onCheckoutButtonClick = {},
                 onAddItemClick = {}
             )
 
@@ -100,8 +123,25 @@ fun CustomFloatingActionButtonPreview() {
             CustomFloatingActionButton(
                 hasItemsInCart = true,
                 isOnShopScreen = true,
+                isOnCheckoutScreen = false,
                 itemCount = 5,
+                totalPrice = 0.0,
                 onCheckoutClick = {},
+                onCheckoutButtonClick = {},
+                onAddItemClick = {}
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Preview with CheckoutButton (on checkout screen)
+            CustomFloatingActionButton(
+                hasItemsInCart = true,
+                isOnShopScreen = false,
+                isOnCheckoutScreen = true,
+                itemCount = 5,
+                totalPrice = 99.99,
+                onCheckoutClick = {},
+                onCheckoutButtonClick = {},
                 onAddItemClick = {}
             )
 
@@ -111,9 +151,12 @@ fun CustomFloatingActionButtonPreview() {
             CustomFloatingActionButton(
                 hasItemsInCart = false,
                 isOnShopScreen = false,
+                isOnCheckoutScreen = false,
                 itemCount = 0,
+                totalPrice = 0.0,
                 showShareButton = true,
                 onCheckoutClick = {},
+                onCheckoutButtonClick = {},
                 onAddItemClick = {},
                 onShareClick = {}
             )

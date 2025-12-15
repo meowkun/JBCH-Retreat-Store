@@ -33,10 +33,20 @@
     <string name="add_item_options_value_placeholder">e.g. Large, Blue, English</string>
     <string name="add_item_add_more_value">Add more variant value</string>
     <string name="add_item_add_variant">Add variant</string>
+    <string name="edit_item_edit_variant">Edit variant</string>
     <string name="add_item_cancel">Cancel</string>
     <string name="add_item_add">Add</string>
     <string name="add_item_save">Save</string>
     <string name="add_item_back">Back</string>
+
+    <!--  Edit item dialog  -->
+    <string name="edit_item_dialog_title">Edit Item</string>
+    <string name="edit_item_update">Update</string>
+    <string name="edit_item_button_description">Edit item</string>
+
+    <!--  Reorderable variants list  -->
+    <string name="reorderable_drag_handle_description">Reorder</string>
+    <string name="add_item_duplicate_variant_key_error">Variant with this name already exists</string>
 
     <!--  Remove item dialog  -->
     <string name="remove_item_dialog_title">Remove Item</string>
@@ -62,12 +72,25 @@
 
     <!--  Purchase history view  -->
     <string name="purchase_history_view_title">Purchase History</string>
+    <string name="purchase_history_remove_title">Remove Purchase Record</string>
+    <string name="purchase_history_remove_message">Are you sure you want to remove this purchase record?</string>
+    <string name="purchase_history_remove_confirm">Yes, Remove</string>
+    <string name="purchase_history_remove_cancel">Cancel</string>
+    <string name="purchase_history_remove_button_description">Remove purchase record</string>
+    <string name="purchase_history_no_items">No items</string>
+    <string name="purchase_history_edit_item_description">Edit item</string>
+    <string name="purchase_history_edit_buyer_name_title">Edit Buyer Name</string>
+    <string name="purchase_history_edit_total">Total</string>
+    <string name="purchase_history_edit_save">Save</string>
+    <string name="purchase_history_edit_cancel">Cancel</string>
 
     <!-- Display item messages -->
     <string name="item_added_success">Item added successfully</string>
     <string name="item_add_failed">Failed to add item</string>
     <string name="item_removed_success">Item removed successfully</string>
     <string name="item_remove_failed">Failed to remove item</string>
+    <string name="item_update_success">Item updated successfully</string>
+    <string name="item_update_failed">Failed to update item</string>
 
     <!-- Cart messages -->
     <string name="added_to_cart">Added to cart</string>
@@ -90,6 +113,8 @@
     <!-- Checkout button -->
     <string name="check_cart_button">Check Cart</string>
     <string name="cart_icon_description">Cart icon</string>
+    <string name="checkout_button_description">Checkout</string>
+    <string name="checkout_button_text">Checkout</string>
 
     <!-- Bottom Navigation -->
     <string name="bottom_nav_shop">Shop</string>

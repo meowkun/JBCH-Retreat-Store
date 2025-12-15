@@ -8,14 +8,14 @@ androidx-appcompat = "1.7.1"
 androidx-constraintlayout = "2.2.1"
 androidx-core = "1.16.0"
 androidx-espresso = "3.6.1"
-androidx-lifecycle = "2.9.5"
+androidx-lifecycle = "2.9.6"
 androidx-testExt = "1.2.1"
-androidx-activityCompose = "1.11.0"
+androidx-activityCompose = "1.12.1"
 androidx-core-ktx = "1.17.0"
 androidx-espresso-core = "3.7.0"
 androidx-material = "1.13.0"
 androidx-test-junit = "1.3.0"
-composeHotReload = "1.0.0-rc03"
+composeHotReload = "1.0.0"
 composeMultiplatform = "1.9.3"
 compose-plugin = "1.7.0"
 navigationCompose = "2.9.1"
@@ -23,7 +23,7 @@ kotlinSerialization = "1.9.0"
 junit = "4.13.2"
 kotlin = "2.2.21"
 kotlinx-coroutines = "1.10.2"
-ktor = "3.3.2"
+ktor = "3.3.3"
 logback = "1.5.21"
 koin = "4.1.1"
 coil3 = "3.3.0"
@@ -34,6 +34,7 @@ datastore = "1.1.7"
 datetime = "0.7.1"
 uuid = "0.1.6"
 turbine = "1.2.1"
+reorderable = "3.0.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -92,6 +93,8 @@ sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sql
 datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "datetime" }
 
 uuid = { group = "app.softwork", name = "kotlinx-uuid-core", version.ref = "uuid" }
+
+reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

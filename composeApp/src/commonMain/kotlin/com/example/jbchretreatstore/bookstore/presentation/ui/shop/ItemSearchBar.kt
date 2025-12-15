@@ -22,7 +22,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.MediumBlue
@@ -40,15 +39,13 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun ItemSearchBar(
     searchQuery: String,
-    onUserIntent: (BookStoreIntent) -> Unit,
+    onSearchQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     OutlinedTextField(
         modifier = modifier.minimumInteractiveComponentSize(),
         value = searchQuery,
-        onValueChange = { query ->
-            onUserIntent(BookStoreIntent.OnSearchQueryChange(query))
-        },
+        onValueChange = onSearchQueryChange,
         textStyle = MaterialTheme.typography.bodyLarge.copy(
             fontWeight = FontWeight.Bold
         ),
@@ -92,11 +89,7 @@ fun ItemSearchBar(
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
-                IconButton(
-                    onClick = {
-                        onUserIntent(BookStoreIntent.OnSearchQueryChange(""))
-                    }
-                ) {
+                IconButton(onClick = { onSearchQueryChange("") }) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = stringResource(Res.string.clear_search_description),
@@ -108,14 +101,13 @@ fun ItemSearchBar(
     )
 }
 
-
 @Preview
 @Composable
 fun ItemSearchBarPreview() {
     BookStoreTheme {
         ItemSearchBar(
             searchQuery = "",
-            onUserIntent = {}
+            onSearchQueryChange = {}
         )
     }
 }

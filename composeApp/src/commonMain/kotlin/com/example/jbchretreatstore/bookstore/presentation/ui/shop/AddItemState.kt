@@ -9,5 +9,6 @@ data class AddItemState (
     val showItemNameError: Boolean = false,
     val showItemPriceError: Boolean = false,
     val showAddOptionError: Boolean = false,
-    val showValueError: Boolean = false
+    val showValueError: Boolean = false,
+    val showDuplicateKeyError: Boolean = false
 )

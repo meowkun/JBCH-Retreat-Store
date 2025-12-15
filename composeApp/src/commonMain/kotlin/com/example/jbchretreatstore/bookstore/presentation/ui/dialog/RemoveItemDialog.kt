@@ -15,9 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
-import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
-import com.example.jbchretreatstore.bookstore.presentation.DialogVisibilityState
-import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Black
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import jbchretreatstore.composeapp.generated.resources.Res
@@ -34,16 +31,11 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun RemoveItemDialog(
     displayItem: DisplayItem,
-    onUserIntent: (BookStoreIntent) -> Unit
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
 ) {
     AlertDialog(
-        onDismissRequest = {
-            onUserIntent(
-                BookStoreIntent.OnUpdateDialogVisibility(
-                    DialogVisibilityState(AlertDialogType.REMOVE_ITEM, false)
-                )
-            )
-        },
+        onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.primaryContainer,
         title = {
             Row(
@@ -52,18 +44,7 @@ fun RemoveItemDialog(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(stringResource(Res.string.remove_item_dialog_title))
-                IconButton(
-                    onClick = {
-                        onUserIntent(
-                            BookStoreIntent.OnUpdateDialogVisibility(
-                                dialogState = DialogVisibilityState(
-                                    alertDialogType = AlertDialogType.REMOVE_ITEM,
-                                    isVisible = false
-                                )
-                            )
-                        )
-                    }
-                ) {
+                IconButton(onClick = onDismiss) {
                     Icon(
                         painter = painterResource(Res.drawable.ic_close),
                         contentDescription = stringResource(Res.string.close_dialog_description)
@@ -84,17 +65,7 @@ fun RemoveItemDialog(
         },
         confirmButton = {
             TextButton(
-                onClick = {
-                    onUserIntent(BookStoreIntent.OnDeleteDisplayItem(displayItem))
-                    onUserIntent(
-                        BookStoreIntent.OnUpdateDialogVisibility(
-                            dialogState = DialogVisibilityState(
-                                alertDialogType = AlertDialogType.REMOVE_ITEM,
-                                isVisible = false
-                            )
-                        )
-                    )
-                },
+                onClick = onConfirm,
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = MaterialTheme.colorScheme.primary
                 )
@@ -104,16 +75,7 @@ fun RemoveItemDialog(
         },
         dismissButton = {
             TextButton(
-                onClick = {
-                    onUserIntent(
-                        BookStoreIntent.OnUpdateDialogVisibility(
-                            dialogState = DialogVisibilityState(
-                                alertDialogType = AlertDialogType.REMOVE_ITEM,
-                                isVisible = false
-                            )
-                        )
-                    )
-                },
+                onClick = onDismiss,
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = MaterialTheme.colorScheme.primary
                 )
@@ -129,7 +91,10 @@ fun RemoveItemDialog(
 fun RemoveItemDialogPreview() {
     BookStoreTheme {
         RemoveItemDialog(
-            displayItem = DisplayItem(name = "Sample Item")
-        ) {}
+            displayItem = DisplayItem(name = "Bible", price = 40.0),
+            onDismiss = {},
+            onConfirm = {}
+        )
     }
 }
+

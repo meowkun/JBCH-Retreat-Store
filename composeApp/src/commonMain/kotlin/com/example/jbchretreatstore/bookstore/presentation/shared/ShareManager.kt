@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.presentation.share
+package com.example.jbchretreatstore.bookstore.presentation.shared
 
 /**
  * Platform-specific share manager for sharing CSV files

@@ -1,6 +1,8 @@
 package com.example.jbchretreatstore.bookstore.presentation.ui.dialog
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,10 +10,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.DragHandle
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -24,6 +31,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,13 +41,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
-import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
-import com.example.jbchretreatstore.bookstore.presentation.DialogVisibilityState
-import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.DialogTitle
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.LabeledTextField
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.VariantValueItem
@@ -54,8 +61,8 @@ import com.example.jbchretreatstore.bookstore.presentation.utils.filterNumericIn
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.add_item_add_more_value
 import jbchretreatstore.composeapp.generated.resources.add_item_add_variant
-import jbchretreatstore.composeapp.generated.resources.add_item_back
 import jbchretreatstore.composeapp.generated.resources.add_item_dialog_title
+import jbchretreatstore.composeapp.generated.resources.add_item_duplicate_variant_key_error
 import jbchretreatstore.composeapp.generated.resources.add_item_name_label
 import jbchretreatstore.composeapp.generated.resources.add_item_name_place_holder
 import jbchretreatstore.composeapp.generated.resources.add_item_options_key
@@ -66,29 +73,48 @@ import jbchretreatstore.composeapp.generated.resources.add_item_options_value_pl
 import jbchretreatstore.composeapp.generated.resources.add_item_price_label
 import jbchretreatstore.composeapp.generated.resources.add_item_price_place_holder
 import jbchretreatstore.composeapp.generated.resources.add_item_save
+import jbchretreatstore.composeapp.generated.resources.edit_item_dialog_title
+import jbchretreatstore.composeapp.generated.resources.edit_item_update
 import jbchretreatstore.composeapp.generated.resources.ic_close
+import jbchretreatstore.composeapp.generated.resources.reorderable_drag_handle_description
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 /**
- * Dialog for adding a new item to the store.
- * Supports adding basic item information (name, price) and optional variants.
+ * Dialog for adding or editing an item in the store.
+ * Supports adding/editing basic item information (name, price) and optional variants.
  *
- * @param onUserIntent Callback for handling user intents
+ * @param onDismiss Callback when dialog is dismissed
+ * @param onAddItem Callback when item is added or updated
+ * @param initialItem Optional item to edit. If null, dialog is in add mode.
  */
 @Composable
 fun AddItemDialog(
-    onUserIntent: (BookStoreIntent) -> Unit
+    onDismiss: () -> Unit,
+    onAddItem: (DisplayItem) -> Unit,
+    initialItem: DisplayItem? = null
 ) {
-    var viewState by remember { mutableStateOf(AddItemState()) }
+    val isEditMode = initialItem != null
+    var viewState by remember {
+        mutableStateOf(
+            AddItemState(
+                newItem = initialItem ?: DisplayItem()
+            )
+        )
+    }
 
     AlertDialog(
         onDismissRequest = {},
         containerColor = White,
         title = {
             DialogTitle(
-                title = stringResource(Res.string.add_item_dialog_title),
+                title = stringResource(
+                    if (isEditMode) Res.string.edit_item_dialog_title
+                    else Res.string.add_item_dialog_title
+                ),
                 showBackArrow = viewState.displayAddOptionView,
                 onClose = {
                     if (viewState.displayAddOptionView) {
@@ -101,14 +127,7 @@ fun AddItemDialog(
                         )
                     } else {
                         // Close the dialog
-                        onUserIntent(
-                            BookStoreIntent.OnUpdateDialogVisibility(
-                                dialogState = DialogVisibilityState(
-                                    alertDialogType = AlertDialogType.ADD_ITEM,
-                                    isVisible = false
-                                )
-                            )
-                        )
+                        onDismiss()
                     }
                 }
             )
@@ -121,7 +140,8 @@ fun AddItemDialog(
             } else {
                 viewState.AddItemContent(
                     updateViewState = { viewState = it },
-                    onUserIntent = onUserIntent
+                    onAddItem = onAddItem,
+                    isEditMode = isEditMode
                 )
             }
         },
@@ -131,13 +151,18 @@ fun AddItemDialog(
 }
 
 /**
- * Content view for adding a new item with basic information.
+ * Content view for adding or editing an item with basic information.
  * Displays name and price fields, existing variants list, and action buttons.
+ *
+ * @param updateViewState Callback to update the parent state
+ * @param onAddItem Callback when save/update button is clicked
+ * @param isEditMode Whether the dialog is in edit mode
  */
 @Composable
 private fun AddItemState.AddItemContent(
     updateViewState: (AddItemState) -> Unit,
-    onUserIntent: (BookStoreIntent) -> Unit
+    onAddItem: (DisplayItem) -> Unit,
+    isEditMode: Boolean = false
 ) {
     var displayPrice by remember {
         mutableStateOf(
@@ -195,7 +220,6 @@ private fun AddItemState.AddItemContent(
             )
         )
 
-        // Existing variants section
         if (newItem.variants.isNotEmpty()) {
 
             HorizontalDivider(modifier = Modifier.padding(vertical = Dimensions.spacing_m))
@@ -207,21 +231,25 @@ private fun AddItemState.AddItemContent(
 
             Spacer(Modifier.height(Dimensions.spacing_s))
 
-            newItem.variants.forEach { variant ->
-                VariantDisplayItem(
-                    variant = variant,
-                    onRemove = {
-                        updateViewState(
-                            this@AddItemContent.copy(
-                                newItem = newItem.copy(
-                                    variants = newItem.variants.filter { it != variant }
-                                )
+            ReorderableVariantsList(
+                variants = newItem.variants,
+                onReorder = { reorderedVariants ->
+                    updateViewState(
+                        this@AddItemContent.copy(
+                            newItem = newItem.copy(variants = reorderedVariants)
+                        )
+                    )
+                },
+                onRemoveVariant = { variantToRemove ->
+                    updateViewState(
+                        this@AddItemContent.copy(
+                            newItem = newItem.copy(
+                                variants = newItem.variants.filter { it != variantToRemove }
                             )
                         )
-                    }
-                )
-                Spacer(Modifier.height(Dimensions.spacing_s))
-            }
+                    )
+                }
+            )
         }
 
         Spacer(Modifier.height(Dimensions.spacing_m))
@@ -252,14 +280,14 @@ private fun AddItemState.AddItemContent(
 
         Spacer(Modifier.height(Dimensions.spacing_s))
 
-        // Save button
+        // Save/Update button
         Button(
             onClick = {
                 val isNameValid = newItem.name.isNotBlank()
                 val isPriceValid = newItem.price > 0.0
 
                 if (isNameValid && isPriceValid) {
-                    onUserIntent(BookStoreIntent.OnAddDisplayItem(newItem))
+                    onAddItem(newItem)
                 } else {
                     updateViewState(
                         this@AddItemContent.copy(
@@ -276,7 +304,10 @@ private fun AddItemState.AddItemContent(
             shape = RoundedCornerShape(Dimensions.corner_radius_s)
         ) {
             Text(
-                text = stringResource(Res.string.add_item_save),
+                text = stringResource(
+                    if (isEditMode) Res.string.edit_item_update
+                    else Res.string.add_item_save
+                ),
                 style = MaterialTheme.typography.labelLarge.copy(
                     fontWeight = FontWeight.ExtraBold
                 )
@@ -312,14 +343,18 @@ fun AddItemState.AddNewVariantView(
                 updateViewState(
                     this@AddNewVariantView.copy(
                         newItemVariant = newItemVariant.copy(key = key),
-                        showAddOptionError = false
+                        showAddOptionError = false,
+                        showDuplicateKeyError = false
                     )
                 )
             },
             label = stringResource(Res.string.add_item_options_key),
             placeholder = stringResource(Res.string.add_item_options_key_placeholder),
             enabled = isOptionKeyEnabled,
-            isError = showAddOptionError
+            isError = showAddOptionError || showDuplicateKeyError,
+            errorMessage = if (showDuplicateKeyError) {
+                stringResource(Res.string.add_item_duplicate_variant_key_error)
+            } else ""
         )
 
         HorizontalDivider(
@@ -327,27 +362,33 @@ fun AddItemState.AddNewVariantView(
             color = MaterialTheme.colorScheme.outline
         )
 
-        // Display list of added variant values
-        newItemVariant.valueList.forEach { value ->
-            VariantValueItem(
-                value = value,
-                onRemove = {
-                    val updatedList = newItemVariant.valueList.filter { it != value }
-                    updateViewState(
-                        this@AddNewVariantView.copy(
-                            newItemVariant = newItemVariant.copy(
-                                valueList = updatedList
-                            )
+        // Display reorderable list of added variant values
+        ReorderableVariantValuesList(
+            values = newItemVariant.valueList,
+            onReorder = { reorderedValues ->
+                updateViewState(
+                    this@AddNewVariantView.copy(
+                        newItemVariant = newItemVariant.copy(
+                            valueList = reorderedValues
                         )
                     )
-                    // Unlock key field when all values are removed
-                    if (updatedList.isEmpty()) {
-                        isOptionKeyEnabled = true
-                    }
+                )
+            },
+            onRemoveValue = { valueToRemove ->
+                val updatedList = newItemVariant.valueList.filter { it != valueToRemove }
+                updateViewState(
+                    this@AddNewVariantView.copy(
+                        newItemVariant = newItemVariant.copy(
+                            valueList = updatedList
+                        )
+                    )
+                )
+                // Unlock key field when all values are removed
+                if (updatedList.isEmpty()) {
+                    isOptionKeyEnabled = true
                 }
-            )
-            Spacer(Modifier.height(Dimensions.spacing_s))
-        }
+            }
+        )
 
         // Variant value input field
         LabeledTextField(
@@ -380,6 +421,21 @@ fun AddItemState.AddNewVariantView(
                     return@Button
                 }
 
+                // Check if variant with same key already exists (only when adding first value)
+                if (newItemVariant.valueList.isEmpty()) {
+                    val isDuplicateKey = newItem.variants.any {
+                        it.key.equals(newItemVariant.key.trim(), ignoreCase = true)
+                    }
+                    if (isDuplicateKey) {
+                        updateViewState(
+                            this@AddNewVariantView.copy(
+                                showDuplicateKeyError = true
+                            )
+                        )
+                        return@Button
+                    }
+                }
+
                 // Validate variant value
                 if (optionValue.isBlank()) {
                     updateViewState(
@@ -406,7 +462,8 @@ fun AddItemState.AddNewVariantView(
                         newItemVariant = newItemVariant.copy(
                             valueList = newItemVariant.valueList + optionValue.trim()
                         ),
-                        showValueError = false
+                        showValueError = false,
+                        showDuplicateKeyError = false
                     )
                 )
                 optionValue = ""
@@ -429,7 +486,7 @@ fun AddItemState.AddNewVariantView(
 
         Spacer(Modifier.height(Dimensions.spacing_s))
 
-        // Back button (saves variant and returns to main view)
+        // Back button (saves variant if valid and returns to main view)
         Button(
             onClick = {
                 val isOptionValid = newItemVariant.key.isNotBlank() &&
@@ -442,6 +499,7 @@ fun AddItemState.AddNewVariantView(
                             displayAddOptionView = false,
                             showAddOptionError = false,
                             showValueError = false,
+                            showDuplicateKeyError = false,
                             newItem = newItem.copy(
                                 variants = newItem.variants + newItemVariant
                             ),
@@ -449,10 +507,14 @@ fun AddItemState.AddNewVariantView(
                         )
                     )
                 } else {
-                    // Show error if variant is incomplete
+                    // Navigate back without saving, clear all states
                     updateViewState(
                         this@AddNewVariantView.copy(
-                            showAddOptionError = newItemVariant.key.isBlank()
+                            displayAddOptionView = false,
+                            showAddOptionError = false,
+                            showValueError = false,
+                            showDuplicateKeyError = false,
+                            newItemVariant = DisplayItem.Variant()
                         )
                     )
                 }
@@ -464,11 +526,175 @@ fun AddItemState.AddNewVariantView(
             shape = RoundedCornerShape(Dimensions.corner_radius_s)
         ) {
             Text(
-                text = stringResource(Res.string.add_item_back),
+                text = stringResource(Res.string.add_item_save),
                 style = MaterialTheme.typography.labelLarge.copy(
                     fontWeight = FontWeight.ExtraBold
                 )
             )
+        }
+    }
+}
+
+/**
+ * A reorderable list of variants with drag-and-drop functionality.
+ * Displays variants in a LazyColumn that supports reordering via drag handles.
+ *
+ * @param variants The list of variants to display
+ * @param onReorder Callback when the list is reordered
+ * @param onRemoveVariant Callback when a variant is removed
+ */
+@Composable
+fun ReorderableVariantsList(
+    variants: List<DisplayItem.Variant>,
+    onReorder: (List<DisplayItem.Variant>) -> Unit,
+    onRemoveVariant: (DisplayItem.Variant) -> Unit
+) {
+    val hapticFeedback = LocalHapticFeedback.current
+    val lazyListState = rememberLazyListState()
+    val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
+        val mutable = variants.toMutableList()
+        val moved = mutable.removeAt(from.index)
+        mutable.add(to.index, moved)
+        onReorder(mutable)
+        hapticFeedback.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
+    }
+
+    val listHeight = (Dimensions.reorderable_item_height * variants.size)
+        .coerceAtMost(Dimensions.reorderable_list_max_height)
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(listHeight),
+        state = lazyListState,
+        verticalArrangement = Arrangement.spacedBy(Dimensions.reorderable_list_item_spacing),
+    ) {
+        items(variants, key = { it.id }) { variant ->
+            ReorderableItem(
+                reorderableLazyListState,
+                key = variant.id
+            ) { isDragging ->
+                val elevation by animateDpAsState(
+                    if (isDragging) Dimensions.reorderable_item_drag_elevation else Dimensions.elevation_none
+                )
+
+                Surface(
+                    shadowElevation = elevation,
+                    shape = RoundedCornerShape(Dimensions.corner_radius_percent_m)
+                ) {
+                    Row {
+                        IconButton(
+                            modifier = Modifier.draggableHandle(
+                                onDragStarted = {
+                                    hapticFeedback.performHapticFeedback(
+                                        HapticFeedbackType.GestureThresholdActivate
+                                    )
+                                },
+                                onDragStopped = {
+                                    hapticFeedback.performHapticFeedback(
+                                        HapticFeedbackType.GestureEnd
+                                    )
+                                },
+                            ),
+                            onClick = {},
+                        ) {
+                            Icon(
+                                Icons.Rounded.DragHandle,
+                                contentDescription = stringResource(Res.string.reorderable_drag_handle_description)
+                            )
+                        }
+
+                        VariantDisplayItem(
+                            variant = variant,
+                            onRemove = { onRemoveVariant(variant) }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * A reorderable list of variant values with drag-and-drop functionality.
+ * Displays values in a LazyColumn that supports reordering via drag handles.
+ *
+ * @param values The list of variant values to display
+ * @param onReorder Callback when the list is reordered
+ * @param onRemoveValue Callback when a value is removed
+ */
+@Composable
+fun ReorderableVariantValuesList(
+    values: List<String>,
+    onReorder: (List<String>) -> Unit,
+    onRemoveValue: (String) -> Unit
+) {
+    if (values.isEmpty()) return
+
+    val hapticFeedback = LocalHapticFeedback.current
+    val lazyListState = rememberLazyListState()
+    val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
+        val mutable = values.toMutableList()
+        val moved = mutable.removeAt(from.index)
+        mutable.add(to.index, moved)
+        onReorder(mutable)
+        hapticFeedback.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
+    }
+
+    val listHeight = (Dimensions.reorderable_item_height * values.size)
+        .coerceAtMost(Dimensions.reorderable_list_max_height)
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(listHeight),
+        state = lazyListState,
+        verticalArrangement = Arrangement.spacedBy(Dimensions.reorderable_list_item_spacing),
+    ) {
+        items(values, key = { it }) { value ->
+            ReorderableItem(
+                reorderableLazyListState,
+                key = value
+            ) { isDragging ->
+                val elevation by animateDpAsState(
+                    if (isDragging) Dimensions.reorderable_item_drag_elevation else Dimensions.elevation_none
+                )
+
+                Surface(
+                    shadowElevation = elevation,
+                    shape = RoundedCornerShape(Dimensions.corner_radius_percent_m)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(
+                            modifier = Modifier.draggableHandle(
+                                onDragStarted = {
+                                    hapticFeedback.performHapticFeedback(
+                                        HapticFeedbackType.GestureThresholdActivate
+                                    )
+                                },
+                                onDragStopped = {
+                                    hapticFeedback.performHapticFeedback(
+                                        HapticFeedbackType.GestureEnd
+                                    )
+                                },
+                            ),
+                            onClick = {},
+                        ) {
+                            Icon(
+                                Icons.Rounded.DragHandle,
+                                contentDescription = stringResource(Res.string.reorderable_drag_handle_description)
+                            )
+                        }
+
+                        VariantValueItem(
+                            value = value,
+                            onRemove = { onRemoveValue(value) }
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -560,6 +786,43 @@ fun VariantDisplayItem(
 
 @Preview
 @Composable
+fun ReorderableVariantsListPreview() {
+    BookStoreTheme {
+        ReorderableVariantsList(
+            variants = listOf(
+                DisplayItem.Variant(
+                    key = "Language",
+                    valueList = listOf("English", "French", "Spanish")
+                ),
+                DisplayItem.Variant(
+                    key = "Size",
+                    valueList = listOf("Small", "Medium", "Large")
+                ),
+                DisplayItem.Variant(
+                    key = "Color",
+                    valueList = listOf("Red", "Blue", "Green")
+                )
+            ),
+            onReorder = {},
+            onRemoveVariant = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+fun ReorderableVariantValuesListPreview() {
+    BookStoreTheme {
+        ReorderableVariantValuesList(
+            values = listOf("English", "French", "Spanish", "German"),
+            onReorder = {},
+            onRemoveValue = {}
+        )
+    }
+}
+
+@Preview
+@Composable
 fun VariantDisplayItemPreview() {
     BookStoreTheme {
         VariantDisplayItem(
@@ -576,6 +839,35 @@ fun VariantDisplayItemPreview() {
 @Composable
 fun AddItemDialogPreview() {
     BookStoreTheme {
-        AddItemDialog { }
+        AddItemDialog(
+            onDismiss = {},
+            onAddItem = {}
+        )
     }
 }
+
+@Preview
+@Composable
+fun EditItemDialogPreview() {
+    BookStoreTheme {
+        AddItemDialog(
+            onDismiss = {},
+            onAddItem = {},
+            initialItem = DisplayItem(
+                name = "The Bible",
+                price = 29.99,
+                variants = listOf(
+                    DisplayItem.Variant(
+                        key = "Language",
+                        valueList = listOf("English", "French", "Spanish")
+                    ),
+                    DisplayItem.Variant(
+                        key = "Cover",
+                        valueList = listOf("Hardcover", "Paperback")
+                    )
+                )
+            )
+        )
+    }
+}
+

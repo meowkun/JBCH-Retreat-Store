@@ -30,12 +30,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
-import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
-import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
-import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewState
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.TitleView
+import com.example.jbchretreatstore.bookstore.presentation.ui.dialog.EditBuyerNameDialog
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.DarkBlue
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
@@ -52,18 +51,17 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun PurchaseHistoryScreen(
-    state: BookStoreViewState,
-    onUserIntent: (BookStoreIntent) -> Unit
+    viewModel: PurchaseHistoryViewModel,
+    onNavigateBack: () -> Unit
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
 
     // Group receipts by date
-    val groupedReceipts = remember(state.purchasedHistory) {
-        state.purchasedHistory
+    val groupedReceipts = remember(uiState.purchasedHistory) {
+        uiState.purchasedHistory
             .sortedByDescending { it.dateTime }
-            .groupBy { receipt ->
-                receipt.dateTime.date
-            }
+            .groupBy { receipt -> receipt.dateTime.date }
             .toList()
             .sortedByDescending { it.first }
     }
@@ -74,9 +72,7 @@ fun PurchaseHistoryScreen(
 
     // Detect scroll state
     val isListScrolling by remember {
-        derivedStateOf {
-            listState.isScrollInProgress
-        }
+        derivedStateOf { listState.isScrollInProgress }
     }
 
     // Show date indicator when scrolling
@@ -102,11 +98,10 @@ fun PurchaseHistoryScreen(
             var currentIndex = 0
 
             for ((date, receipts) in groupedReceipts) {
-                // +1 for date header
                 if (firstVisibleIndex <= currentIndex) {
                     return@derivedStateOf date
                 }
-                currentIndex++ // date header
+                currentIndex++
                 currentIndex += receipts.size
             }
 
@@ -114,16 +109,17 @@ fun PurchaseHistoryScreen(
         }
     }
 
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
+    Surface(modifier = Modifier.fillMaxWidth()) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                TitleView(stringResource(Res.string.purchase_history_view_title))
+                TitleView(
+                    title = stringResource(Res.string.purchase_history_view_title),
+                    onBackClick = onNavigateBack
+                )
 
                 LazyColumn(
                     state = listState,
@@ -134,19 +130,29 @@ fun PurchaseHistoryScreen(
                     contentPadding = PaddingValues(bottom = Dimensions.gradient_overlay_height)
                 ) {
                     groupedReceipts.forEach { (date, receipts) ->
-                        // Date header
                         item(key = "header_$date") {
                             DateHeader(date = date)
                         }
 
-                        // Items for this date
                         items(
                             count = receipts.size,
                             key = { index -> "${receipts[index].id}_${receipts[index].dateTime}" }
                         ) { index ->
                             PurchaseHistoryItemView(
                                 receipt = receipts[index],
-                                onUserIntent = onUserIntent
+                                onRemoveClick = { receipt ->
+                                    viewModel.showRemoveBottomSheet(true, receipt)
+                                },
+                                onEditClick = { receipt, purchaseHistoryItem ->
+                                    viewModel.showEditBottomSheet(
+                                        true,
+                                        receipt,
+                                        purchaseHistoryItem
+                                    )
+                                },
+                                onEditBuyerNameClick = { receipt ->
+                                    viewModel.showEditBuyerNameDialog(true, receipt)
+                                }
                             )
                         }
                     }
@@ -158,8 +164,7 @@ fun PurchaseHistoryScreen(
                     textAlign = TextAlign.End,
                     text = stringResource(
                         Res.string.checkout_view_item_total_price,
-                        state.purchasedHistory.sumOf { it.checkoutList.sumOf { it.totalPrice } }
-                            .toCurrency()
+                        uiState.totalAmount.toCurrency()
                     ),
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.ExtraBold
@@ -185,6 +190,45 @@ fun PurchaseHistoryScreen(
             }
         }
     }
+
+    // Remove confirmation bottom sheet
+    uiState.receiptToRemove?.let { receipt ->
+        if (uiState.showRemoveBottomSheet) {
+            RemoveConfirmationBottomSheet(
+                onDismiss = { viewModel.showRemoveBottomSheet(false) },
+                onConfirm = { viewModel.removeReceipt(receipt) }
+            )
+        }
+    }
+
+    // Edit purchase history item bottom sheet
+    val receiptToEdit = uiState.receiptToEdit
+    val itemToEdit = uiState.purchaseHistoryItemToEdit
+    if (uiState.showEditBottomSheet && receiptToEdit != null && itemToEdit != null) {
+        EditPurchaseHistoryItemBottomSheet(
+            purchaseHistoryItem = itemToEdit,
+            onDismiss = { viewModel.showEditBottomSheet(false) },
+            onSave = { updatedItem ->
+                viewModel.updateCheckoutItem(
+                    receipt = receiptToEdit,
+                    originalItem = itemToEdit,
+                    updatedItem = updatedItem
+                )
+            }
+        )
+    }
+
+    // Edit buyer name dialog
+    val receiptToEditBuyerName = uiState.receiptToEditBuyerName
+    if (uiState.showEditBuyerNameDialog && receiptToEditBuyerName != null) {
+        EditBuyerNameDialog(
+            currentBuyerName = receiptToEditBuyerName.buyerName,
+            onDismiss = { viewModel.showEditBuyerNameDialog(false) },
+            onSave = { newBuyerName ->
+                viewModel.updateBuyerName(receiptToEditBuyerName, newBuyerName)
+            }
+        )
+    }
 }
 
 @Composable
@@ -195,9 +239,7 @@ private fun DateHeader(date: LocalDate) {
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        HorizontalDivider(
-            modifier = Modifier.weight(1f)
-        )
+        HorizontalDivider(modifier = Modifier.weight(1f))
         Text(
             modifier = Modifier.padding(horizontal = Dimensions.spacing_s),
             text = date.toFormattedDateString(),
@@ -206,17 +248,7 @@ private fun DateHeader(date: LocalDate) {
             ),
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
         )
-        HorizontalDivider(
-            modifier = Modifier.weight(1f)
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun DateHeaderPreview() {
-    BookStoreTheme {
-        DateHeader(date = LocalDate(2024, 11, 30))
+        HorizontalDivider(modifier = Modifier.weight(1f))
     }
 }
 
@@ -242,46 +274,58 @@ private fun DateSliderIndicator(date: LocalDate) {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
-private fun DateSliderIndicatorPreview() {
+private fun DateHeaderPreview() {
     BookStoreTheme {
-        DateSliderIndicator(date = LocalDate(2024, 11, 30))
+        DateHeader(
+            date = LocalDate(2025, 12, 7)
+        )
     }
 }
 
 @Preview
 @Composable
-fun PurchaseHistoryScreenPreview() {
+private fun DateSliderIndicatorPreview() {
     BookStoreTheme {
-        PurchaseHistoryScreen(
-            state = BookStoreViewState(
-                receiptList = listOf(
-                    ReceiptData(
-                        buyerName = "Isaac",
-                        checkoutList = listOf(
-                            CheckoutItem(itemName = "Bible", totalPrice = 40.0),
-                            CheckoutItem(itemName = "T-shirt", totalPrice = 15.0)
-                        ),
-                        checkoutStatus = CheckoutStatus.CHECKED_OUT
+        DateSliderIndicator(
+            date = LocalDate(2025, 12, 7)
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PurchaseHistoryItemViewPreview() {
+    BookStoreTheme {
+        PurchaseHistoryItemView(
+            receipt = ReceiptData(
+                buyerName = "John Doe",
+                checkoutList = listOf(
+                    CheckoutItem(
+                        itemName = "Bible",
+                        totalPrice = 40.0,
+                        quantity = 2,
+                        variants = listOf(
+                            CheckoutItem.Variant(
+                                "Language",
+                                listOf("English", "Chinese"),
+                                "English"
+                            ),
+                            CheckoutItem.Variant("Version", listOf("NIV", "KJV"), "NIV")
+                        )
                     ),
-                    ReceiptData(
-                        buyerName = "John",
-                        checkoutList = listOf(
-                            CheckoutItem(itemName = "Prayer Book", totalPrice = 25.0)
-                        ),
-                        checkoutStatus = CheckoutStatus.CHECKED_OUT
-                    ),
-                    ReceiptData(
-                        buyerName = "Mary",
-                        checkoutList = listOf(
-                            CheckoutItem(itemName = "Cross Necklace", totalPrice = 35.0)
-                        ),
-                        checkoutStatus = CheckoutStatus.CHECKED_OUT
+                    CheckoutItem(
+                        itemName = "T-shirt",
+                        totalPrice = 15.0,
+                        quantity = 1,
+                        variants = listOf(
+                            CheckoutItem.Variant("Size", listOf("S", "M", "L", "XL"), "L"),
+                            CheckoutItem.Variant("Color", listOf("Red", "Blue", "Green"), "Blue")
+                        )
                     )
                 )
-            ),
-            onUserIntent = {}
+            )
         )
     }
 }

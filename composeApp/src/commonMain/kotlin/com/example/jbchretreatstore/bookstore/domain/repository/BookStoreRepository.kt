@@ -9,4 +9,8 @@ interface BookStoreRepository {
     fun fetchDisplayItems(): Flow<List<DisplayItem>>
     suspend fun updateReceiptList(items: List<ReceiptData>)
     fun fetchReceiptList(): Flow<List<ReceiptData>>
+
+    // Test data loading flag
+    suspend fun isTestDataLoaded(): Boolean
+    suspend fun setTestDataLoaded(loaded: Boolean)
 }

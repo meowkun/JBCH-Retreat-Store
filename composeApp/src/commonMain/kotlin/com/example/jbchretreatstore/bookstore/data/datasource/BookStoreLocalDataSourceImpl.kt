@@ -2,11 +2,13 @@ package com.example.jbchretreatstore.bookstore.data.datasource
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.jbchretreatstore.bookstore.data.model.DisplayItemDto
 import com.example.jbchretreatstore.bookstore.data.model.ReceiptDataDto
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 
@@ -16,6 +18,7 @@ class BookStoreLocalDataSourceImpl(
 
     private val displayItemsKey = stringPreferencesKey("display_items")
     private val receiptsKey = stringPreferencesKey("receipt_list")
+    private val testDataLoadedKey = booleanPreferencesKey("test_data_loaded")
 
     private val json = Json {
         ignoreUnknownKeys = true
@@ -72,5 +75,16 @@ class BookStoreLocalDataSourceImpl(
                 emptyList()
             }
         }
+
+    override suspend fun isTestDataLoaded(): Boolean =
+        dataStore.data.map { prefs ->
+            prefs[testDataLoadedKey] ?: false
+        }.first()
+
+    override suspend fun setTestDataLoaded(loaded: Boolean) {
+        dataStore.edit { prefs ->
+            prefs[testDataLoadedKey] = loaded
+        }
+    }
 }
 

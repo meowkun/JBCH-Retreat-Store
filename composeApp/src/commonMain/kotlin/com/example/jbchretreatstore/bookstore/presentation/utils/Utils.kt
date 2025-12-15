@@ -43,23 +43,6 @@ fun LocalDateTime.toFormattedDateString(): String {
 }
 
 /**
- * Filters a string to only allow numeric input (digits and decimal point).
- * Ensures only one decimal point is allowed.
- *
- * @return Filtered string containing only digits and at most one decimal point, or null if invalid
- */
-fun String.filterNumericInput(): String? {
-    // Only allow numbers and decimal point
-    val filtered = this.filter { char -> char.isDigit() || char == '.' }
-    // Ensure only one decimal point
-    return if (filtered.count { char -> char == '.' } <= 1) {
-        filtered
-    } else {
-        null
-    }
-}
-
-/**
  * Filters a string to only allow numeric input with max 2 decimal places.
  * Ensures only one decimal point is allowed and limits decimal places to 2.
  *

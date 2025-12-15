@@ -1,5 +1,7 @@
 package com.example.jbchretreatstore.bookstore.domain.usecase
 
+import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
+import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
 import com.example.jbchretreatstore.bookstore.domain.repository.BookStoreRepository
 import com.example.jbchretreatstore.bookstore.presentation.CheckoutState
@@ -17,17 +19,17 @@ class CheckoutUseCase(
 ) {
 
     /**
-     * Process checkout with validation
+     * Process checkout with validation (simplified API for tests)
      */
     @OptIn(ExperimentalTime::class)
     suspend fun processCheckout(
         cart: ReceiptData,
-        checkoutState: CheckoutState
+        buyerName: String,
+        checkoutStatus: CheckoutStatus,
+        paymentMethod: PaymentMethod = PaymentMethod.CASH
     ): Result<ReceiptData> {
-        // Validate buyer name
-        if (checkoutState.buyerName.isBlank()) {
-            return Result.failure(IllegalArgumentException("Buyer name cannot be empty"))
-        }
+        // Use "Unknown" if buyer name is empty
+        val finalBuyerName = buyerName.ifBlank { "Unknown" }
 
         // Validate cart is not empty
         if (cart.checkoutList.isEmpty()) {
@@ -35,19 +37,15 @@ class CheckoutUseCase(
         }
 
         // Validate all items have positive quantities and prices
-        val hasInvalidItems = cart.checkoutList.any {
-            it.quantity <= 0 || it.totalPrice <= 0
-        }
-
-        if (hasInvalidItems) {
+        if (cart.checkoutList.any { it.quantity <= 0 || it.totalPrice <= 0 }) {
             return Result.failure(IllegalStateException("Cart contains invalid items"))
         }
 
         // Create receipt with timestamp
         val receipt = cart.copy(
-            buyerName = checkoutState.buyerName,
-            checkoutStatus = checkoutState.checkoutStatus,
-            paymentMethod = checkoutState.paymentMethod,
+            buyerName = finalBuyerName,
+            checkoutStatus = checkoutStatus,
+            paymentMethod = paymentMethod,
             dateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         )
 
@@ -60,23 +58,29 @@ class CheckoutUseCase(
     }
 
     /**
-     * Save cart for later
+     * Process checkout with CheckoutState (used by ViewModel)
      */
-    @OptIn(ExperimentalTime::class)
-    suspend fun saveForLater(
+    suspend fun processCheckout(
         cart: ReceiptData,
         checkoutState: CheckoutState
-    ): Result<ReceiptData> {
-        return processCheckout(
-            cart,
-            checkoutState
-        )
-    }
+    ): Result<ReceiptData> = processCheckout(
+        cart = cart,
+        buyerName = checkoutState.buyerName,
+        checkoutStatus = checkoutState.checkoutStatus,
+        paymentMethod = checkoutState.paymentMethod
+    )
 
     /**
-     * Calculate total amount for checkout
+     * Save cart for later with SAVE_FOR_LATER status
      */
-    fun calculateCheckoutTotal(cart: ReceiptData): Double {
-        return cart.checkoutList.sumOf { it.totalPrice }
-    }
+    suspend fun saveForLater(
+        cart: ReceiptData,
+        buyerName: String
+    ): Result<ReceiptData> = processCheckout(
+        cart = cart,
+        buyerName = buyerName,
+        checkoutStatus = CheckoutStatus.SAVE_FOR_LATER,
+        paymentMethod = PaymentMethod.CASH
+    )
+
 }

@@ -13,6 +13,7 @@ data class DisplayItem(
 ) {
     @Serializable
     data class Variant(
+        val id: Uuid = Uuid.random(),
         val key: String = "",
         val valueList: List<String> = emptyList()
     )

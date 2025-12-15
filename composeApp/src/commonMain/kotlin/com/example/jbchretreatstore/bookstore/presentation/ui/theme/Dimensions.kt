@@ -18,6 +18,7 @@ object Dimensions {
     val spacing_xl: Dp = 32.dp
     val spacing_xxl: Dp = 40.dp
     val spacing_xxxl: Dp = 48.dp
+    val spacing_xxxxl: Dp = 64.dp
 
     // Corner Radius
     val corner_radius_none: Dp = 0.dp
@@ -99,6 +100,13 @@ object Dimensions {
     val bottom_nav_height: Dp = 80.dp
     val bottom_nav_icon_size: Dp = 24.dp
     val bottom_nav_item_spacing: Dp = 8.dp
+
+    // Reorderable Variants List
+    val reorderable_item_height: Dp = 64.dp
+    val reorderable_list_max_height: Dp = 256.dp
+    val reorderable_list_content_padding: Dp = 8.dp
+    val reorderable_list_item_spacing: Dp = 8.dp
+    val reorderable_item_drag_elevation: Dp = 4.dp
 
     // Badge
     val badge_size: Dp = 20.dp

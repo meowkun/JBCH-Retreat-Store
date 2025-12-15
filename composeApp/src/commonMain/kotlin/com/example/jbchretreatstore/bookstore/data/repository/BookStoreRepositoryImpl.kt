@@ -34,5 +34,13 @@ class BookStoreRepositoryImpl(
             ReceiptDataMapper.toDomainList(dtoList)
         }
     }
+
+    override suspend fun isTestDataLoaded(): Boolean {
+        return localDataSource.isTestDataLoaded()
+    }
+
+    override suspend fun setTestDataLoaded(loaded: Boolean) {
+        localDataSource.setTestDataLoaded(loaded)
+    }
 }
 

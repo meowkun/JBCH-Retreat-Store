@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -25,6 +27,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -34,6 +37,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,12 +52,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
-import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
-import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewState
-import com.example.jbchretreatstore.bookstore.presentation.DialogVisibilityState
-import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.Stepper
-import com.example.jbchretreatstore.bookstore.presentation.ui.dialog.RemoveItemDialog
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Black
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
@@ -62,6 +63,7 @@ import com.example.jbchretreatstore.bookstore.presentation.ui.theme.White
 import com.example.jbchretreatstore.bookstore.presentation.utils.toCurrency
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.add_to_cart
+import jbchretreatstore.composeapp.generated.resources.edit_item_button_description
 import jbchretreatstore.composeapp.generated.resources.ic_chevron
 import jbchretreatstore.composeapp.generated.resources.ic_chevron_small
 import jbchretreatstore.composeapp.generated.resources.ic_trash_can
@@ -70,34 +72,71 @@ import jbchretreatstore.composeapp.generated.resources.item_price_per_unit
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
+
+/**
+ * Saver for CheckoutItem to persist state across LazyColumn item disposal
+ */
+@OptIn(ExperimentalUuidApi::class)
+private val CheckoutItemSaver: Saver<CheckoutItem, Any> = listSaver(
+    save = { item ->
+        listOf(
+            item.id.toString(),
+            item.itemName,
+            item.quantity,
+            item.variants.map { variant ->
+                listOf(variant.key, variant.valueList, variant.selectedValue)
+            },
+            item.totalPrice
+        )
+    },
+    restore = { list ->
+        @Suppress("UNCHECKED_CAST")
+        CheckoutItem(
+            id = Uuid.parse(list[0] as String),
+            itemName = list[1] as String,
+            quantity = list[2] as Int,
+            variants = (list[3] as List<List<Any>>).map { variantList ->
+                CheckoutItem.Variant(
+                    key = variantList[0] as String,
+                    valueList = variantList[1] as List<String>,
+                    selectedValue = variantList[2] as String
+                )
+            },
+            totalPrice = list[4] as Double
+        )
+    }
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemView(
-    state: BookStoreViewState,
     displayItem: DisplayItem,
     modifier: Modifier = Modifier,
-    onUserIntent: (BookStoreIntent) -> Unit
+    onAddToCart: (CheckoutItem) -> Unit,
+    onDeleteItem: (DisplayItem) -> Unit,
+    onEditItem: (DisplayItem) -> Unit
 ) {
-    var expanded by remember { mutableStateOf(true) }
-    var checkoutItem by remember {
+    var expanded by rememberSaveable { mutableStateOf(true) }
+    var checkoutItem by rememberSaveable(
+        stateSaver = CheckoutItemSaver
+    ) {
         mutableStateOf(
             CheckoutItem(
                 itemName = displayItem.name,
-                variantsMap = displayItem.variants.associate {
-                    it.key to it.valueList.first()
-                }.toMutableMap(),
+                variants = displayItem.variants.map { variant ->
+                    CheckoutItem.Variant(
+                        key = variant.key,
+                        valueList = variant.valueList,
+                        selectedValue = variant.valueList.firstOrNull() ?: ""
+                    )
+                },
                 totalPrice = displayItem.price
             )
         )
     }
 
-    if (state.displayRemoveDisplayItemDialog) {
-        RemoveItemDialog(
-            displayItem = displayItem,
-            onUserIntent = onUserIntent
-        )
-    }
 
     ElevatedCard(
         shape = Shapes.itemCard,
@@ -135,7 +174,9 @@ fun ItemView(
                 updateCartItem = {
                     checkoutItem = it
                 },
-                onUserIntent = onUserIntent
+                onAddToCart = onAddToCart,
+                onDeleteClick = { onDeleteItem(displayItem) },
+                onEditClick = { onEditItem(displayItem) }
             )
         }
     }
@@ -208,7 +249,9 @@ fun ItemExpandableView(
     displayItem: DisplayItem,
     checkoutItem: CheckoutItem,
     updateCartItem: (CheckoutItem) -> Unit,
-    onUserIntent: (BookStoreIntent) -> Unit,
+    onAddToCart: (CheckoutItem) -> Unit,
+    onDeleteClick: () -> Unit,
+    onEditClick: () -> Unit
 ) {
     Column(
         modifier = Modifier.background(color = White).padding(
@@ -224,11 +267,24 @@ fun ItemExpandableView(
             Spacer(Modifier.height(Dimensions.spacing_m))
         }
 
-        QuantityStepper(
-            displayItem = displayItem,
-            checkoutItem = checkoutItem,
-            updateCartItem = updateCartItem
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            QuantityStepper(
+                displayItem = displayItem,
+                checkoutItem = checkoutItem,
+                updateCartItem = updateCartItem
+            )
+
+            IconButton(onClick = onEditClick) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = stringResource(Res.string.edit_item_button_description)
+                )
+            }
+        }
 
         Spacer(Modifier.height(Dimensions.spacing_m))
 
@@ -237,18 +293,7 @@ fun ItemExpandableView(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(
-                onClick = {
-                    onUserIntent(
-                        BookStoreIntent.OnUpdateDialogVisibility(
-                            dialogState = DialogVisibilityState(
-                                alertDialogType = AlertDialogType.REMOVE_ITEM,
-                                isVisible = true
-                            )
-                        )
-                    )
-                }
-            ) {
+            IconButton(onClick = onDeleteClick) {
                 Image(
                     painter = painterResource(Res.drawable.ic_trash_can),
                     contentDescription = "Delete item"
@@ -261,9 +306,7 @@ fun ItemExpandableView(
                     .weight(1f)
                     .heightIn(min = Dimensions.button_height_l)
                     .padding(start = Dimensions.spacing_m),
-                onClick = {
-                    onUserIntent(BookStoreIntent.OnAddToCheckoutItem(checkoutItem))
-                },
+                onClick = { onAddToCart(checkoutItem) },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary
                 )
@@ -353,11 +396,14 @@ fun ItemVariantMenu(
                         )
                     },
                     onClick = {
-                        val updatedOptions = checkoutItem.variantsMap.toMutableMap()
-                        updatedOptions[variant.key] = value
+                        val updatedVariants = checkoutItem.variants.map { v ->
+                            if (v.key == variant.key) {
+                                v.copy(selectedValue = value)
+                            } else v
+                        }
 
                         updateCartItem.invoke(
-                            checkoutItem.copy(variantsMap = updatedOptions.toMap())
+                            checkoutItem.copy(variants = updatedVariants)
                         )
                         expanded = false
                     }
@@ -474,7 +520,6 @@ fun ItemViewPreview() {
             modifier = Modifier.background(color = White)
         ) {
             ItemView(
-                state = BookStoreViewState(),
                 displayItem = DisplayItem(
                     price = 40.00,
                     name = "Bible",
@@ -487,10 +532,12 @@ fun ItemViewPreview() {
                             key = "Version",
                             valueList = listOf("KJV", "NKJV", "NIV")
                         ),
-                    ),
-                    isInCart = false
-                )
-            ) {}
+                    )
+                ),
+                onAddToCart = {},
+                onDeleteItem = {},
+                onEditItem = {}
+            )
         }
     }
 }

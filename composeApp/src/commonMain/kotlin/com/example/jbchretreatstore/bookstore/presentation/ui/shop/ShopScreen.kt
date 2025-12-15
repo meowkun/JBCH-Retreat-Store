@@ -7,23 +7,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
-import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
-import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
-import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
-import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.BottomGradientOverlay
-import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
+import com.example.jbchretreatstore.bookstore.presentation.ui.dialog.AddItemDialog
+import com.example.jbchretreatstore.bookstore.presentation.ui.dialog.RemoveItemDialog
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun ShopScreen(
-    state: BookStoreViewState,
-    onUserIntent: (BookStoreIntent) -> Unit,
+    viewModel: ShopViewModel
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     Surface(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -38,16 +36,17 @@ fun ShopScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(Dimensions.spacing_m),
-                    searchQuery = state.searchQuery,
-                    onUserIntent = onUserIntent
+                    searchQuery = uiState.searchQuery,
+                    onSearchQueryChange = { viewModel.onSearchQueryChange(it) }
                 )
                 ItemListView(
                     modifier = Modifier
                         .weight(1f)
                         .padding(Dimensions.spacing_m),
-                    displayItemList = state.searchedItemList,
-                    onUserIntent = onUserIntent,
-                    state = state
+                    displayItemList = uiState.searchedItemList,
+                    onAddToCart = { viewModel.onAddToCart(it) },
+                    onDeleteItem = { viewModel.showRemoveItemDialog(true, it) },
+                    onEditItem = { viewModel.showEditItemDialog(true, it) }
                 )
             }
 
@@ -55,58 +54,33 @@ fun ShopScreen(
             BottomGradientOverlay(modifier = Modifier.align(Alignment.BottomCenter))
         }
     }
-}
 
-@Preview
-@Composable
-fun ShopScreenPreview() {
-    BookStoreTheme {
-        ShopScreen(
-            state = BookStoreViewState(
-                displayItemList = listOf(
-                    DisplayItem(
-                        name = "Bible",
-                        price = 40.00,
-                        variants = listOf(
-                            DisplayItem.Variant(
-                                key = "Language",
-                                valueList = listOf("English", "French", "Spanish")
-                            ),
-                            DisplayItem.Variant(
-                                key = "Version",
-                                valueList = listOf("KJV", "NKJV", "NIV")
-                            ),
-                        )
-                    ),
-                    DisplayItem(
-                        name = "T-shirt",
-                        price = 15.00,
-                        variants = listOf(
-                            DisplayItem.Variant(
-                                key = "Color",
-                                valueList = listOf("Blue", "Black")
-                            ),
-                            DisplayItem.Variant(
-                                key = "Size",
-                                valueList = listOf("XS", "S", "M", "L", "XL", "XXL", "XXXL")
-                            ),
-                        )
-                    )
-                ),
-                currentCheckoutList = ReceiptData(
-                    checkoutList = listOf(
-                        CheckoutItem(
-                            itemName = "Bible",
-                            totalPrice = 40.00,
-                        ),
-                        CheckoutItem(
-                            itemName = "T-shirt",
-                            totalPrice = 15.00,
-                        )
-                    )
-                )
-            ),
-            onUserIntent = {},
+    // Show add item dialog
+    if (uiState.showAddItemDialog) {
+        AddItemDialog(
+            onDismiss = { viewModel.showAddItemDialog(false) },
+            onAddItem = { newItem -> viewModel.onAddDisplayItem(newItem) }
+        )
+    }
+
+    // Show remove item dialog
+    if (uiState.showRemoveItemDialog && uiState.itemToRemove != null) {
+        RemoveItemDialog(
+            displayItem = uiState.itemToRemove!!,
+            onDismiss = { viewModel.showRemoveItemDialog(false) },
+            onConfirm = {
+                viewModel.onDeleteDisplayItem(uiState.itemToRemove!!)
+            }
+        )
+    }
+
+    // Show edit item dialog
+    if (uiState.showEditItemDialog && uiState.itemToEdit != null) {
+        AddItemDialog(
+            onDismiss = { viewModel.showEditItemDialog(false) },
+            onAddItem = { updatedItem -> viewModel.onUpdateDisplayItem(updatedItem) },
+            initialItem = uiState.itemToEdit
         )
     }
 }
+

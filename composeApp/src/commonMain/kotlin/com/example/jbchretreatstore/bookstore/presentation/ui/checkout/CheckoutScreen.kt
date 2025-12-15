@@ -3,345 +3,214 @@ package com.example.jbchretreatstore.bookstore.presentation.ui.checkout
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Payments
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
-import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
 import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod
-import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod.CASH
-import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod.VENMO
-import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod.ZELLE
-import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
-import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
-import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewState
-import com.example.jbchretreatstore.bookstore.presentation.DialogVisibilityState
-import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
-import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavDestination
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.TitleView
 import com.example.jbchretreatstore.bookstore.presentation.ui.dialog.CheckoutDialog
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
-import com.example.jbchretreatstore.bookstore.presentation.ui.theme.LightBlue
-import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Shapes
-import com.example.jbchretreatstore.bookstore.presentation.utils.toCurrency
 import jbchretreatstore.composeapp.generated.resources.Res
-import jbchretreatstore.composeapp.generated.resources.cart_icon_description
-import jbchretreatstore.composeapp.generated.resources.checkout_view_item_checkout
-import jbchretreatstore.composeapp.generated.resources.checkout_view_item_save_to_waitlist
 import jbchretreatstore.composeapp.generated.resources.checkout_view_item_title
-import jbchretreatstore.composeapp.generated.resources.checkout_view_item_total_price
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun CheckoutScreen(
-    state: BookStoreViewState,
-    onUserIntent: (BookStoreIntent) -> Unit
+    viewModel: CheckoutViewModel,
+    onNavigateBack: () -> Unit,
+    onCheckoutSuccess: () -> Unit
 ) {
-    // State management
-    val radioOptions = listOf(ZELLE, VENMO, CASH)
-    val selectedOption = remember { mutableStateOf(radioOptions[2]) }
-    var checkoutStatus by remember { mutableStateOf(CheckoutStatus.PENDING) }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Navigate back if cart is empty - use LaunchedEffect to prevent composition issues
-    LaunchedEffect(state.currentCheckoutList.checkoutList.isEmpty()) {
-        if (state.currentCheckoutList.checkoutList.isEmpty()) {
-            onUserIntent.invoke(BookStoreIntent.OnNavigate(BookStoreNavDestination.ShopScreen))
+    // Navigate back if cart is empty (only on initial load, not after checkout)
+    LaunchedEffect(uiState.checkoutItems.isEmpty(), uiState.checkoutSuccess) {
+        if (uiState.checkoutItems.isEmpty() && !uiState.checkoutSuccess) {
+            onNavigateBack()
         }
     }
 
+    // Handle checkout success navigation
+    LaunchedEffect(uiState.checkoutSuccess) {
+        if (uiState.checkoutSuccess) {
+            viewModel.onCheckoutSuccessHandled()
+            onCheckoutSuccess()
+        }
+    }
+
+    CheckoutScreenContent(
+        uiState = uiState,
+        onNavigateBack = onNavigateBack,
+        onRemoveItem = { viewModel.onRemoveFromCart(it) },
+        onPaymentMethodSelected = { viewModel.onPaymentMethodSelected(it) },
+        onDismissDialog = { viewModel.showCheckoutDialog(false) },
+        onCheckout = { buyerName -> viewModel.processCheckout(buyerName) }
+    )
+}
+
+@Composable
+private fun CheckoutScreenContent(
+    uiState: CheckoutUiState,
+    onNavigateBack: () -> Unit,
+    onRemoveItem: (CheckoutItem) -> Unit,
+    onPaymentMethodSelected: (PaymentMethod) -> Unit,
+    onDismissDialog: () -> Unit,
+    onCheckout: (String) -> Unit
+) {
     Surface(modifier = Modifier.fillMaxWidth()) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .navigationBarsPadding(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Title
-            TitleView(stringResource(Res.string.checkout_view_item_title))
+            TitleView(
+                title = stringResource(Res.string.checkout_view_item_title),
+                onBackClick = onNavigateBack
+            )
 
-            // Checkout items list with gradient overlay
+            // Checkout items list
             LazyColumn(
-                modifier = Modifier.fillMaxSize().weight(1f),
+                modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_m),
                 contentPadding = PaddingValues(
                     top = Dimensions.spacing_s,
-                    bottom = Dimensions.gradient_overlay_height
+                    bottom = Dimensions.checkout_button_height + Dimensions.spacing_xxl
                 ),
             ) {
                 items(
-                    items = state.currentCheckoutList.checkoutList,
+                    items = uiState.checkoutItems,
                     key = { "${it.id}_${it.variantsMap.hashCode()}" }
                 ) { item ->
                     CheckoutItemView(
                         checkoutItem = item,
-                        onUserIntent = onUserIntent
+                        onRemoveItem = onRemoveItem
                     )
                 }
             }
-
-            // Bottom checkout panel
-            CheckoutPanel(
-                totalPrice = state.currentCheckoutList.checkoutList.sumOf { it.totalPrice },
-                radioOptions = radioOptions,
-                selectedOption = selectedOption.value,
-                onOptionSelected = { selectedOption.value = it },
-                onSaveForLater = {
-                    checkoutStatus = CheckoutStatus.SAVE_FOR_LATER
-                    onUserIntent.invoke(
-                        BookStoreIntent.OnUpdateDialogVisibility(
-                            dialogState = DialogVisibilityState(
-                                alertDialogType = AlertDialogType.CHECKOUT,
-                                isVisible = true
-                            )
-                        )
-                    )
-                },
-                onCheckout = {
-                    checkoutStatus = CheckoutStatus.CHECKED_OUT
-                    onUserIntent.invoke(
-                        BookStoreIntent.OnUpdateDialogVisibility(
-                            dialogState = DialogVisibilityState(
-                                alertDialogType = AlertDialogType.CHECKOUT,
-                                isVisible = true
-                            )
-                        )
-                    )
-                }
-            )
         }
     }
 
     // Show checkout dialog
-    if (state.displayCheckoutDialog) {
+    if (uiState.showCheckoutDialog) {
         CheckoutDialog(
-            checkoutStatus = checkoutStatus,
-            paymentMethod = selectedOption.value,
-            onUserIntent = onUserIntent
+            paymentMethod = uiState.selectedPaymentMethod,
+            onPaymentMethodSelected = onPaymentMethodSelected,
+            onDismiss = onDismissDialog,
+            onCheckout = onCheckout
         )
     }
 }
 
+@Preview
 @Composable
-fun CheckoutPanel(
-    totalPrice: Double,
-    radioOptions: List<PaymentMethod>,
-    selectedOption: PaymentMethod,
-    onOptionSelected: (PaymentMethod) -> Unit,
-    onSaveForLater: () -> Unit,
-    onCheckout: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        color = LightBlue,
-        shape = Shapes.topRounded,
-        shadowElevation = Dimensions.elevation_l,
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(Dimensions.spacing_m),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_s)
-        ) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.End,
-                text = stringResource(
-                    Res.string.checkout_view_item_total_price,
-                    totalPrice.toCurrency()
-                ),
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.ExtraBold
-                ),
-            )
-
-            // Payment method selection (horizontal)
-            RadioButtonHorizontalSelection(
-                radioOptions = radioOptions,
-                selectedOption = selectedOption,
-                onOptionSelected = onOptionSelected
-            )
-
-            // Action buttons
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                TextButton(onClick = onSaveForLater) {
-                    Text(
-                        text = stringResource(Res.string.checkout_view_item_save_to_waitlist),
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                }
-
-                Button(onClick = onCheckout) {
-                    Row(
-                        modifier = Modifier.wrapContentSize(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Payments,
-                            contentDescription = stringResource(Res.string.cart_icon_description),
-                        )
-                        Spacer(modifier = Modifier.width(Dimensions.spacing_xs))
-                        Text(
-                            text = stringResource(Res.string.checkout_view_item_checkout),
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontWeight = FontWeight.Bold
+private fun CheckoutScreenPreview() {
+    BookStoreTheme {
+        CheckoutScreenContent(
+            uiState = CheckoutUiState(
+                checkoutItems = listOf(
+                    CheckoutItem(
+                        itemName = "Holy Bible - NIV",
+                        quantity = 2,
+                        totalPrice = 91.98,
+                        variants = listOf(
+                            CheckoutItem.Variant(
+                                "Language",
+                                listOf("English", "Chinese"),
+                                "English"
+                            ),
+                            CheckoutItem.Variant(
+                                "Cover",
+                                listOf("Hardcover", "Paperback"),
+                                "Hardcover"
                             )
                         )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun RadioButtonHorizontalSelection(
-    radioOptions: List<PaymentMethod>,
-    selectedOption: PaymentMethod,
-    onOptionSelected: (PaymentMethod) -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .selectableGroup(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        radioOptions.forEach { paymentMethod ->
-            Row(
-                modifier = Modifier
-                    .selectable(
-                        selected = paymentMethod == selectedOption,
-                        onClick = { onOptionSelected(paymentMethod) },
-                        role = Role.RadioButton
+                    ),
+                    CheckoutItem(
+                        itemName = "Christian T-Shirt",
+                        quantity = 3,
+                        totalPrice = 59.97,
+                        variants = listOf(
+                            CheckoutItem.Variant("Size", listOf("S", "M", "L", "XL"), "L"),
+                            CheckoutItem.Variant("Color", listOf("White", "Black", "Navy"), "Navy")
+                        )
+                    ),
+                    CheckoutItem(
+                        itemName = "Devotional Journal",
+                        quantity = 1,
+                        totalPrice = 24.99,
+                        variants = emptyList()
                     )
-                    .padding(Dimensions.spacing_xs),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RadioButton(
-                    selected = paymentMethod == selectedOption,
-                    onClick = { onOptionSelected(paymentMethod) }
-                )
-                Text(
-                    text = paymentMethod.methodName,
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun CheckoutPanelPreview() {
-    BookStoreTheme {
-        CheckoutPanel(
-            totalPrice = 139.23,
-            radioOptions = listOf(ZELLE, VENMO, CASH),
-            selectedOption = CASH,
-            onOptionSelected = {},
-            onSaveForLater = {},
+                ),
+                totalPrice = 176.94,
+                selectedPaymentMethod = PaymentMethod.CASH
+            ),
+            onNavigateBack = {},
+            onRemoveItem = {},
+            onPaymentMethodSelected = {},
+            onDismissDialog = {},
             onCheckout = {}
         )
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
-fun RadioButtonHorizontalSelectionPreview() {
+private fun CheckoutScreenWithDialogPreview() {
     BookStoreTheme {
-        RadioButtonHorizontalSelection(
-            radioOptions = listOf(ZELLE, VENMO, CASH),
-            selectedOption = VENMO,
-            onOptionSelected = {}
+        CheckoutScreenContent(
+            uiState = CheckoutUiState(
+                checkoutItems = listOf(
+                    CheckoutItem(
+                        itemName = "Holy Bible - NIV",
+                        quantity = 1,
+                        totalPrice = 45.99,
+                        variants = listOf(
+                            CheckoutItem.Variant(
+                                "Language",
+                                listOf("English", "Chinese"),
+                                "English"
+                            )
+                        )
+                    )
+                ),
+                totalPrice = 45.99,
+                selectedPaymentMethod = PaymentMethod.ZELLE,
+                showCheckoutDialog = true
+            ),
+            onNavigateBack = {},
+            onRemoveItem = {},
+            onPaymentMethodSelected = {},
+            onDismissDialog = {},
+            onCheckout = {}
         )
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
-fun CheckoutScreenPreview() {
+private fun CheckoutScreenEmptyPreview() {
     BookStoreTheme {
-        CheckoutScreen(
-            state = BookStoreViewState(
-                currentCheckoutList = ReceiptData(
-                    checkoutList = listOf(
-                        CheckoutItem(
-                            itemName = "Holy Bible - NIV",
-                            totalPrice = 45.99,
-                            variantsMap = mapOf("Language" to "English", "Version" to "NIV")
-                        ),
-                        CheckoutItem(
-                            itemName = "Christian T-Shirt - Faith",
-                            totalPrice = 24.99,
-                            variantsMap = mapOf("Size" to "L", "Color" to "Blue")
-                        ),
-                        CheckoutItem(
-                            itemName = "Devotional Journal",
-                            totalPrice = 18.50,
-                            variantsMap = mapOf("Cover" to "Leather", "Pages" to "200")
-                        ),
-                        CheckoutItem(
-                            itemName = "Children's Bible Stories",
-                            totalPrice = 32.00,
-                            variantsMap = mapOf("Age Group" to "5-8 years", "Format" to "Hardcover")
-                        ),
-                        CheckoutItem(
-                            itemName = "Worship CD Collection",
-                            totalPrice = 29.99,
-                            variantsMap = mapOf("Genre" to "Contemporary", "Artist" to "Various")
-                        ),
-                        CheckoutItem(
-                            itemName = "Prayer Book",
-                            totalPrice = 16.75,
-                            variantsMap = mapOf("Type" to "Daily Prayers", "Language" to "English")
-                        )
-                    )
-                )
+        CheckoutScreenContent(
+            uiState = CheckoutUiState(
+                checkoutItems = emptyList(),
+                totalPrice = 0.0
             ),
-            onUserIntent = {}
+            onNavigateBack = {},
+            onRemoveItem = {},
+            onPaymentMethodSelected = {},
+            onDismissDialog = {},
+            onCheckout = {}
         )
     }
 }
+

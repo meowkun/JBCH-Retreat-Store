@@ -11,9 +11,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.White
+import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
-import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
-import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewState
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -24,9 +23,10 @@ import kotlin.uuid.ExperimentalUuidApi
 fun ItemListView(
     modifier: Modifier = Modifier.fillMaxWidth(),
     displayItemList: List<DisplayItem>,
-    onUserIntent: (BookStoreIntent) -> Unit,
-    scrollState: LazyListState = rememberLazyListState(),
-    state: BookStoreViewState
+    onAddToCart: (CheckoutItem) -> Unit,
+    onDeleteItem: (DisplayItem) -> Unit,
+    onEditItem: (DisplayItem) -> Unit,
+    scrollState: LazyListState = rememberLazyListState()
 ) {
     LazyColumn(
         modifier = modifier,
@@ -36,15 +36,15 @@ fun ItemListView(
     ) {
         items(items = displayItemList, key = { it.id }) { item ->
             ItemView(
-                state = state,
                 displayItem = item,
                 modifier = Modifier.fillParentMaxWidth(),
-                onUserIntent = onUserIntent
+                onAddToCart = onAddToCart,
+                onDeleteItem = onDeleteItem,
+                onEditItem = onEditItem
             )
         }
     }
 }
-
 
 @Preview
 @Composable
@@ -52,38 +52,39 @@ fun ItemListViewPreview() {
     BookStoreTheme {
         ItemListView(
             displayItemList = listOf(
-            DisplayItem(
-                name = "Bible",
-                price = 40.00,
-                variants = listOf(
-                    DisplayItem.Variant(
-                        key = "Language",
-                        valueList = listOf("English", "French", "Spanish")
-                    ),
-                    DisplayItem.Variant(
-                        key = "Version",
-                        valueList = listOf("KJV", "NKJV", "NIV")
-                    ),
+                DisplayItem(
+                    name = "Bible",
+                    price = 40.00,
+                    variants = listOf(
+                        DisplayItem.Variant(
+                            key = "Language",
+                            valueList = listOf("English", "French", "Spanish")
+                        ),
+                        DisplayItem.Variant(
+                            key = "Version",
+                            valueList = listOf("KJV", "NKJV", "NIV")
+                        ),
+                    )
+                ),
+                DisplayItem(
+                    name = "T-shirt",
+                    price = 15.00,
+                    variants = listOf(
+                        DisplayItem.Variant(
+                            key = "Color",
+                            valueList = listOf("Blue", "Black")
+                        ),
+                        DisplayItem.Variant(
+                            key = "Size",
+                            valueList = listOf("XS", "S", "M", "L", "XL", "XXL", "XXXL")
+                        ),
+                    )
                 )
             ),
-            DisplayItem(
-                name = "T-shirt",
-                price = 15.00,
-                variants = listOf(
-                    DisplayItem.Variant(
-                        key = "Color",
-                        valueList = listOf("Blue", "Black")
-                    ),
-                    DisplayItem.Variant(
-                        key = "Size",
-                        valueList = listOf("XS", "S", "M", "L", "XL", "XXL", "XXXL")
-                    ),
-                )
-            )
-        ),
             modifier = Modifier.background(White),
-            onUserIntent = { },
-            state = BookStoreViewState()
+            onAddToCart = {},
+            onDeleteItem = {},
+            onEditItem = {}
         )
     }
 }

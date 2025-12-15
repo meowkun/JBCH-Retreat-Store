@@ -5,12 +5,13 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -25,30 +26,40 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
-import com.example.jbchretreatstore.bookstore.presentation.BookStoreViewModel
-import com.example.jbchretreatstore.bookstore.presentation.DialogVisibilityState
-import com.example.jbchretreatstore.bookstore.presentation.model.AlertDialogType
+import com.example.jbchretreatstore.bookstore.presentation.shared.SnackbarManager
 import com.example.jbchretreatstore.bookstore.presentation.ui.checkout.CheckoutScreen
+import com.example.jbchretreatstore.bookstore.presentation.ui.checkout.CheckoutViewModel
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.BottomNavigationBar
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.CustomFloatingActionButton
-import com.example.jbchretreatstore.bookstore.presentation.ui.dialog.AddItemDialog
 import com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory.PurchaseHistoryScreen
+import com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory.PurchaseHistoryViewModel
 import com.example.jbchretreatstore.bookstore.presentation.ui.shop.ShopScreen
+import com.example.jbchretreatstore.bookstore.presentation.ui.shop.ShopViewModel
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.app_logo_description
 import jbchretreatstore.composeapp.generated.resources.ic_app_logo
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun BookStoreNavHost(viewModel: BookStoreViewModel) {
-
+fun BookStoreNavHost() {
     val navController = rememberNavController()
     val navigator = remember { BookStoreNavigator(navController) }
-    val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // Inject shared managers
+    val snackbarManager: SnackbarManager = koinInject()
+
+    // Inject ViewModels at NavHost level for FAB state
+    val shopViewModel: ShopViewModel = koinViewModel()
+    val checkoutViewModel: CheckoutViewModel = koinViewModel()
+    val purchaseHistoryViewModel: PurchaseHistoryViewModel = koinViewModel()
+
+    val shopState by shopViewModel.uiState.collectAsStateWithLifecycle()
+    val checkoutState by checkoutViewModel.uiState.collectAsStateWithLifecycle()
 
     // Derive current destination from the NavController
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -59,24 +70,26 @@ fun BookStoreNavHost(viewModel: BookStoreViewModel) {
     }
 
     // Show snackbar when snackbarMessage is not null
-    val snackbarText = state.snackbarMessage?.let { stringResource(it) }
+    val snackbarMessage by snackbarManager.snackbarMessage.collectAsStateWithLifecycle()
+    val snackbarText = snackbarMessage?.let { stringResource(it) }
     LaunchedEffect(snackbarText) {
         snackbarText?.let { message ->
-            // Show snackbar with auto-dismiss (suspends until dismissed)
             snackbarHostState.showSnackbar(
                 message = message,
-                duration = SnackbarDuration.Short // 4 seconds
+                withDismissAction = true
             )
-            // Clear message after snackbar is dismissed
-            viewModel.onUserIntent(BookStoreIntent.OnSnackbarDismissed, navigator)
+            snackbarManager.dismissSnackbar()
         }
     }
 
     Scaffold(
+        modifier = Modifier.fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding(),
         topBar = {
             Image(
                 modifier = Modifier.fillMaxWidth()
-                    .statusBarsPadding(),
+                    .padding(top = Dimensions.spacing_m),
                 painter = painterResource(Res.drawable.ic_app_logo),
                 contentDescription = stringResource(Res.string.app_logo_description),
                 contentScale = ContentScale.Inside,
@@ -91,55 +104,39 @@ fun BookStoreNavHost(viewModel: BookStoreViewModel) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_m)
             ) {
-                // Determine button visibility states
-                val showButtons = currentDestination != BookStoreNavDestination.CheckoutScreen
-                val hasItemsInCart = state.currentCheckoutList.checkoutList.isNotEmpty()
                 val isOnShopScreen = currentDestination == BookStoreNavDestination.ShopScreen
+                val isOnCheckoutScreen =
+                    currentDestination == BookStoreNavDestination.CheckoutScreen
                 val isOnReceiptScreen = currentDestination == BookStoreNavDestination.ReceiptScreen
-                val hasReceiptData = state.purchasedHistory.isNotEmpty() &&
-                        state.purchasedHistory.any { it.checkoutList.isNotEmpty() }
 
-                // Unified FloatingActionButton - handles Add Item, Checkout, and Share
-                AnimatedVisibility(visible = showButtons) {
-                    CustomFloatingActionButton(
-                        hasItemsInCart = hasItemsInCart,
-                        isOnShopScreen = isOnShopScreen,
-                        itemCount = state.currentCheckoutList.checkoutList.sumOf { it.quantity },
-                        showShareButton = isOnReceiptScreen && hasReceiptData,
-                        onCheckoutClick = {
-                            viewModel.onUserIntent(
-                                BookStoreIntent.OnNavigate(BookStoreNavDestination.CheckoutScreen),
-                                navigator
-                            )
-                        },
-                        onAddItemClick = {
-                            viewModel.onUserIntent(
-                                BookStoreIntent.OnUpdateDialogVisibility(
-                                    dialogState = DialogVisibilityState(
-                                        alertDialogType = AlertDialogType.ADD_ITEM,
-                                        isVisible = true
-                                    )
-                                ),
-                                navigator
-                            )
-                        },
-                        onShareClick = {
-                            viewModel.onUserIntent(
-                                BookStoreIntent.OnSharePurchaseHistory,
-                                navigator
-                            )
-                        }
-                    )
-                }
+                CustomFloatingActionButton(
+                    hasItemsInCart = shopState.hasItemsInCart,
+                    isOnShopScreen = isOnShopScreen,
+                    isOnCheckoutScreen = isOnCheckoutScreen,
+                    itemCount = shopState.cartItemCount,
+                    totalPrice = checkoutState.totalPrice,
+                    showShareButton = isOnReceiptScreen && purchaseHistoryViewModel.hasReceiptData(),
+                    onCheckoutClick = {
+                        navigator.navigateTo(BookStoreNavDestination.CheckoutScreen)
+                    },
+                    onCheckoutButtonClick = {
+                        checkoutViewModel.showCheckoutDialog(true)
+                    },
+                    onAddItemClick = {
+                        shopViewModel.showAddItemDialog(true)
+                    },
+                    onShareClick = {
+                        purchaseHistoryViewModel.sharePurchaseHistory()
+                    }
+                )
 
-                // Bottom Navigation Bar - visible when not on checkout screen
-                AnimatedVisibility(visible = showButtons) {
+                AnimatedVisibility(visible = !isOnCheckoutScreen) {
                     BottomNavigationBar(
                         currentDestination = currentDestination,
-                        onUserIntent = { intent ->
-                            viewModel.onUserIntent(intent, navigator)
+                        onNavigate = { destination ->
+                            navigator.navigateTo(destination)
                         },
-                        modifier = Modifier.padding(bottom = Dimensions.spacing_xxl)
+                        modifier = Modifier.padding(bottom = Dimensions.spacing_xxxl)
                     )
                 }
             }
@@ -153,30 +150,27 @@ fun BookStoreNavHost(viewModel: BookStoreViewModel) {
         ) {
             composable(BookStoreNavDestination.ShopScreen.route) {
                 ShopScreen(
-                    state = state,
-                ) { intent ->
-                    viewModel.onUserIntent(intent, navigator)
-                }
+                    viewModel = shopViewModel
+                )
             }
             composable(BookStoreNavDestination.CheckoutScreen.route) {
                 CheckoutScreen(
-                    state = state,
-                ) { intent ->
-                    viewModel.onUserIntent(intent, navigator)
-                }
+                    viewModel = checkoutViewModel,
+                    onNavigateBack = {
+                        navigator.navigateTo(BookStoreNavDestination.ShopScreen)
+                    },
+                    onCheckoutSuccess = {
+                        navigator.navigateTo(BookStoreNavDestination.ReceiptScreen)
+                    }
+                )
             }
-            // New destination: Purchase History (ReceiptScreen)
             composable(BookStoreNavDestination.ReceiptScreen.route) {
                 PurchaseHistoryScreen(
-                    state = state,
-                ) { intent ->
-                    viewModel.onUserIntent(intent, navigator)
-                }
-            }
-        }
-        if (state.displayAddDisplayItemDialog) {
-            AddItemDialog { intent ->
-                viewModel.onUserIntent(intent, navigator)
+                    viewModel = purchaseHistoryViewModel,
+                    onNavigateBack = {
+                        navigator.navigateTo(BookStoreNavDestination.ShopScreen)
+                    }
+                )
             }
         }
     }

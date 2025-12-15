@@ -16,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
-import com.example.jbchretreatstore.bookstore.presentation.BookStoreIntent
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.MediumBlue
@@ -32,7 +31,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun CheckoutItemView(
     checkoutItem: CheckoutItem,
-    onUserIntent: (BookStoreIntent) -> Unit
+    onRemoveItem: (CheckoutItem) -> Unit
 ) {
     OutlinedCard(
         shape = Shapes.itemCard,
@@ -100,11 +99,7 @@ fun CheckoutItemView(
                     ),
                 )
 
-                IconButton(
-                    onClick = {
-                        onUserIntent(BookStoreIntent.OnRemoveFromCheckoutItem(checkoutItem))
-                    }
-                ) {
+                IconButton(onClick = { onRemoveItem(checkoutItem) }) {
                     Image(
                         painter = painterResource(Res.drawable.ic_trash_can),
                         contentDescription = "Delete item"
@@ -129,13 +124,13 @@ fun CheckoutItemViewPreview() {
                     itemName = "Christian T-Shirt - Faith",
                     quantity = 2,
                     totalPrice = 24.99,
-                    variantsMap = mapOf(
-                        "Size" to "Large",
-                        "Color" to "Blue",
-                        "Design" to "Cross"
+                    variants = listOf(
+                        CheckoutItem.Variant("Size", listOf("S", "M", "L", "XL"), "Large"),
+                        CheckoutItem.Variant("Color", listOf("Red", "Blue", "Green"), "Blue"),
+                        CheckoutItem.Variant("Design", listOf("Cross", "Fish", "Dove"), "Cross")
                     )
                 ),
-                onUserIntent = {}
+                onRemoveItem = {}
             )
 
             // Simple item without variants
@@ -144,9 +139,9 @@ fun CheckoutItemViewPreview() {
                     itemName = "Holy Bible - NIV",
                     quantity = 1,
                     totalPrice = 45.99,
-                    variantsMap = emptyMap()
+                    variants = emptyList()
                 ),
-                onUserIntent = {}
+                onRemoveItem = {}
             )
         }
     }

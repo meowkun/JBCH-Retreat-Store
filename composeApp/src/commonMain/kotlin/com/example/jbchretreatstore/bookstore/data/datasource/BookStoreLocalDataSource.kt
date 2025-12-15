@@ -9,5 +9,9 @@ interface BookStoreLocalDataSource {
     fun getDisplayItems(): Flow<List<DisplayItemDto>>
     suspend fun saveReceipts(receipts: List<ReceiptDataDto>)
     fun getReceipts(): Flow<List<ReceiptDataDto>>
+
+    // Test data loading flag
+    suspend fun isTestDataLoaded(): Boolean
+    suspend fun setTestDataLoaded(loaded: Boolean)
 }
 
