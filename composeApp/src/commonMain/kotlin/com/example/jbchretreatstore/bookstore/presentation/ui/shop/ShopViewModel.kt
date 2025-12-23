@@ -6,7 +6,6 @@ import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.domain.usecase.ManageCartUseCase
 import com.example.jbchretreatstore.bookstore.domain.usecase.ManageDisplayItemsUseCase
-import com.example.jbchretreatstore.bookstore.domain.usecase.PurchaseHistoryUseCase
 import com.example.jbchretreatstore.bookstore.presentation.shared.CartStateHolder
 import com.example.jbchretreatstore.bookstore.presentation.shared.SnackbarManager
 import jbchretreatstore.composeapp.generated.resources.Res
@@ -32,7 +31,6 @@ import kotlinx.coroutines.launch
 class ShopViewModel(
     private val manageDisplayItemsUseCase: ManageDisplayItemsUseCase,
     private val manageCartUseCase: ManageCartUseCase,
-    private val purchaseHistoryUseCase: PurchaseHistoryUseCase,
     private val cartStateHolder: CartStateHolder,
     private val snackbarManager: SnackbarManager
 ) : ViewModel() {
@@ -132,11 +130,11 @@ class ShopViewModel(
         viewModelScope.launch {
             val result = manageDisplayItemsUseCase.removeDisplayItem(displayItem)
             result.onSuccess {
-                _uiState.update { it.copy(showRemoveItemDialog = false) }
+                _uiState.update { it.copy(showRemoveItemDialog = false, itemToRemove = null) }
                 snackbarManager.showSnackbar(Res.string.item_removed_success)
             }.onFailure { error ->
                 println("Failed to remove item: ${error.message}")
-                _uiState.update { it.copy(showRemoveItemDialog = false) }
+                _uiState.update { it.copy(showRemoveItemDialog = false, itemToRemove = null) }
                 snackbarManager.showSnackbar(Res.string.item_remove_failed)
             }
         }

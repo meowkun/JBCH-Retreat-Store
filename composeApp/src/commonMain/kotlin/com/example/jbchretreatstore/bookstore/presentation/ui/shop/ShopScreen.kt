@@ -65,12 +65,13 @@ fun ShopScreen(
     }
 
     // Show remove item dialog
-    if (uiState.showRemoveItemDialog && uiState.itemToRemove != null) {
+    val itemToRemove = uiState.itemToRemove
+    if (uiState.showRemoveItemDialog && itemToRemove != null) {
         RemoveItemDialog(
-            displayItem = uiState.itemToRemove!!,
+            displayItem = itemToRemove,
             onDismiss = { onIntent(ShopIntent.ShowRemoveItemDialog(false)) },
             onConfirm = {
-                onIntent(ShopIntent.DeleteDisplayItem(uiState.itemToRemove!!))
+                onIntent(ShopIntent.DeleteDisplayItem(itemToRemove))
             }
         )
     }

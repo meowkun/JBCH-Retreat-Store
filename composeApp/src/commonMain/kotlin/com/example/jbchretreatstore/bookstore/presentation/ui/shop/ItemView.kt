@@ -119,7 +119,9 @@ fun ItemView(
     onEditItem: (DisplayItem) -> Unit
 ) {
     var expanded by rememberSaveable { mutableStateOf(true) }
+    // Use inputs vararg to reset state when displayItem content changes (name, price, variants)
     var checkoutItem by rememberSaveable(
+        displayItem.id, displayItem.name, displayItem.price, displayItem.variants,
         stateSaver = CheckoutItemSaver
     ) {
         mutableStateOf(
@@ -348,7 +350,7 @@ fun ItemVariantMenu(
         OutlinedTextField(
             modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, true)
                 .wrapContentSize(),
-            value = checkoutItem.variantsMap[variant.key] ?: variant.valueList.first(),
+            value = checkoutItem.variantsMap[variant.key] ?: variant.valueList.firstOrNull() ?: "",
             onValueChange = { },
             textStyle = MaterialTheme.typography.bodyLarge.copy(
                 fontWeight = FontWeight.Bold
