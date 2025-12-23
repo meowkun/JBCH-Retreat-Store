@@ -89,7 +89,8 @@ class ManageDisplayItemsUseCase(
     }
 
     /**
-     * Search items by name
+     * Search items by name.
+     * @testOnly Currently only used in unit tests.
      */
     suspend fun searchItems(query: String): List<DisplayItem> {
         if (query.isBlank()) {

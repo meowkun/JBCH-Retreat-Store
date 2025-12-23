@@ -74,8 +74,9 @@ class ManageCartUseCase {
     }
 
     /**
-     * Update quantity of an existing cart item
-     * @return Result with updated cart or failure with error message
+     * Update quantity of an existing cart item.
+     * @return Result with updated cart or failure with error message.
+     * @testOnly Currently only used in unit tests.
      */
     fun updateQuantity(
         currentCart: ReceiptData,
@@ -122,32 +123,36 @@ class ManageCartUseCase {
     }
 
     /**
-     * Clear all items from cart
-     * @return Result with empty cart
+     * Clear all items from cart.
+     * @return Result with empty cart.
+     * @testOnly Currently only used in unit tests.
      */
     fun clearCart(currentCart: ReceiptData): Result<ReceiptData> {
         return Result.success(currentCart.copy(checkoutList = emptyList()))
     }
 
     /**
-     * Calculate total price of all items in cart
-     * @return Total price as Double
+     * Calculate total price of all items in cart.
+     * @return Total price as Double.
+     * @testOnly Currently only used in unit tests.
      */
     fun calculateTotal(cart: ReceiptData): Double {
         return cart.checkoutList.sumOf { it.totalPrice }
     }
 
     /**
-     * Get total number of items in cart (sum of quantities)
-     * @return Total item count
+     * Get total number of items in cart (sum of quantities).
+     * @return Total item count.
+     * @testOnly Currently only used in unit tests.
      */
     fun getItemCount(cart: ReceiptData): Int {
         return cart.checkoutList.sumOf { it.quantity }
     }
 
     /**
-     * Validate cart before checkout
-     * @return Result.success if valid, Result.failure with error message if invalid
+     * Validate cart before checkout.
+     * @return Result.success if valid, Result.failure with error message if invalid.
+     * @testOnly Currently only used in unit tests.
      */
     fun validateCart(cart: ReceiptData): Result<Unit> {
         if (cart.checkoutList.isEmpty()) {
@@ -170,8 +175,9 @@ class ManageCartUseCase {
     }
 
     /**
-     * Check if cart contains a specific item
-     * @return true if item exists in cart, false otherwise
+     * Check if cart contains a specific item.
+     * @return true if item exists in cart, false otherwise.
+     * @testOnly Currently only used in unit tests.
      */
     fun containsItem(cart: ReceiptData, itemName: String, options: Map<String, String>): Boolean {
         return cart.checkoutList.any {
@@ -180,8 +186,9 @@ class ManageCartUseCase {
     }
 
     /**
-     * Get item from cart by ID
-     * @return Result with CheckoutItem or failure if not found
+     * Get item from cart by ID.
+     * @return Result with CheckoutItem or failure if not found.
+     * @testOnly Currently only used in unit tests.
      */
     fun getItemById(cart: ReceiptData, itemId: kotlin.uuid.Uuid): Result<CheckoutItem> {
         val item = cart.checkoutList.find { it.id == itemId }

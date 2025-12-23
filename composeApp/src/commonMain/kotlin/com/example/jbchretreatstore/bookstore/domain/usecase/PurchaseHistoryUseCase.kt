@@ -19,7 +19,8 @@ class PurchaseHistoryUseCase(
 ) {
 
     /**
-     * Get all receipts
+     * Get all receipts.
+     * @testOnly Currently only used in unit tests.
      */
     fun getAllReceipts(): Flow<List<ReceiptData>> {
         return repository.fetchReceiptList()
@@ -35,7 +36,8 @@ class PurchaseHistoryUseCase(
     }
 
     /**
-     * Get saved for later items
+     * Get saved for later items.
+     * @testOnly Currently only used in unit tests.
      */
     fun getSavedForLater(): Flow<List<ReceiptData>> {
         return repository.fetchReceiptList().map { receipts ->
@@ -44,7 +46,8 @@ class PurchaseHistoryUseCase(
     }
 
     /**
-     * Calculate total revenue from all purchases
+     * Calculate total revenue from all purchases.
+     * @testOnly Currently only used in unit tests.
      */
     suspend fun calculateTotalRevenue(): Double {
         return repository.fetchReceiptList().first()
@@ -53,7 +56,8 @@ class PurchaseHistoryUseCase(
     }
 
     /**
-     * Get receipts by buyer name
+     * Get receipts by buyer name.
+     * @testOnly Currently only used in unit tests.
      */
     fun getReceiptsByBuyer(buyerName: String): Flow<List<ReceiptData>> {
         return repository.fetchReceiptList().map { receipts ->
@@ -64,7 +68,8 @@ class PurchaseHistoryUseCase(
     }
 
     /**
-     * Get receipt count
+     * Get receipt count.
+     * @testOnly Currently only used in unit tests.
      */
     suspend fun getReceiptCount(): Int {
         return repository.fetchReceiptList().map { it.size }.first()
