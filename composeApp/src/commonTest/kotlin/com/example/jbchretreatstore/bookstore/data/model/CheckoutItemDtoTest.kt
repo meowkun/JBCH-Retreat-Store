@@ -163,7 +163,7 @@ class CheckoutItemDtoTest {
     }
 
     @Test
-    fun `dto with negative quantity (edge case)`() {
+    fun `dto with negative quantity edge case`() {
         val dto = CheckoutItemDto(itemName = "Item", quantity = -1, totalPrice = 10.0)
 
         assertEquals(-1, dto.quantity)
@@ -184,7 +184,7 @@ class CheckoutItemDtoTest {
     }
 
     @Test
-    fun `dto with negative total price (edge case)`() {
+    fun `dto with negative total price edge case`() {
         val dto = CheckoutItemDto(itemName = "Refund", quantity = 1, totalPrice = -10.0)
 
         assertEquals(-10.0, dto.totalPrice)

@@ -155,7 +155,7 @@ class DisplayItemDtoTest {
     }
 
     @Test
-    fun `dto with negative price (edge case)`() {
+    fun `dto with negative price edge case`() {
         val dto = DisplayItemDto(name = "Negative", price = -10.0)
 
         assertEquals(-10.0, dto.price)

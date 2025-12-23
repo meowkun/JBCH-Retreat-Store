@@ -327,7 +327,7 @@ class ManageCartUseCaseTest {
     }
 
     @Test
-    fun `updateQuantity fails when item has zero quantity (edge case)`() {
+    fun `updateQuantity fails when item has zero quantity edge case`() {
         val itemId = Uuid.random()
         // This is an edge case where an item might have 0 quantity due to a bug
         val item = CheckoutItem(

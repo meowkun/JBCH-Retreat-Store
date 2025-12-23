@@ -232,21 +232,21 @@ class ReceiptDataDtoTest {
     // ============= INVALID STRING VALUES (EDGE CASES) =============
 
     @Test
-    fun `paymentMethod can be arbitrary string (DTO level)`() {
+    fun `paymentMethod can be arbitrary string at DTO level`() {
         // At DTO level, we accept any string - validation happens at domain level
         val dto = ReceiptDataDto(paymentMethod = "INVALID_METHOD")
         assertEquals("INVALID_METHOD", dto.paymentMethod)
     }
 
     @Test
-    fun `checkoutStatus can be arbitrary string (DTO level)`() {
+    fun `checkoutStatus can be arbitrary string at DTO level`() {
         // At DTO level, we accept any string - validation happens at domain level
         val dto = ReceiptDataDto(checkoutStatus = "INVALID_STATUS")
         assertEquals("INVALID_STATUS", dto.checkoutStatus)
     }
 
     @Test
-    fun `dateTime can be arbitrary string (DTO level)`() {
+    fun `dateTime can be arbitrary string at DTO level`() {
         // At DTO level, we accept any string - parsing happens at mapper level
         val dto = ReceiptDataDto(dateTime = "not-a-date")
         assertEquals("not-a-date", dto.dateTime)
