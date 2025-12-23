@@ -15,7 +15,7 @@ class ReceiptDataTest {
     fun `default constructor creates receipt with default values`() {
         val receipt = ReceiptData()
 
-        assertEquals("", receipt.buyerName)
+        assertEquals("Unknown", receipt.buyerName)
         assertTrue(receipt.checkoutList.isEmpty())
         assertEquals(PaymentMethod.CASH, receipt.paymentMethod)
         assertEquals(CheckoutStatus.PENDING, receipt.checkoutStatus)

@@ -93,7 +93,7 @@ class CheckoutUseCaseTest {
     }
 
     @Test
-    fun `processCheckout fails with empty buyer name`() = runTest {
+    fun `processCheckout uses Unknown for empty buyer name`() = runTest {
         val cart = ReceiptData(
             checkoutList = listOf(
                 CheckoutItem(itemName = "Book", quantity = 1, totalPrice = 20.0)
@@ -106,13 +106,12 @@ class CheckoutUseCaseTest {
             checkoutStatus = CheckoutStatus.CHECKED_OUT
         )
 
-        assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull() is IllegalArgumentException)
-        assertEquals("Buyer name cannot be empty", result.exceptionOrNull()?.message)
+        assertTrue(result.isSuccess)
+        assertEquals("Unknown", result.getOrThrow().buyerName)
     }
 
     @Test
-    fun `processCheckout fails with blank buyer name`() = runTest {
+    fun `processCheckout uses Unknown for blank buyer name`() = runTest {
         val cart = ReceiptData(
             checkoutList = listOf(
                 CheckoutItem(itemName = "Book", quantity = 1, totalPrice = 20.0)
@@ -125,8 +124,8 @@ class CheckoutUseCaseTest {
             checkoutStatus = CheckoutStatus.CHECKED_OUT
         )
 
-        assertTrue(result.isFailure)
-        assertEquals("Buyer name cannot be empty", result.exceptionOrNull()?.message)
+        assertTrue(result.isSuccess)
+        assertEquals("Unknown", result.getOrThrow().buyerName)
     }
 
     @Test
@@ -322,7 +321,7 @@ class CheckoutUseCaseTest {
     }
 
     @Test
-    fun `processCheckout with CheckoutState validates buyer name`() = runTest {
+    fun `processCheckout with CheckoutState uses Unknown for empty buyer name`() = runTest {
         val cart = ReceiptData(
             checkoutList = listOf(
                 CheckoutItem(itemName = "Book", quantity = 1, totalPrice = 20.0)
@@ -336,8 +335,8 @@ class CheckoutUseCaseTest {
 
         val result = useCase.processCheckout(cart, checkoutState)
 
-        assertTrue(result.isFailure)
-        assertEquals("Buyer name cannot be empty", result.exceptionOrNull()?.message)
+        assertTrue(result.isSuccess)
+        assertEquals("Unknown", result.getOrThrow().buyerName)
     }
 
     // ============= SAVE FOR LATER TESTS =============
@@ -359,7 +358,7 @@ class CheckoutUseCaseTest {
     }
 
     @Test
-    fun `saveForLater fails with empty buyer name`() = runTest {
+    fun `saveForLater uses Unknown for empty buyer name`() = runTest {
         val cart = ReceiptData(
             checkoutList = listOf(
                 CheckoutItem(itemName = "Book", quantity = 1, totalPrice = 20.0)
@@ -368,8 +367,8 @@ class CheckoutUseCaseTest {
 
         val result = useCase.saveForLater(cart, "")
 
-        assertTrue(result.isFailure)
-        assertEquals("Buyer name cannot be empty", result.exceptionOrNull()?.message)
+        assertTrue(result.isSuccess)
+        assertEquals("Unknown", result.getOrThrow().buyerName)
     }
 
     @Test

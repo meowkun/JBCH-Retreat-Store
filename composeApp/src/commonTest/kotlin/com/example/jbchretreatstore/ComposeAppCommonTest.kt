@@ -31,7 +31,7 @@ class ComposeAppCommonTest {
 
         assertEquals("", checkoutItem.itemName)
         assertEquals("", displayItem.name)
-        assertEquals("", receiptData.buyerName)
+        assertEquals("Unknown", receiptData.buyerName)
     }
 
     @Test

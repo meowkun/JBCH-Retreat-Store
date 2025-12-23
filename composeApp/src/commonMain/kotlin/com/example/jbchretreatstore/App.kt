@@ -18,7 +18,7 @@ fun App() {
             modules(bookStoreModule)
         }) {
             // Load test data on app startup (comment out for production)
-            LoadTestData()
+//            LoadTestData()
 
             BookStoreNavHost()
         }
