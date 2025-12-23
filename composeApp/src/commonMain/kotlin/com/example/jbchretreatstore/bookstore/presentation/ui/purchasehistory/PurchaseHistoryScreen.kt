@@ -55,6 +55,7 @@ fun PurchaseHistoryScreen(
     onNavigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val onIntent: (PurchaseHistoryIntent) -> Unit = viewModel::handleIntent
     val listState = rememberLazyListState()
 
     // Group receipts by date
@@ -141,17 +142,29 @@ fun PurchaseHistoryScreen(
                             PurchaseHistoryItemView(
                                 receipt = receipts[index],
                                 onRemoveClick = { receipt ->
-                                    viewModel.showRemoveBottomSheet(true, receipt)
+                                    onIntent(
+                                        PurchaseHistoryIntent.ShowRemoveBottomSheet(
+                                            true,
+                                            receipt
+                                        )
+                                    )
                                 },
                                 onEditClick = { receipt, purchaseHistoryItem ->
-                                    viewModel.showEditBottomSheet(
+                                    onIntent(
+                                        PurchaseHistoryIntent.ShowEditBottomSheet(
                                         true,
                                         receipt,
                                         purchaseHistoryItem
+                                        )
                                     )
                                 },
                                 onEditBuyerNameClick = { receipt ->
-                                    viewModel.showEditBuyerNameDialog(true, receipt)
+                                    onIntent(
+                                        PurchaseHistoryIntent.ShowEditBuyerNameDialog(
+                                            true,
+                                            receipt
+                                        )
+                                    )
                                 }
                             )
                         }
@@ -195,8 +208,8 @@ fun PurchaseHistoryScreen(
     uiState.receiptToRemove?.let { receipt ->
         if (uiState.showRemoveBottomSheet) {
             RemoveConfirmationBottomSheet(
-                onDismiss = { viewModel.showRemoveBottomSheet(false) },
-                onConfirm = { viewModel.removeReceipt(receipt) }
+                onDismiss = { onIntent(PurchaseHistoryIntent.ShowRemoveBottomSheet(false)) },
+                onConfirm = { onIntent(PurchaseHistoryIntent.RemoveReceipt(receipt)) }
             )
         }
     }
@@ -207,12 +220,14 @@ fun PurchaseHistoryScreen(
     if (uiState.showEditBottomSheet && receiptToEdit != null && itemToEdit != null) {
         EditPurchaseHistoryItemBottomSheet(
             purchaseHistoryItem = itemToEdit,
-            onDismiss = { viewModel.showEditBottomSheet(false) },
+            onDismiss = { onIntent(PurchaseHistoryIntent.ShowEditBottomSheet(false)) },
             onSave = { updatedItem ->
-                viewModel.updateCheckoutItem(
+                onIntent(
+                    PurchaseHistoryIntent.UpdateCheckoutItem(
                     receipt = receiptToEdit,
                     originalItem = itemToEdit,
                     updatedItem = updatedItem
+                    )
                 )
             }
         )
@@ -223,9 +238,14 @@ fun PurchaseHistoryScreen(
     if (uiState.showEditBuyerNameDialog && receiptToEditBuyerName != null) {
         EditBuyerNameDialog(
             currentBuyerName = receiptToEditBuyerName.buyerName,
-            onDismiss = { viewModel.showEditBuyerNameDialog(false) },
+            onDismiss = { onIntent(PurchaseHistoryIntent.ShowEditBuyerNameDialog(false)) },
             onSave = { newBuyerName ->
-                viewModel.updateBuyerName(receiptToEditBuyerName, newBuyerName)
+                onIntent(
+                    PurchaseHistoryIntent.UpdateBuyerName(
+                        receiptToEditBuyerName,
+                        newBuyerName
+                    )
+                )
             }
         )
     }

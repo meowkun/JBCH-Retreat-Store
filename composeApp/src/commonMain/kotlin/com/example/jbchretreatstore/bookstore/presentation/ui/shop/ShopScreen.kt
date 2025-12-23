@@ -21,6 +21,7 @@ fun ShopScreen(
     viewModel: ShopViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val onIntent: (ShopIntent) -> Unit = viewModel::handleIntent
 
     Surface(
         modifier = Modifier.fillMaxSize()
@@ -37,16 +38,16 @@ fun ShopScreen(
                         .fillMaxWidth()
                         .padding(Dimensions.spacing_m),
                     searchQuery = uiState.searchQuery,
-                    onSearchQueryChange = { viewModel.onSearchQueryChange(it) }
+                    onSearchQueryChange = { onIntent(ShopIntent.UpdateSearchQuery(it)) }
                 )
                 ItemListView(
                     modifier = Modifier
                         .weight(1f)
                         .padding(Dimensions.spacing_m),
                     displayItemList = uiState.searchedItemList,
-                    onAddToCart = { viewModel.onAddToCart(it) },
-                    onDeleteItem = { viewModel.showRemoveItemDialog(true, it) },
-                    onEditItem = { viewModel.showEditItemDialog(true, it) }
+                    onAddToCart = { onIntent(ShopIntent.AddToCart(it)) },
+                    onDeleteItem = { onIntent(ShopIntent.ShowRemoveItemDialog(true, it)) },
+                    onEditItem = { onIntent(ShopIntent.ShowEditItemDialog(true, it)) }
                 )
             }
 
@@ -58,8 +59,8 @@ fun ShopScreen(
     // Show add item dialog
     if (uiState.showAddItemDialog) {
         AddItemDialog(
-            onDismiss = { viewModel.showAddItemDialog(false) },
-            onAddItem = { newItem -> viewModel.onAddDisplayItem(newItem) }
+            onDismiss = { onIntent(ShopIntent.ShowAddItemDialog(false)) },
+            onAddItem = { newItem -> onIntent(ShopIntent.AddDisplayItem(newItem)) }
         )
     }
 
@@ -67,9 +68,9 @@ fun ShopScreen(
     if (uiState.showRemoveItemDialog && uiState.itemToRemove != null) {
         RemoveItemDialog(
             displayItem = uiState.itemToRemove!!,
-            onDismiss = { viewModel.showRemoveItemDialog(false) },
+            onDismiss = { onIntent(ShopIntent.ShowRemoveItemDialog(false)) },
             onConfirm = {
-                viewModel.onDeleteDisplayItem(uiState.itemToRemove!!)
+                onIntent(ShopIntent.DeleteDisplayItem(uiState.itemToRemove!!))
             }
         )
     }
@@ -77,8 +78,8 @@ fun ShopScreen(
     // Show edit item dialog
     if (uiState.showEditItemDialog && uiState.itemToEdit != null) {
         AddItemDialog(
-            onDismiss = { viewModel.showEditItemDialog(false) },
-            onAddItem = { updatedItem -> viewModel.onUpdateDisplayItem(updatedItem) },
+            onDismiss = { onIntent(ShopIntent.ShowEditItemDialog(false)) },
+            onAddItem = { updatedItem -> onIntent(ShopIntent.UpdateDisplayItem(updatedItem)) },
             initialItem = uiState.itemToEdit
         )
     }

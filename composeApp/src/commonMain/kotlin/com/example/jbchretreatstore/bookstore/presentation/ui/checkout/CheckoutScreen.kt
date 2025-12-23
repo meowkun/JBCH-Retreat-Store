@@ -32,6 +32,7 @@ fun CheckoutScreen(
     onCheckoutSuccess: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val onIntent: (CheckoutIntent) -> Unit = viewModel::handleIntent
 
     // Navigate back if cart is empty (only on initial load, not after checkout)
     LaunchedEffect(uiState.checkoutItems.isEmpty(), uiState.checkoutSuccess) {
@@ -43,7 +44,7 @@ fun CheckoutScreen(
     // Handle checkout success navigation
     LaunchedEffect(uiState.checkoutSuccess) {
         if (uiState.checkoutSuccess) {
-            viewModel.onCheckoutSuccessHandled()
+            onIntent(CheckoutIntent.CheckoutSuccessHandled)
             onCheckoutSuccess()
         }
     }
@@ -51,10 +52,10 @@ fun CheckoutScreen(
     CheckoutScreenContent(
         uiState = uiState,
         onNavigateBack = onNavigateBack,
-        onRemoveItem = { viewModel.onRemoveFromCart(it) },
-        onPaymentMethodSelected = { viewModel.onPaymentMethodSelected(it) },
-        onDismissDialog = { viewModel.showCheckoutDialog(false) },
-        onCheckout = { buyerName -> viewModel.processCheckout(buyerName) }
+        onRemoveItem = { onIntent(CheckoutIntent.RemoveFromCart(it)) },
+        onPaymentMethodSelected = { onIntent(CheckoutIntent.SelectPaymentMethod(it)) },
+        onDismissDialog = { onIntent(CheckoutIntent.ShowCheckoutDialog(false)) },
+        onCheckout = { buyerName -> onIntent(CheckoutIntent.ProcessCheckout(buyerName)) }
     )
 }
 

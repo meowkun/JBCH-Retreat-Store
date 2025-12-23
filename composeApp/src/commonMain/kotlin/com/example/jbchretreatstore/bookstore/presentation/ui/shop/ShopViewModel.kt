@@ -25,6 +25,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel for Shop screen following MVI architecture pattern.
+ * All user actions are processed through the handleIntent() function.
+ */
 class ShopViewModel(
     private val manageDisplayItemsUseCase: ManageDisplayItemsUseCase,
     private val manageCartUseCase: ManageCartUseCase,
@@ -50,23 +54,52 @@ class ShopViewModel(
     )
 
     init {
-//        loadTestDataOnce()
         loadDisplayItems()
     }
 
     /**
-     * Load test data only on first app run
+     * Central intent handler following MVI pattern.
+     * All user actions should be dispatched through this function.
      */
-    private fun loadTestDataOnce() {
-        viewModelScope.launch {
-            // Load both display items and purchase history test data if not already loaded
-            val wasLoaded = manageDisplayItemsUseCase.loadTestDataIfNeeded()
-            if (wasLoaded) {
-                // Also load purchase history test data
-                purchaseHistoryUseCase.loadTestData()
-            }
+    fun handleIntent(intent: ShopIntent) {
+        when (intent) {
+            is ShopIntent.UpdateSearchQuery -> reduceSearchQuery(intent.query)
+            is ShopIntent.AddDisplayItem -> handleAddDisplayItem(intent.item)
+            is ShopIntent.UpdateDisplayItem -> handleUpdateDisplayItem(intent.item)
+            is ShopIntent.DeleteDisplayItem -> handleDeleteDisplayItem(intent.item)
+            is ShopIntent.AddToCart -> handleAddToCart(intent.checkoutItem)
+            is ShopIntent.ShowAddItemDialog -> reduceShowAddItemDialog(intent.show)
+            is ShopIntent.ShowRemoveItemDialog -> reduceShowRemoveItemDialog(
+                intent.show,
+                intent.item
+            )
+
+            is ShopIntent.ShowEditItemDialog -> reduceShowEditItemDialog(intent.show, intent.item)
+            is ShopIntent.LoadTestData -> handleLoadTestData()
         }
     }
+
+    // region State Reducers (pure state updates)
+
+    private fun reduceSearchQuery(query: String) {
+        _uiState.update { it.copy(searchQuery = query) }
+    }
+
+    private fun reduceShowAddItemDialog(show: Boolean) {
+        _uiState.update { it.copy(showAddItemDialog = show) }
+    }
+
+    private fun reduceShowRemoveItemDialog(show: Boolean, item: DisplayItem?) {
+        _uiState.update { it.copy(showRemoveItemDialog = show, itemToRemove = item) }
+    }
+
+    private fun reduceShowEditItemDialog(show: Boolean, item: DisplayItem?) {
+        _uiState.update { it.copy(showEditItemDialog = show, itemToEdit = item) }
+    }
+
+    // endregion
+
+    // region Side Effects (async operations)
 
     private fun loadDisplayItems() {
         viewModelScope.launch {
@@ -81,11 +114,7 @@ class ShopViewModel(
         }
     }
 
-    fun onSearchQueryChange(query: String) {
-        _uiState.update { it.copy(searchQuery = query) }
-    }
-
-    fun onAddDisplayItem(newItem: DisplayItem) {
+    private fun handleAddDisplayItem(newItem: DisplayItem) {
         viewModelScope.launch {
             val result = manageDisplayItemsUseCase.addDisplayItem(newItem)
             result.onSuccess {
@@ -99,7 +128,7 @@ class ShopViewModel(
         }
     }
 
-    fun onDeleteDisplayItem(displayItem: DisplayItem) {
+    private fun handleDeleteDisplayItem(displayItem: DisplayItem) {
         viewModelScope.launch {
             val result = manageDisplayItemsUseCase.removeDisplayItem(displayItem)
             result.onSuccess {
@@ -113,33 +142,7 @@ class ShopViewModel(
         }
     }
 
-    fun onAddToCart(checkoutItem: CheckoutItem) {
-        val result = manageCartUseCase.addToCart(
-            cartStateHolder.cartState.value,
-            checkoutItem
-        )
-        result.onSuccess { updatedCart ->
-            cartStateHolder.updateCart(updatedCart)
-            snackbarManager.showSnackbar(Res.string.added_to_cart)
-        }.onFailure { error ->
-            println("Failed to add to cart: ${error.message}")
-            snackbarManager.showSnackbar(Res.string.checkout_failed)
-        }
-    }
-
-    fun showAddItemDialog(show: Boolean) {
-        _uiState.update { it.copy(showAddItemDialog = show) }
-    }
-
-    fun showRemoveItemDialog(show: Boolean, item: DisplayItem? = null) {
-        _uiState.update { it.copy(showRemoveItemDialog = show, itemToRemove = item) }
-    }
-
-    fun showEditItemDialog(show: Boolean, item: DisplayItem? = null) {
-        _uiState.update { it.copy(showEditItemDialog = show, itemToEdit = item) }
-    }
-
-    fun onUpdateDisplayItem(updatedItem: DisplayItem) {
+    private fun handleUpdateDisplayItem(updatedItem: DisplayItem) {
         viewModelScope.launch {
             val result = manageDisplayItemsUseCase.updateDisplayItem(updatedItem)
             result.onSuccess {
@@ -153,13 +156,26 @@ class ShopViewModel(
         }
     }
 
-    /**
-     * Load sample test data for development/testing purposes
-     */
-    fun loadTestData() {
+    private fun handleAddToCart(checkoutItem: CheckoutItem) {
+        val result = manageCartUseCase.addToCart(
+            cartStateHolder.cartState.value,
+            checkoutItem
+        )
+        result.onSuccess { updatedCart ->
+            cartStateHolder.updateCart(updatedCart)
+            snackbarManager.showSnackbar(Res.string.added_to_cart)
+        }.onFailure { error ->
+            println("Failed to add to cart: ${error.message}")
+            snackbarManager.showSnackbar(Res.string.checkout_failed)
+        }
+    }
+
+    private fun handleLoadTestData() {
         viewModelScope.launch {
             manageDisplayItemsUseCase.loadTestData()
         }
     }
+
+    // endregion
 }
 

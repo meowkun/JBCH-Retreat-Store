@@ -27,12 +27,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.jbchretreatstore.bookstore.presentation.shared.SnackbarManager
+import com.example.jbchretreatstore.bookstore.presentation.ui.checkout.CheckoutIntent
 import com.example.jbchretreatstore.bookstore.presentation.ui.checkout.CheckoutScreen
 import com.example.jbchretreatstore.bookstore.presentation.ui.checkout.CheckoutViewModel
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.BottomNavigationBar
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.CustomFloatingActionButton
+import com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory.PurchaseHistoryIntent
 import com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory.PurchaseHistoryScreen
 import com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory.PurchaseHistoryViewModel
+import com.example.jbchretreatstore.bookstore.presentation.ui.shop.ShopIntent
 import com.example.jbchretreatstore.bookstore.presentation.ui.shop.ShopScreen
 import com.example.jbchretreatstore.bookstore.presentation.ui.shop.ShopViewModel
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
@@ -120,13 +123,13 @@ fun BookStoreNavHost() {
                         navigator.navigateTo(BookStoreNavDestination.CheckoutScreen)
                     },
                     onCheckoutButtonClick = {
-                        checkoutViewModel.showCheckoutDialog(true)
+                        checkoutViewModel.handleIntent(CheckoutIntent.ShowCheckoutDialog(true))
                     },
                     onAddItemClick = {
-                        shopViewModel.showAddItemDialog(true)
+                        shopViewModel.handleIntent(ShopIntent.ShowAddItemDialog(true))
                     },
                     onShareClick = {
-                        purchaseHistoryViewModel.sharePurchaseHistory()
+                        purchaseHistoryViewModel.handleIntent(PurchaseHistoryIntent.SharePurchaseHistory)
                     }
                 )
 
