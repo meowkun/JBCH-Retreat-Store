@@ -50,7 +50,7 @@
 
     <!--  Remove item dialog  -->
     <string name="remove_item_dialog_title">Remove Item</string>
-    <string name="remove_item_dialog_message">Are you sure you want to %1$d?</string>
+    <string name="remove_item_dialog_message">Are you sure you want to remove</string>
     <string name="remove_item_cancel">Cancel</string>
     <string name="remove_item_remove">Remove</string>
 
