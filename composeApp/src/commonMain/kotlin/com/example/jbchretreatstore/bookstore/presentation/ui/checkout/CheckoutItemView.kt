@@ -23,7 +23,9 @@ import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Shapes
 import com.example.jbchretreatstore.bookstore.presentation.utils.toCurrency
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.checkout_view_item_quantity
+import jbchretreatstore.composeapp.generated.resources.delete_item_description
 import jbchretreatstore.composeapp.generated.resources.ic_trash_can
+import jbchretreatstore.composeapp.generated.resources.variant_key_value_format
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -68,14 +70,14 @@ fun CheckoutItemView(
             }
 
             // Variants display
-            if (checkoutItem.variantsMap.isNotEmpty()) {
+            if (checkoutItem.hasVariants) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_xxs)
                 ) {
-                    checkoutItem.variantsMap.forEach { (key, value) ->
+                    checkoutItem.variantPairs.forEach { (key, value) ->
                         Text(
-                            text = "$key: $value",
+                            text = stringResource(Res.string.variant_key_value_format, key, value),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                         )
@@ -102,7 +104,7 @@ fun CheckoutItemView(
                 IconButton(onClick = { onRemoveItem(checkoutItem) }) {
                     Image(
                         painter = painterResource(Res.drawable.ic_trash_can),
-                        contentDescription = "Delete item"
+                        contentDescription = stringResource(Res.string.delete_item_description)
                     )
                 }
             }

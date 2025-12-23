@@ -90,7 +90,7 @@ private fun CheckoutScreenContent(
             ) {
                 items(
                     items = uiState.checkoutItems,
-                    key = { "${it.id}_${it.variantsMap.hashCode()}" }
+                    key = { it.uniqueKey }
                 ) { item ->
                     CheckoutItemView(
                         checkoutItem = item,

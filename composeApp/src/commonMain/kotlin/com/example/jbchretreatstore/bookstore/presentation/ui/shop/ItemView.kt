@@ -63,6 +63,7 @@ import com.example.jbchretreatstore.bookstore.presentation.ui.theme.White
 import com.example.jbchretreatstore.bookstore.presentation.utils.toCurrency
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.add_to_cart
+import jbchretreatstore.composeapp.generated.resources.delete_item_description
 import jbchretreatstore.composeapp.generated.resources.edit_item_button_description
 import jbchretreatstore.composeapp.generated.resources.ic_chevron
 import jbchretreatstore.composeapp.generated.resources.ic_chevron_small
@@ -298,7 +299,7 @@ fun ItemExpandableView(
             IconButton(onClick = onDeleteClick) {
                 Image(
                     painter = painterResource(Res.drawable.ic_trash_can),
-                    contentDescription = "Delete item"
+                    contentDescription = stringResource(Res.string.delete_item_description)
                 )
             }
 
