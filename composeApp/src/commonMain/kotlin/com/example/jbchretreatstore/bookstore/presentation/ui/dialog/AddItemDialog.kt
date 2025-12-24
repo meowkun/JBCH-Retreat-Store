@@ -99,11 +99,7 @@ fun AddItemDialog(
 ) {
     val isEditMode = initialItem != null
     var viewState by remember {
-        mutableStateOf(
-            AddItemState(
-                newItem = initialItem ?: DisplayItem()
-            )
-        )
+        mutableStateOf(AddItemState.fromItem(initialItem))
     }
 
     AlertDialog(
@@ -123,7 +119,8 @@ fun AddItemDialog(
                             displayAddOptionView = false,
                             showAddOptionError = false,
                             showValueError = false,
-                            newItemVariant = DisplayItem.Variant()
+                            newItemVariant = DisplayItem.Variant(),
+                            optionValue = ""
                         )
                     } else {
                         // Close the dialog
@@ -164,11 +161,6 @@ private fun AddItemState.AddItemContent(
     onAddItem: (DisplayItem) -> Unit,
     isEditMode: Boolean = false
 ) {
-    var displayPrice by remember {
-        mutableStateOf(
-            if (newItem.price > 0.0) newItem.price.toString() else ""
-        )
-    }
     val scrollState = rememberScrollState()
 
     Column(
@@ -200,9 +192,9 @@ private fun AddItemState.AddItemContent(
             value = displayPrice,
             onValueChange = { input ->
                 input.filterNumericInputWithMaxDecimals()?.let { filtered ->
-                    displayPrice = filtered
                     updateViewState(
                         this@AddItemContent.copy(
+                            displayPrice = filtered,
                             newItem = newItem.copy(
                                 price = filtered.toDoubleOrNull() ?: 0.0
                             ),
@@ -326,8 +318,6 @@ private fun AddItemState.AddItemContent(
 fun AddItemState.AddNewVariantView(
     updateViewState: (AddItemState) -> Unit
 ) {
-    var optionValue by remember { mutableStateOf("") }
-    var isOptionKeyEnabled by remember { mutableStateOf(true) }
     val scrollState = rememberScrollState()
 
     Column(
@@ -375,18 +365,13 @@ fun AddItemState.AddNewVariantView(
                 )
             },
             onRemoveValue = { valueToRemove ->
-                val updatedList = newItemVariant.valueList.filter { it != valueToRemove }
                 updateViewState(
                     this@AddNewVariantView.copy(
                         newItemVariant = newItemVariant.copy(
-                            valueList = updatedList
+                            valueList = newItemVariant.valueList.filter { it != valueToRemove }
                         )
                     )
                 )
-                // Unlock key field when all values are removed
-                if (updatedList.isEmpty()) {
-                    isOptionKeyEnabled = true
-                }
             }
         )
 
@@ -394,9 +379,9 @@ fun AddItemState.AddNewVariantView(
         LabeledTextField(
             value = optionValue,
             onValueChange = { value ->
-                optionValue = value
                 updateViewState(
                     this@AddNewVariantView.copy(
+                        optionValue = value,
                         showValueError = false
                     )
                 )
@@ -462,12 +447,11 @@ fun AddItemState.AddNewVariantView(
                         newItemVariant = newItemVariant.copy(
                             valueList = newItemVariant.valueList + optionValue.trim()
                         ),
+                        optionValue = "",
                         showValueError = false,
                         showDuplicateKeyError = false
                     )
                 )
-                optionValue = ""
-                isOptionKeyEnabled = false
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
@@ -503,7 +487,8 @@ fun AddItemState.AddNewVariantView(
                             newItem = newItem.copy(
                                 variants = newItem.variants + newItemVariant
                             ),
-                            newItemVariant = DisplayItem.Variant()
+                            newItemVariant = DisplayItem.Variant(),
+                            optionValue = ""
                         )
                     )
                 } else {
@@ -514,7 +499,8 @@ fun AddItemState.AddNewVariantView(
                             showAddOptionError = false,
                             showValueError = false,
                             showDuplicateKeyError = false,
-                            newItemVariant = DisplayItem.Variant()
+                            newItemVariant = DisplayItem.Variant(),
+                            optionValue = ""
                         )
                     )
                 }
@@ -870,4 +856,3 @@ fun EditItemDialogPreview() {
         )
     }
 }
-
