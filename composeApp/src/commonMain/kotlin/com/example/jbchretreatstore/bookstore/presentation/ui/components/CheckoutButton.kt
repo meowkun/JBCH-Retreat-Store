@@ -27,6 +27,7 @@ import com.example.jbchretreatstore.bookstore.presentation.utils.toCurrency
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.checkout_button_description
 import jbchretreatstore.composeapp.generated.resources.checkout_button_text
+import jbchretreatstore.composeapp.generated.resources.checkout_total_price_format
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -62,7 +63,12 @@ fun CheckoutButton(
                     withStyle(style = SpanStyle(fontWeight = FontWeight.ExtraBold)) {
                         append(stringResource(Res.string.checkout_button_text))
                     }
-                    append("  (${totalPrice.toCurrency()})")
+                    append(
+                        stringResource(
+                            Res.string.checkout_total_price_format,
+                            totalPrice.toCurrency()
+                        )
+                    )
                 },
                 style = MaterialTheme.typography.titleLarge
             )

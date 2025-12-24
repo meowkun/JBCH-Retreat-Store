@@ -97,7 +97,9 @@
 
     <!-- Checkout button -->
     <string name="check_cart_button">Check Cart</string>
+    <string name="cart_item_count_format">  (%1$d)</string>
     <string name="checkout_button_text">Checkout</string>
+    <string name="checkout_total_price_format">  (%1$s)</string>
 
     <!-- Bottom Navigation -->
     <string name="bottom_nav_shop">Shop</string>
