@@ -57,11 +57,9 @@ import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.GrayBlue
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.MediumBlue
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.White
-import com.example.jbchretreatstore.bookstore.presentation.utils.filterNumericInputWithMaxDecimals
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.add_item_add_more_value
 import jbchretreatstore.composeapp.generated.resources.add_item_add_variant
-import jbchretreatstore.composeapp.generated.resources.add_item_dialog_title
 import jbchretreatstore.composeapp.generated.resources.add_item_duplicate_variant_key_error
 import jbchretreatstore.composeapp.generated.resources.add_item_name_label
 import jbchretreatstore.composeapp.generated.resources.add_item_name_place_holder
@@ -73,8 +71,6 @@ import jbchretreatstore.composeapp.generated.resources.add_item_options_value_pl
 import jbchretreatstore.composeapp.generated.resources.add_item_price_label
 import jbchretreatstore.composeapp.generated.resources.add_item_price_place_holder
 import jbchretreatstore.composeapp.generated.resources.add_item_save
-import jbchretreatstore.composeapp.generated.resources.edit_item_dialog_title
-import jbchretreatstore.composeapp.generated.resources.edit_item_update
 import jbchretreatstore.composeapp.generated.resources.ic_close
 import jbchretreatstore.composeapp.generated.resources.reorderable_drag_handle_description
 import org.jetbrains.compose.resources.painterResource
@@ -97,7 +93,6 @@ fun AddItemDialog(
     onAddItem: (DisplayItem) -> Unit,
     initialItem: DisplayItem? = null
 ) {
-    val isEditMode = initialItem != null
     var viewState by remember {
         mutableStateOf(AddItemState.fromItem(initialItem))
     }
@@ -107,23 +102,12 @@ fun AddItemDialog(
         containerColor = White,
         title = {
             DialogTitle(
-                title = stringResource(
-                    if (isEditMode) Res.string.edit_item_dialog_title
-                    else Res.string.add_item_dialog_title
-                ),
+                title = stringResource(viewState.dialogTitleRes),
                 showBackArrow = viewState.displayAddOptionView,
                 onClose = {
                     if (viewState.displayAddOptionView) {
-                        // Navigate back to AddItemContent
-                        viewState = viewState.copy(
-                            displayAddOptionView = false,
-                            showAddOptionError = false,
-                            showValueError = false,
-                            newItemVariant = DisplayItem.Variant(),
-                            optionValue = ""
-                        )
+                        viewState = viewState.navigateBack()
                     } else {
-                        // Close the dialog
                         onDismiss()
                     }
                 }
@@ -137,8 +121,7 @@ fun AddItemDialog(
             } else {
                 viewState.AddItemContent(
                     updateViewState = { viewState = it },
-                    onAddItem = onAddItem,
-                    isEditMode = isEditMode
+                    onAddItem = onAddItem
                 )
             }
         },
@@ -153,13 +136,11 @@ fun AddItemDialog(
  *
  * @param updateViewState Callback to update the parent state
  * @param onAddItem Callback when save/update button is clicked
- * @param isEditMode Whether the dialog is in edit mode
  */
 @Composable
 private fun AddItemState.AddItemContent(
     updateViewState: (AddItemState) -> Unit,
-    onAddItem: (DisplayItem) -> Unit,
-    isEditMode: Boolean = false
+    onAddItem: (DisplayItem) -> Unit
 ) {
     val scrollState = rememberScrollState()
 
@@ -172,17 +153,10 @@ private fun AddItemState.AddItemContent(
         // Name field
         LabeledTextField(
             value = newItem.name,
-            onValueChange = { name ->
-                updateViewState(
-                    this@AddItemContent.copy(
-                        newItem = newItem.copy(name = name),
-                        showItemNameError = false
-                    )
-                )
-            },
+            onValueChange = { name -> updateViewState(updateName(name)) },
             label = stringResource(Res.string.add_item_name_label),
             placeholder = stringResource(Res.string.add_item_name_place_holder),
-            isError = showItemNameError && newItem.name.isBlank()
+            isError = showNameFieldError
         )
 
         Spacer(Modifier.height(Dimensions.spacing_m))
@@ -190,29 +164,17 @@ private fun AddItemState.AddItemContent(
         // Price field
         LabeledTextField(
             value = displayPrice,
-            onValueChange = { input ->
-                input.filterNumericInputWithMaxDecimals()?.let { filtered ->
-                    updateViewState(
-                        this@AddItemContent.copy(
-                            displayPrice = filtered,
-                            newItem = newItem.copy(
-                                price = filtered.toDoubleOrNull() ?: 0.0
-                            ),
-                            showItemPriceError = false
-                        )
-                    )
-                }
-            },
+            onValueChange = { input -> updatePrice(input)?.let { updateViewState(it) } },
             label = stringResource(Res.string.add_item_price_label),
             placeholder = stringResource(Res.string.add_item_price_place_holder),
-            isError = showItemPriceError && newItem.price <= 0.0,
+            isError = showPriceFieldError,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Decimal,
                 imeAction = ImeAction.Done
             )
         )
 
-        if (newItem.variants.isNotEmpty()) {
+        if (hasVariants) {
 
             HorizontalDivider(modifier = Modifier.padding(vertical = Dimensions.spacing_m))
 
@@ -225,22 +187,8 @@ private fun AddItemState.AddItemContent(
 
             ReorderableVariantsList(
                 variants = newItem.variants,
-                onReorder = { reorderedVariants ->
-                    updateViewState(
-                        this@AddItemContent.copy(
-                            newItem = newItem.copy(variants = reorderedVariants)
-                        )
-                    )
-                },
-                onRemoveVariant = { variantToRemove ->
-                    updateViewState(
-                        this@AddItemContent.copy(
-                            newItem = newItem.copy(
-                                variants = newItem.variants.filter { it != variantToRemove }
-                            )
-                        )
-                    )
-                }
+                onReorder = { updateViewState(reorderVariants(it)) },
+                onRemoveVariant = { updateViewState(removeVariant(it)) }
             )
         }
 
@@ -248,13 +196,7 @@ private fun AddItemState.AddItemContent(
 
         // Add variant button
         Button(
-            onClick = {
-                updateViewState(
-                    this@AddItemContent.copy(
-                        displayAddOptionView = true
-                    )
-                )
-            },
+            onClick = { updateViewState(showAddOptionView()) },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -275,18 +217,11 @@ private fun AddItemState.AddItemContent(
         // Save/Update button
         Button(
             onClick = {
-                val isNameValid = newItem.name.isNotBlank()
-                val isPriceValid = newItem.price > 0.0
-
-                if (isNameValid && isPriceValid) {
-                    onAddItem(newItem)
+                val (validItem, newState) = validateItem()
+                if (validItem != null) {
+                    onAddItem(validItem)
                 } else {
-                    updateViewState(
-                        this@AddItemContent.copy(
-                            showItemNameError = !isNameValid,
-                            showItemPriceError = !isPriceValid
-                        )
-                    )
+                    updateViewState(newState)
                 }
             },
             modifier = Modifier.fillMaxWidth(),
@@ -296,10 +231,7 @@ private fun AddItemState.AddItemContent(
             shape = RoundedCornerShape(Dimensions.corner_radius_s)
         ) {
             Text(
-                text = stringResource(
-                    if (isEditMode) Res.string.edit_item_update
-                    else Res.string.add_item_save
-                ),
+                text = stringResource(saveButtonTextRes),
                 style = MaterialTheme.typography.labelLarge.copy(
                     fontWeight = FontWeight.ExtraBold
                 )
@@ -329,19 +261,11 @@ fun AddItemState.AddNewVariantView(
         // Variant key field (locks after first value is added)
         LabeledTextField(
             value = newItemVariant.key,
-            onValueChange = { key ->
-                updateViewState(
-                    this@AddNewVariantView.copy(
-                        newItemVariant = newItemVariant.copy(key = key),
-                        showAddOptionError = false,
-                        showDuplicateKeyError = false
-                    )
-                )
-            },
+            onValueChange = { key -> updateViewState(updateVariantKey(key)) },
             label = stringResource(Res.string.add_item_options_key),
             placeholder = stringResource(Res.string.add_item_options_key_placeholder),
             enabled = isOptionKeyEnabled,
-            isError = showAddOptionError || showDuplicateKeyError,
+            isError = showVariantKeyFieldError,
             errorMessage = if (showDuplicateKeyError) {
                 stringResource(Res.string.add_item_duplicate_variant_key_error)
             } else ""
@@ -355,37 +279,14 @@ fun AddItemState.AddNewVariantView(
         // Display reorderable list of added variant values
         ReorderableVariantValuesList(
             values = newItemVariant.valueList,
-            onReorder = { reorderedValues ->
-                updateViewState(
-                    this@AddNewVariantView.copy(
-                        newItemVariant = newItemVariant.copy(
-                            valueList = reorderedValues
-                        )
-                    )
-                )
-            },
-            onRemoveValue = { valueToRemove ->
-                updateViewState(
-                    this@AddNewVariantView.copy(
-                        newItemVariant = newItemVariant.copy(
-                            valueList = newItemVariant.valueList.filter { it != valueToRemove }
-                        )
-                    )
-                )
-            }
+            onReorder = { updateViewState(reorderVariantValues(it)) },
+            onRemoveValue = { updateViewState(removeVariantValue(it)) }
         )
 
         // Variant value input field
         LabeledTextField(
             value = optionValue,
-            onValueChange = { value ->
-                updateViewState(
-                    this@AddNewVariantView.copy(
-                        optionValue = value,
-                        showValueError = false
-                    )
-                )
-            },
+            onValueChange = { value -> updateViewState(updateOptionValue(value)) },
             label = stringResource(Res.string.add_item_options_value),
             placeholder = stringResource(Res.string.add_item_options_value_placeholder),
             isError = showValueError
@@ -395,64 +296,7 @@ fun AddItemState.AddNewVariantView(
 
         // Add more variant value button
         Button(
-            onClick = {
-                // Validate variant key first
-                if (newItemVariant.key.isBlank()) {
-                    updateViewState(
-                        this@AddNewVariantView.copy(
-                            showAddOptionError = true
-                        )
-                    )
-                    return@Button
-                }
-
-                // Check if variant with same key already exists (only when adding first value)
-                if (newItemVariant.valueList.isEmpty()) {
-                    val isDuplicateKey = newItem.variants.any {
-                        it.key.equals(newItemVariant.key.trim(), ignoreCase = true)
-                    }
-                    if (isDuplicateKey) {
-                        updateViewState(
-                            this@AddNewVariantView.copy(
-                                showDuplicateKeyError = true
-                            )
-                        )
-                        return@Button
-                    }
-                }
-
-                // Validate variant value
-                if (optionValue.isBlank()) {
-                    updateViewState(
-                        this@AddNewVariantView.copy(
-                            showValueError = true
-                        )
-                    )
-                    return@Button
-                }
-
-                // Check for duplicate values
-                if (newItemVariant.valueList.contains(optionValue.trim())) {
-                    updateViewState(
-                        this@AddNewVariantView.copy(
-                            showValueError = true
-                        )
-                    )
-                    return@Button
-                }
-
-                // Add the value and lock the key field
-                updateViewState(
-                    this@AddNewVariantView.copy(
-                        newItemVariant = newItemVariant.copy(
-                            valueList = newItemVariant.valueList + optionValue.trim()
-                        ),
-                        optionValue = "",
-                        showValueError = false,
-                        showDuplicateKeyError = false
-                    )
-                )
-            },
+            onClick = { updateViewState(addVariantValue()) },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MediumBlue,
@@ -472,39 +316,7 @@ fun AddItemState.AddNewVariantView(
 
         // Back button (saves variant if valid and returns to main view)
         Button(
-            onClick = {
-                val isOptionValid = newItemVariant.key.isNotBlank() &&
-                        newItemVariant.valueList.isNotEmpty()
-
-                if (isOptionValid) {
-                    // Save variant and navigate back
-                    updateViewState(
-                        this@AddNewVariantView.copy(
-                            displayAddOptionView = false,
-                            showAddOptionError = false,
-                            showValueError = false,
-                            showDuplicateKeyError = false,
-                            newItem = newItem.copy(
-                                variants = newItem.variants + newItemVariant
-                            ),
-                            newItemVariant = DisplayItem.Variant(),
-                            optionValue = ""
-                        )
-                    )
-                } else {
-                    // Navigate back without saving, clear all states
-                    updateViewState(
-                        this@AddNewVariantView.copy(
-                            displayAddOptionView = false,
-                            showAddOptionError = false,
-                            showValueError = false,
-                            showDuplicateKeyError = false,
-                            newItemVariant = DisplayItem.Variant(),
-                            optionValue = ""
-                        )
-                    )
-                }
-            },
+            onClick = { updateViewState(saveVariantAndNavigateBack()) },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary
