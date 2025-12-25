@@ -1,6 +1,7 @@
 package com.example.jbchretreatstore.bookstore.domain.model
 
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.number
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -139,8 +140,8 @@ class ReceiptDataTest {
         val receipt = ReceiptData(dateTime = dateTime)
 
         assertEquals(2024, receipt.dateTime.year)
-        assertEquals(1, receipt.dateTime.monthNumber)
-        assertEquals(15, receipt.dateTime.dayOfMonth)
+        assertEquals(1, receipt.dateTime.month.number)
+        assertEquals(15, receipt.dateTime.day)
         assertEquals(14, receipt.dateTime.hour)
         assertEquals(30, receipt.dateTime.minute)
         assertEquals(45, receipt.dateTime.second)

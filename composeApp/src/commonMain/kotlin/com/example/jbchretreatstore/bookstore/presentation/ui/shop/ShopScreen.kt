@@ -65,23 +65,20 @@ fun ShopScreen(
     }
 
     // Show remove item dialog
-    val itemToRemove = uiState.itemToRemove
-    if (uiState.showRemoveItemDialog && itemToRemove != null) {
+    uiState.removeDialogData?.let { item ->
         RemoveItemDialog(
-            displayItem = itemToRemove,
+            displayItem = item,
             onDismiss = { onIntent(ShopIntent.ShowRemoveItemDialog(false)) },
-            onConfirm = {
-                onIntent(ShopIntent.DeleteDisplayItem(itemToRemove))
-            }
+            onConfirm = { onIntent(ShopIntent.DeleteDisplayItem(item)) }
         )
     }
 
     // Show edit item dialog
-    if (uiState.showEditItemDialog && uiState.itemToEdit != null) {
+    uiState.editDialogData?.let { item ->
         AddItemDialog(
             onDismiss = { onIntent(ShopIntent.ShowEditItemDialog(false)) },
             onAddItem = { updatedItem -> onIntent(ShopIntent.UpdateDisplayItem(updatedItem)) },
-            initialItem = uiState.itemToEdit
+            initialItem = item
         )
     }
 }

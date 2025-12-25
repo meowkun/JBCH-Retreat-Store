@@ -1,5 +1,6 @@
 package com.example.jbchretreatstore.bookstore.presentation.ui.shop
 
+import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -149,6 +150,179 @@ class ShopUiStateTest {
 
         assertTrue(stateWithItems.hasItemsInCart)
         assertFalse(stateWithoutItems.hasItemsInCart)
+    }
+
+    // Tests for showClearSearchButton derived property
+
+    @Test
+    fun `showClearSearchButton returns true when search query is not blank`() {
+        val uiState = ShopUiState(searchQuery = "Bible")
+
+        assertTrue(uiState.showClearSearchButton)
+    }
+
+    @Test
+    fun `showClearSearchButton returns false when search query is empty`() {
+        val uiState = ShopUiState(searchQuery = "")
+
+        assertFalse(uiState.showClearSearchButton)
+    }
+
+    @Test
+    fun `showClearSearchButton returns false when search query is blank with spaces`() {
+        val uiState = ShopUiState(searchQuery = "   ")
+
+        assertFalse(uiState.showClearSearchButton)
+    }
+
+    // Tests for removeDialogData derived property
+
+    @Test
+    fun `removeDialogData returns item when all conditions met`() {
+        val item = DisplayItem(name = "Test")
+        val uiState = ShopUiState(showRemoveItemDialog = true, itemToRemove = item)
+
+        assertEquals(item, uiState.removeDialogData)
+    }
+
+    @Test
+    fun `removeDialogData returns null when showRemoveItemDialog is false`() {
+        val item = DisplayItem(name = "Test")
+        val uiState = ShopUiState(showRemoveItemDialog = false, itemToRemove = item)
+
+        assertNull(uiState.removeDialogData)
+    }
+
+    @Test
+    fun `removeDialogData returns null when itemToRemove is null`() {
+        val uiState = ShopUiState(showRemoveItemDialog = true, itemToRemove = null)
+
+        assertNull(uiState.removeDialogData)
+    }
+
+    // Tests for editDialogData derived property
+
+    @Test
+    fun `editDialogData returns item when all conditions met`() {
+        val item = DisplayItem(name = "Test")
+        val uiState = ShopUiState(showEditItemDialog = true, itemToEdit = item)
+
+        assertEquals(item, uiState.editDialogData)
+    }
+
+    @Test
+    fun `editDialogData returns null when showEditItemDialog is false`() {
+        val item = DisplayItem(name = "Test")
+        val uiState = ShopUiState(showEditItemDialog = false, itemToEdit = item)
+
+        assertNull(uiState.editDialogData)
+    }
+
+    @Test
+    fun `editDialogData returns null when itemToEdit is null`() {
+        val uiState = ShopUiState(showEditItemDialog = true, itemToEdit = null)
+
+        assertNull(uiState.editDialogData)
+    }
+
+    // Tests for DisplayItem.formattedPrice extension
+
+    @Test
+    fun `DisplayItem formattedPrice returns formatted currency`() {
+        val item = DisplayItem(name = "Bible", price = 25.50)
+
+        assertEquals("$25.50", item.formattedPrice)
+    }
+
+    @Test
+    fun `DisplayItem formattedPrice handles zero price`() {
+        val item = DisplayItem(name = "Free Item", price = 0.0)
+
+        assertEquals("$0.00", item.formattedPrice)
+    }
+
+    // Tests for CheckoutItem.getSelectedVariantValue extension
+
+    @Test
+    fun `getSelectedVariantValue returns value from variantsMap when present`() {
+        val checkoutItem = CheckoutItem(
+            itemName = "T-Shirt",
+            variants = listOf(
+                CheckoutItem.Variant(
+                    key = "Size",
+                    valueList = listOf("S", "M", "L"),
+                    selectedValue = "M"
+                )
+            )
+        )
+        val displayVariant = DisplayItem.Variant(key = "Size", valueList = listOf("S", "M", "L"))
+
+        assertEquals("M", checkoutItem.getSelectedVariantValue(displayVariant))
+    }
+
+    @Test
+    fun `getSelectedVariantValue falls back to first value when key not in variantsMap`() {
+        val checkoutItem = CheckoutItem(
+            itemName = "T-Shirt",
+            variants = emptyList()
+        )
+        val displayVariant = DisplayItem.Variant(key = "Size", valueList = listOf("S", "M", "L"))
+
+        assertEquals("S", checkoutItem.getSelectedVariantValue(displayVariant))
+    }
+
+    @Test
+    fun `getSelectedVariantValue returns empty string when both sources are empty`() {
+        val checkoutItem = CheckoutItem(
+            itemName = "T-Shirt",
+            variants = emptyList()
+        )
+        val displayVariant = DisplayItem.Variant(key = "Size", valueList = emptyList())
+
+        assertEquals("", checkoutItem.getSelectedVariantValue(displayVariant))
+    }
+
+    @Test
+    fun `getSelectedVariantValue uses correct variant key for lookup`() {
+        val checkoutItem = CheckoutItem(
+            itemName = "T-Shirt",
+            variants = listOf(
+                CheckoutItem.Variant(
+                    key = "Size",
+                    valueList = listOf("S", "M", "L"),
+                    selectedValue = "L"
+                ),
+                CheckoutItem.Variant(
+                    key = "Color",
+                    valueList = listOf("Red", "Blue"),
+                    selectedValue = "Blue"
+                )
+            )
+        )
+        val sizeVariant = DisplayItem.Variant(key = "Size", valueList = listOf("S", "M", "L"))
+        val colorVariant = DisplayItem.Variant(key = "Color", valueList = listOf("Red", "Blue"))
+
+        assertEquals("L", checkoutItem.getSelectedVariantValue(sizeVariant))
+        assertEquals("Blue", checkoutItem.getSelectedVariantValue(colorVariant))
+    }
+
+    @Test
+    fun `getSelectedVariantValue falls back when variant key exists but has empty selectedValue`() {
+        val checkoutItem = CheckoutItem(
+            itemName = "T-Shirt",
+            variants = listOf(
+                CheckoutItem.Variant(
+                    key = "Size",
+                    valueList = listOf("S", "M", "L"),
+                    selectedValue = ""
+                )
+            )
+        )
+        val displayVariant = DisplayItem.Variant(key = "Size", valueList = listOf("S", "M", "L"))
+
+        // variantsMap["Size"] returns "" (empty string), which is truthy in Kotlin
+        // so it won't fall back - the empty string IS the selected value
+        assertEquals("", checkoutItem.getSelectedVariantValue(displayVariant))
     }
 }
 

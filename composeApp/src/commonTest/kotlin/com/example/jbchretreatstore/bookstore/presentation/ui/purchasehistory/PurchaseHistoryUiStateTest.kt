@@ -119,9 +119,9 @@ class PurchaseHistoryUiStateTest {
         val uiState = PurchaseHistoryUiState(purchasedHistory = receipts)
         val dates = uiState.groupedReceipts.map { it.first }
 
-        assertEquals(25, dates[0].dayOfMonth)
-        assertEquals(22, dates[1].dayOfMonth)
-        assertEquals(20, dates[2].dayOfMonth)
+        assertEquals(25, dates[0].day)
+        assertEquals(22, dates[1].day)
+        assertEquals(20, dates[2].day)
     }
 
     @Test

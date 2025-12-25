@@ -2,6 +2,7 @@ package com.example.jbchretreatstore.bookstore.presentation.ui.shop
 
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
+import com.example.jbchretreatstore.bookstore.presentation.utils.toCurrency
 
 /**
  * UI State for Shop screen following MVI pattern
@@ -26,7 +27,32 @@ data class ShopUiState(
                 it.name.contains(searchQuery, ignoreCase = true)
             }
         }
+
+    /** True when clear search button should be shown */
+    val showClearSearchButton: Boolean
+        get() = searchQuery.isNotBlank()
+
+    /** Data for remove item dialog when available, null otherwise */
+    val removeDialogData: DisplayItem?
+        get() = if (showRemoveItemDialog && itemToRemove != null) itemToRemove else null
+
+    /** Data for edit item dialog when available, null otherwise */
+    val editDialogData: DisplayItem?
+        get() = if (showEditItemDialog && itemToEdit != null) itemToEdit else null
 }
+
+// Extension properties for UI display
+
+/** Price formatted as currency string */
+val DisplayItem.formattedPrice: String
+    get() = price.toCurrency()
+
+/**
+ * Gets the selected value for a variant, falling back to the first option or empty string.
+ * Used for dropdown menus displaying variant options.
+ */
+fun CheckoutItem.getSelectedVariantValue(variant: DisplayItem.Variant): String =
+    variantsMap[variant.key] ?: variant.valueList.firstOrNull() ?: ""
 
 /**
  * User intents (actions) for Shop screen following MVI pattern

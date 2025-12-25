@@ -12,6 +12,7 @@
     <string name="quantity_label">Quantity</string>
     <string name="total_price_text">Total: %1$d</string>
     <string name="add_to_cart">Add to cart</string>
+    <string name="add_to_cart_total"> Total (%1$s)</string>
 
     <!--  Add item dialog  -->
     <string name="add_item_dialog_title">Add New Item</string>
