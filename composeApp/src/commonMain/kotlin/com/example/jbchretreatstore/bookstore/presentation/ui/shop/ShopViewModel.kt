@@ -2,6 +2,7 @@ package com.example.jbchretreatstore.bookstore.presentation.ui.shop
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.jbchretreatstore.bookstore.domain.constants.LogMessages
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.domain.usecase.ManageCartUseCase
@@ -119,7 +120,7 @@ class ShopViewModel(
                 _uiState.update { it.copy(showAddItemDialog = false) }
                 snackbarManager.showSnackbar(Res.string.item_added_success)
             }.onFailure { error ->
-                println("Failed to add item: ${error.message}")
+                println(LogMessages.withError(LogMessages.ADD_ITEM_FAILED_PREFIX, error.message))
                 _uiState.update { it.copy(showAddItemDialog = false) }
                 snackbarManager.showSnackbar(Res.string.item_add_failed)
             }
@@ -133,7 +134,7 @@ class ShopViewModel(
                 _uiState.update { it.copy(showRemoveItemDialog = false, itemToRemove = null) }
                 snackbarManager.showSnackbar(Res.string.item_removed_success)
             }.onFailure { error ->
-                println("Failed to remove item: ${error.message}")
+                println(LogMessages.withError(LogMessages.REMOVE_ITEM_FAILED_PREFIX, error.message))
                 _uiState.update { it.copy(showRemoveItemDialog = false, itemToRemove = null) }
                 snackbarManager.showSnackbar(Res.string.item_remove_failed)
             }
@@ -147,7 +148,7 @@ class ShopViewModel(
                 _uiState.update { it.copy(showEditItemDialog = false, itemToEdit = null) }
                 snackbarManager.showSnackbar(Res.string.item_update_success)
             }.onFailure { error ->
-                println("Failed to update item: ${error.message}")
+                println(LogMessages.withError(LogMessages.UPDATE_ITEM_FAILED_PREFIX, error.message))
                 _uiState.update { it.copy(showEditItemDialog = false, itemToEdit = null) }
                 snackbarManager.showSnackbar(Res.string.item_update_failed)
             }
@@ -163,7 +164,7 @@ class ShopViewModel(
             cartStateHolder.updateCart(updatedCart)
             snackbarManager.showSnackbar(Res.string.added_to_cart)
         }.onFailure { error ->
-            println("Failed to add to cart: ${error.message}")
+            println(LogMessages.withError(LogMessages.ADD_TO_CART_FAILED_PREFIX, error.message))
             snackbarManager.showSnackbar(Res.string.checkout_failed)
         }
     }

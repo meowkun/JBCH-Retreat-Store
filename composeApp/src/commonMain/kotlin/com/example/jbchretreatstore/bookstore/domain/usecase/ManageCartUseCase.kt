@@ -1,5 +1,6 @@
 package com.example.jbchretreatstore.bookstore.domain.usecase
 
+import com.example.jbchretreatstore.bookstore.domain.constants.ErrorMessages
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
 
@@ -18,17 +19,17 @@ class ManageCartUseCase {
     ): Result<ReceiptData> {
         // Validate item name is not empty
         if (newItem.itemName.isBlank()) {
-            return Result.failure(IllegalArgumentException("Item name cannot be empty"))
+            return Result.failure(IllegalArgumentException(ErrorMessages.ITEM_NAME_EMPTY))
         }
 
         // Validate quantity is positive
         if (newItem.quantity <= 0) {
-            return Result.failure(IllegalArgumentException("Quantity must be greater than zero"))
+            return Result.failure(IllegalArgumentException(ErrorMessages.ITEM_QUANTITY_INVALID))
         }
 
         // Validate price is positive
         if (newItem.totalPrice <= 0) {
-            return Result.failure(IllegalArgumentException("Price must be greater than zero"))
+            return Result.failure(IllegalArgumentException(ErrorMessages.ITEM_PRICE_INVALID))
         }
 
         // Check if item with same name and options already exists
@@ -67,7 +68,7 @@ class ManageCartUseCase {
         val updatedList = currentCart.checkoutList.filter { it.id != itemToRemove.id }
 
         if (updatedList.size == currentCart.checkoutList.size) {
-            return Result.failure(IllegalArgumentException("Item not found in cart"))
+            return Result.failure(IllegalArgumentException(ErrorMessages.CART_ITEM_NOT_FOUND))
         }
 
         return Result.success(currentCart.copy(checkoutList = updatedList))
@@ -85,20 +86,20 @@ class ManageCartUseCase {
     ): Result<ReceiptData> {
         // Validate quantity is positive
         if (newQuantity <= 0) {
-            return Result.failure(IllegalArgumentException("Quantity must be greater than zero"))
+            return Result.failure(IllegalArgumentException(ErrorMessages.ITEM_QUANTITY_INVALID))
         }
 
         // Find the item in cart
         val itemIndex = currentCart.checkoutList.indexOfFirst { it.id == itemId }
         if (itemIndex == -1) {
-            return Result.failure(IllegalArgumentException("Item not found in cart"))
+            return Result.failure(IllegalArgumentException(ErrorMessages.CART_ITEM_NOT_FOUND))
         }
 
         val item = currentCart.checkoutList[itemIndex]
 
         // Prevent division by zero
         if (item.quantity <= 0) {
-            return Result.failure(IllegalStateException("Cart item has invalid quantity"))
+            return Result.failure(IllegalStateException(ErrorMessages.CART_INVALID_QUANTITY))
         }
 
         // Calculate price per unit (safe from division by zero)
@@ -106,7 +107,7 @@ class ManageCartUseCase {
 
         // Validate price is positive
         if (pricePerUnit <= 0) {
-            return Result.failure(IllegalStateException("Cart item has invalid price"))
+            return Result.failure(IllegalStateException(ErrorMessages.CART_INVALID_PRICE))
         }
 
         // Update item with new quantity and recalculate total price
@@ -156,19 +157,19 @@ class ManageCartUseCase {
      */
     fun validateCart(cart: ReceiptData): Result<Unit> {
         if (cart.checkoutList.isEmpty()) {
-            return Result.failure(IllegalStateException("Cart is empty"))
+            return Result.failure(IllegalStateException(ErrorMessages.CART_EMPTY))
         }
 
         if (cart.checkoutList.any { it.quantity <= 0 }) {
-            return Result.failure(IllegalStateException("Invalid item quantity"))
+            return Result.failure(IllegalStateException(ErrorMessages.ITEM_QUANTITY_VALIDATION_FAILED))
         }
 
         if (cart.checkoutList.any { it.totalPrice <= 0 }) {
-            return Result.failure(IllegalStateException("Invalid item price"))
+            return Result.failure(IllegalStateException(ErrorMessages.ITEM_PRICE_VALIDATION_FAILED))
         }
 
         if (cart.checkoutList.any { it.itemName.isBlank() }) {
-            return Result.failure(IllegalStateException("Invalid item name"))
+            return Result.failure(IllegalStateException(ErrorMessages.ITEM_NAME_INVALID))
         }
 
         return Result.success(Unit)
@@ -195,7 +196,7 @@ class ManageCartUseCase {
         return if (item != null) {
             Result.success(item)
         } else {
-            Result.failure(IllegalArgumentException("Item not found in cart"))
+            Result.failure(IllegalArgumentException(ErrorMessages.CART_ITEM_NOT_FOUND))
         }
     }
 }

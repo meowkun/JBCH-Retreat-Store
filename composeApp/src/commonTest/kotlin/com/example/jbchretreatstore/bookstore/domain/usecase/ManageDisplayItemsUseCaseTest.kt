@@ -1,6 +1,7 @@
 package com.example.jbchretreatstore.bookstore.domain.usecase
 
 import app.cash.turbine.test
+import com.example.jbchretreatstore.bookstore.domain.constants.ErrorMessages
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.fake.FakeBookStoreRepository
 import kotlinx.coroutines.test.runTest
@@ -73,7 +74,7 @@ class ManageDisplayItemsUseCaseTest {
 
         assertTrue(result.isFailure)
         assertTrue(result.exceptionOrNull() is IllegalArgumentException)
-        assertEquals("Item name cannot be empty", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_NAME_EMPTY, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -83,7 +84,7 @@ class ManageDisplayItemsUseCaseTest {
         val result = useCase.addDisplayItem(newItem)
 
         assertTrue(result.isFailure)
-        assertEquals("Item name cannot be empty", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_NAME_EMPTY, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -93,7 +94,7 @@ class ManageDisplayItemsUseCaseTest {
         val result = useCase.addDisplayItem(newItem)
 
         assertTrue(result.isFailure)
-        assertEquals("Item price must be greater than zero", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_PRICE_INVALID, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -103,7 +104,7 @@ class ManageDisplayItemsUseCaseTest {
         val result = useCase.addDisplayItem(newItem)
 
         assertTrue(result.isFailure)
-        assertEquals("Item price must be greater than zero", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_PRICE_INVALID, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -203,7 +204,7 @@ class ManageDisplayItemsUseCaseTest {
         val result = useCase.removeDisplayItem(nonExistentItem)
 
         assertTrue(result.isFailure)
-        assertEquals("Item not found", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_NOT_FOUND, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -255,7 +256,7 @@ class ManageDisplayItemsUseCaseTest {
         val result = useCase.updateDisplayItem(nonExistentItem)
 
         assertTrue(result.isFailure)
-        assertEquals("Item not found", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_NOT_FOUND, result.exceptionOrNull()?.message)
     }
 
     @Test

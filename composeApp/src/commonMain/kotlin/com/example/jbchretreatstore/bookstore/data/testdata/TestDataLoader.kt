@@ -1,6 +1,7 @@
 package com.example.jbchretreatstore.bookstore.data.testdata
 
 import com.example.jbchretreatstore.bookstore.data.testdata.TestDataLoader.Companion.ENABLE_TEST_DATA
+import com.example.jbchretreatstore.bookstore.domain.constants.LogMessages
 import com.example.jbchretreatstore.bookstore.domain.repository.BookStoreRepository
 
 /**
@@ -28,14 +29,14 @@ class TestDataLoader(
      */
     suspend fun loadAllTestData() {
         if (!ENABLE_TEST_DATA) {
-            println("TestDataLoader: Test data loading is disabled")
+            println(LogMessages.TEST_DATA_DISABLED)
             return
         }
 
-        println("TestDataLoader: Loading all test data...")
+        println(LogMessages.TEST_DATA_LOADING_ALL)
         repository.updateDisplayItems(SampleTestData.sampleDisplayItems)
         repository.updateReceiptList(SampleTestData.samplePurchaseHistory)
-        println("TestDataLoader: Test data loaded successfully")
+        println(LogMessages.TEST_DATA_LOADED_SUCCESS)
     }
 
     /**
@@ -46,20 +47,20 @@ class TestDataLoader(
      */
     suspend fun loadAllTestDataIfNeeded(): Boolean {
         if (!ENABLE_TEST_DATA) {
-            println("TestDataLoader: Test data loading is disabled")
+            println(LogMessages.TEST_DATA_DISABLED)
             return false
         }
 
         if (repository.isTestDataLoaded()) {
-            println("TestDataLoader: Test data already loaded, skipping")
+            println(LogMessages.TEST_DATA_ALREADY_LOADED)
             return false
         }
 
-        println("TestDataLoader: Loading test data for the first time...")
+        println(LogMessages.TEST_DATA_LOADING_FIRST_TIME)
         repository.updateDisplayItems(SampleTestData.sampleDisplayItems)
         repository.updateReceiptList(SampleTestData.samplePurchaseHistory)
         repository.setTestDataLoaded(true)
-        println("TestDataLoader: Test data loaded successfully")
+        println(LogMessages.TEST_DATA_LOADED_SUCCESS)
         return true
     }
 
@@ -86,7 +87,7 @@ class TestDataLoader(
         repository.updateDisplayItems(emptyList())
         repository.updateReceiptList(emptyList())
         repository.setTestDataLoaded(false)
-        println("TestDataLoader: All data cleared")
+        println(LogMessages.TEST_DATA_CLEARED)
     }
 
     /**
@@ -94,7 +95,7 @@ class TestDataLoader(
      */
     suspend fun resetTestDataFlag() {
         repository.setTestDataLoaded(false)
-        println("TestDataLoader: Test data flag reset")
+        println(LogMessages.TEST_DATA_FLAG_RESET)
     }
 }
 

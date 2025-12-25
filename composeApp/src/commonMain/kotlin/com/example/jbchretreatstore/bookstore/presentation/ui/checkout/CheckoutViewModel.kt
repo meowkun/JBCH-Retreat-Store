@@ -2,6 +2,7 @@ package com.example.jbchretreatstore.bookstore.presentation.ui.checkout
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.jbchretreatstore.bookstore.domain.constants.LogMessages
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
 import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod
@@ -114,7 +115,7 @@ class CheckoutViewModel(
                 }
                 snackbarManager.showSnackbar(Res.string.checkout_success)
             }.onFailure { error ->
-                println("Checkout failed: ${error.message}")
+                println(LogMessages.withError(LogMessages.CHECKOUT_FAILED_PREFIX, error.message))
                 _uiState.update { it.copy(showCheckoutDialog = false) }
                 snackbarManager.showSnackbar(Res.string.checkout_failed)
             }

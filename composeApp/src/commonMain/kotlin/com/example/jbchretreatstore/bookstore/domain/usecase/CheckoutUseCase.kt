@@ -1,5 +1,6 @@
 package com.example.jbchretreatstore.bookstore.domain.usecase
 
+import com.example.jbchretreatstore.bookstore.domain.constants.ErrorMessages
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
 import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
@@ -33,12 +34,12 @@ class CheckoutUseCase(
 
         // Validate cart is not empty
         if (cart.checkoutList.isEmpty()) {
-            return Result.failure(IllegalStateException("Cannot checkout with empty cart"))
+            return Result.failure(IllegalStateException(ErrorMessages.CHECKOUT_EMPTY_CART))
         }
 
         // Validate all items have positive quantities and prices
         if (cart.checkoutList.any { it.quantity <= 0 || it.totalPrice <= 0 }) {
-            return Result.failure(IllegalStateException("Cart contains invalid items"))
+            return Result.failure(IllegalStateException(ErrorMessages.CHECKOUT_INVALID_ITEMS))
         }
 
         // Create receipt with timestamp

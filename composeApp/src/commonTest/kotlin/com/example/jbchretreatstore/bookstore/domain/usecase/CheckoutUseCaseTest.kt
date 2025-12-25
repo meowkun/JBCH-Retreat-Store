@@ -1,5 +1,6 @@
 package com.example.jbchretreatstore.bookstore.domain.usecase
 
+import com.example.jbchretreatstore.bookstore.domain.constants.ErrorMessages
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
 import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod
@@ -140,7 +141,7 @@ class CheckoutUseCaseTest {
 
         assertTrue(result.isFailure)
         assertTrue(result.exceptionOrNull() is IllegalStateException)
-        assertEquals("Cannot checkout with empty cart", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.CHECKOUT_EMPTY_CART, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -158,7 +159,7 @@ class CheckoutUseCaseTest {
         )
 
         assertTrue(result.isFailure)
-        assertEquals("Cart contains invalid items", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.CHECKOUT_INVALID_ITEMS, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -176,7 +177,7 @@ class CheckoutUseCaseTest {
         )
 
         assertTrue(result.isFailure)
-        assertEquals("Cart contains invalid items", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.CHECKOUT_INVALID_ITEMS, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -194,7 +195,7 @@ class CheckoutUseCaseTest {
         )
 
         assertTrue(result.isFailure)
-        assertEquals("Cart contains invalid items", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.CHECKOUT_INVALID_ITEMS, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -212,7 +213,7 @@ class CheckoutUseCaseTest {
         )
 
         assertTrue(result.isFailure)
-        assertEquals("Cart contains invalid items", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.CHECKOUT_INVALID_ITEMS, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -378,7 +379,7 @@ class CheckoutUseCaseTest {
         val result = useCase.saveForLater(cart, "John Doe")
 
         assertTrue(result.isFailure)
-        assertEquals("Cannot checkout with empty cart", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.CHECKOUT_EMPTY_CART, result.exceptionOrNull()?.message)
     }
 
     @Test

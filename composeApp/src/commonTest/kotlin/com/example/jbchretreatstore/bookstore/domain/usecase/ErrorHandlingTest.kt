@@ -1,5 +1,6 @@
 package com.example.jbchretreatstore.bookstore.domain.usecase
 
+import com.example.jbchretreatstore.bookstore.domain.constants.ErrorMessages
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
@@ -64,7 +65,7 @@ class ErrorHandlingTest {
         )
 
         assertTrue(result.isFailure)
-        assertEquals("Cart contains invalid items", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.CHECKOUT_INVALID_ITEMS, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -82,7 +83,7 @@ class ErrorHandlingTest {
         )
 
         assertTrue(result.isFailure)
-        assertEquals("Cart contains invalid items", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.CHECKOUT_INVALID_ITEMS, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -114,7 +115,7 @@ class ErrorHandlingTest {
         val result = manageDisplayItemsUseCase.addDisplayItem(item)
 
         assertTrue(result.isFailure)
-        assertEquals("Item name cannot be empty", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_NAME_EMPTY, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -124,7 +125,7 @@ class ErrorHandlingTest {
         val result = manageDisplayItemsUseCase.addDisplayItem(item)
 
         assertTrue(result.isFailure)
-        assertEquals("Item name cannot be empty", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_NAME_EMPTY, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -134,7 +135,7 @@ class ErrorHandlingTest {
         val result = manageDisplayItemsUseCase.addDisplayItem(item)
 
         assertTrue(result.isFailure)
-        assertEquals("Item price must be greater than zero", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_PRICE_INVALID, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -144,7 +145,7 @@ class ErrorHandlingTest {
         val result = manageDisplayItemsUseCase.addDisplayItem(item)
 
         assertTrue(result.isFailure)
-        assertEquals("Item price must be greater than zero", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_PRICE_INVALID, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -168,7 +169,7 @@ class ErrorHandlingTest {
         )
 
         assertTrue(result.isFailure)
-        assertEquals("Item not found", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_NOT_FOUND, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -180,7 +181,7 @@ class ErrorHandlingTest {
         )
 
         assertTrue(result.isFailure)
-        assertEquals("Item not found", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_NOT_FOUND, result.exceptionOrNull()?.message)
     }
 
     // ============= MANAGE CART USE CASE ERROR HANDLING =============
@@ -193,7 +194,7 @@ class ErrorHandlingTest {
         val result = manageCartUseCase.addToCart(cart, item)
 
         assertTrue(result.isFailure)
-        assertEquals("Item name cannot be empty", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_NAME_EMPTY, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -204,7 +205,7 @@ class ErrorHandlingTest {
         val result = manageCartUseCase.addToCart(cart, item)
 
         assertTrue(result.isFailure)
-        assertEquals("Quantity must be greater than zero", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_QUANTITY_INVALID, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -215,7 +216,7 @@ class ErrorHandlingTest {
         val result = manageCartUseCase.addToCart(cart, item)
 
         assertTrue(result.isFailure)
-        assertEquals("Price must be greater than zero", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_PRICE_INVALID, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -230,7 +231,7 @@ class ErrorHandlingTest {
         val result = manageCartUseCase.removeFromCart(cart, itemToRemove)
 
         assertTrue(result.isFailure)
-        assertEquals("Item not found in cart", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.CART_ITEM_NOT_FOUND, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -248,7 +249,7 @@ class ErrorHandlingTest {
         )
 
         assertTrue(result.isFailure)
-        assertEquals("Item not found in cart", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.CART_ITEM_NOT_FOUND, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -259,7 +260,7 @@ class ErrorHandlingTest {
         val result = manageCartUseCase.updateQuantity(cart, item.id, 0)
 
         assertTrue(result.isFailure)
-        assertEquals("Quantity must be greater than zero", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_QUANTITY_INVALID, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -270,7 +271,7 @@ class ErrorHandlingTest {
         val result = manageCartUseCase.updateQuantity(cart, item.id, -1)
 
         assertTrue(result.isFailure)
-        assertEquals("Quantity must be greater than zero", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_QUANTITY_INVALID, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -336,7 +337,7 @@ class ErrorHandlingTest {
         val result = manageCartUseCase.getItemById(cart, kotlin.uuid.Uuid.random())
 
         assertTrue(result.isFailure)
-        assertEquals("Item not found in cart", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.CART_ITEM_NOT_FOUND, result.exceptionOrNull()?.message)
     }
 
     // ============= PURCHASE HISTORY ERROR HANDLING =============

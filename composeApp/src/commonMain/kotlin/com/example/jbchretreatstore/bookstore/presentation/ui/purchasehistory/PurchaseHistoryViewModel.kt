@@ -2,6 +2,7 @@ package com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.jbchretreatstore.bookstore.domain.constants.LogMessages
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
@@ -149,7 +150,7 @@ class PurchaseHistoryViewModel(
                 val timestamp = Clock.System.now().toEpochMilliseconds()
                 shareManager.shareCsv(csvResult.combinedCsv, "purchase_history_$timestamp.csv")
             } catch (e: Exception) {
-                println("Failed to share purchase history: ${e.message}")
+                println(LogMessages.withError(LogMessages.SHARE_FAILED_PREFIX, e.message))
             }
         }
     }
@@ -157,7 +158,14 @@ class PurchaseHistoryViewModel(
     private fun handleRemoveReceipt(receipt: ReceiptData) {
         viewModelScope.launch {
             purchaseHistoryUseCase.removeReceipt(receipt)
-                .onFailure { println("Failed to remove receipt: ${it.message}") }
+                .onFailure {
+                    println(
+                        LogMessages.withError(
+                            LogMessages.REMOVE_RECEIPT_FAILED_PREFIX,
+                            it.message
+                        )
+                    )
+                }
             // Always dismiss - flow collection handles UI update
             reduceDismissRemoveBottomSheet()
         }
@@ -170,7 +178,14 @@ class PurchaseHistoryViewModel(
     ) {
         viewModelScope.launch {
             purchaseHistoryUseCase.updateCheckoutItemByVariants(receipt, originalItem, updatedItem)
-                .onFailure { println("Failed to update checkout item: ${it.message}") }
+                .onFailure {
+                    println(
+                        LogMessages.withError(
+                            LogMessages.UPDATE_CHECKOUT_ITEM_FAILED_PREFIX,
+                            it.message
+                        )
+                    )
+                }
             // Always dismiss - flow collection handles UI update
             reduceDismissEditBottomSheet()
         }
@@ -187,7 +202,14 @@ class PurchaseHistoryViewModel(
                 newBuyerName,
                 newPaymentMethod
             )
-                .onFailure { println("Failed to update buyer name: ${it.message}") }
+                .onFailure {
+                    println(
+                        LogMessages.withError(
+                            LogMessages.UPDATE_BUYER_NAME_FAILED_PREFIX,
+                            it.message
+                        )
+                    )
+                }
             reduceDismissEditBuyerNameDialog()
         }
     }

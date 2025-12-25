@@ -1,6 +1,7 @@
 package com.example.jbchretreatstore.bookstore.domain.usecase
 
 import com.example.jbchretreatstore.bookstore.data.testdata.SampleTestData
+import com.example.jbchretreatstore.bookstore.domain.constants.ErrorMessages
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.domain.repository.BookStoreRepository
 import kotlinx.coroutines.flow.Flow
@@ -29,12 +30,12 @@ class ManageDisplayItemsUseCase(
     suspend fun addDisplayItem(newItem: DisplayItem): Result<Unit> {
         // Validate item name is not empty
         if (newItem.name.isBlank()) {
-            return Result.failure(IllegalArgumentException("Item name cannot be empty"))
+            return Result.failure(IllegalArgumentException(ErrorMessages.ITEM_NAME_EMPTY))
         }
 
         // Validate price is positive
         if (newItem.price <= 0) {
-            return Result.failure(IllegalArgumentException("Item price must be greater than zero"))
+            return Result.failure(IllegalArgumentException(ErrorMessages.ITEM_PRICE_INVALID))
         }
 
         // Validate no duplicate items (case-insensitive)
@@ -44,7 +45,7 @@ class ManageDisplayItemsUseCase(
         }
 
         if (isDuplicate) {
-            return Result.failure(IllegalArgumentException("Item with name '${newItem.name}' already exists"))
+            return Result.failure(IllegalArgumentException(ErrorMessages.itemAlreadyExists(newItem.name)))
         }
 
         // Add item
@@ -62,7 +63,7 @@ class ManageDisplayItemsUseCase(
         val updatedList = currentItems.filter { it.id != item.id }
 
         if (updatedList.size == currentItems.size) {
-            return Result.failure(IllegalArgumentException("Item not found"))
+            return Result.failure(IllegalArgumentException(ErrorMessages.ITEM_NOT_FOUND))
         }
 
         repository.updateDisplayItems(updatedList)
@@ -77,7 +78,7 @@ class ManageDisplayItemsUseCase(
         val itemIndex = currentItems.indexOfFirst { it.id == updatedItem.id }
 
         if (itemIndex == -1) {
-            return Result.failure(IllegalArgumentException("Item not found"))
+            return Result.failure(IllegalArgumentException(ErrorMessages.ITEM_NOT_FOUND))
         }
 
         val updatedList = currentItems.toMutableList().apply {
