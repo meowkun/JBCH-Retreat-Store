@@ -205,5 +205,42 @@ class CheckoutItemTest {
         assertEquals("Second", item.variants[1].key)
         assertEquals("Third", item.variants[2].key)
     }
+
+    // Tests for unitPrice derived property
+
+    @Test
+    fun `unitPrice calculates correctly for positive quantity`() {
+        val item = CheckoutItem(totalPrice = 100.0, quantity = 4)
+
+        assertEquals(25.0, item.unitPrice)
+    }
+
+    @Test
+    fun `unitPrice calculates correctly for quantity of 1`() {
+        val item = CheckoutItem(totalPrice = 50.0, quantity = 1)
+
+        assertEquals(50.0, item.unitPrice)
+    }
+
+    @Test
+    fun `unitPrice returns totalPrice when quantity is zero`() {
+        val item = CheckoutItem(totalPrice = 30.0, quantity = 0)
+
+        assertEquals(30.0, item.unitPrice)
+    }
+
+    @Test
+    fun `unitPrice returns totalPrice when quantity is negative`() {
+        val item = CheckoutItem(totalPrice = 30.0, quantity = -1)
+
+        assertEquals(30.0, item.unitPrice)
+    }
+
+    @Test
+    fun `unitPrice handles decimal division`() {
+        val item = CheckoutItem(totalPrice = 100.0, quantity = 3)
+
+        assertEquals(100.0 / 3, item.unitPrice, 0.0001)
+    }
 }
 

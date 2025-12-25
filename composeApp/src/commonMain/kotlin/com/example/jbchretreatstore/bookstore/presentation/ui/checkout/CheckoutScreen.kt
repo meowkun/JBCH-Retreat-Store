@@ -85,7 +85,7 @@ private fun CheckoutScreenContent(
                 verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_m),
                 contentPadding = PaddingValues(
                     top = Dimensions.spacing_s,
-                    bottom = Dimensions.checkout_button_height + Dimensions.spacing_xxl
+                    bottom = Dimensions.gradient_overlay_height
                 ),
             ) {
                 items(

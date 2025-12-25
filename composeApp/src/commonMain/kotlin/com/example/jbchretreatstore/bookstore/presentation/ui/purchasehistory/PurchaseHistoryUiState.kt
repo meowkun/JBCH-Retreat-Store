@@ -2,6 +2,8 @@ package com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory
 
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
+import com.example.jbchretreatstore.bookstore.presentation.utils.toCurrency
+import kotlinx.datetime.LocalDate
 
 /**
  * UI State for Purchase History screen following MVI pattern
@@ -18,14 +20,42 @@ data class PurchaseHistoryUiState(
     val receiptToEditBuyerName: ReceiptData? = null
 ) {
     val totalAmount: Double
-        get() = purchasedHistory.sumOf { receipt ->
-            receipt.checkoutList.sumOf { it.totalPrice }
-        }
+        get() = purchasedHistory.sumOf { it.totalPrice }
+
+    /** Total amount formatted as currency string */
+    val formattedTotalAmount: String
+        get() = totalAmount.toCurrency()
 
     val hasReceiptData: Boolean
         get() = purchasedHistory.isNotEmpty() &&
                 purchasedHistory.any { it.checkoutList.isNotEmpty() }
+
+    /** Receipts grouped by date, sorted descending (most recent first) */
+    val groupedReceipts: List<Pair<LocalDate, List<ReceiptData>>>
+        get() = purchasedHistory
+            .sortedByDescending { it.dateTime }
+            .groupBy { it.dateTime.date }
+            .toList()
+            .sortedByDescending { it.first }
+
+    /** Data for edit bottom sheet when available, null otherwise */
+    val editBottomSheetData: EditBottomSheetData?
+        get() = if (showEditBottomSheet && receiptToEdit != null && purchaseHistoryItemToEdit != null) {
+            EditBottomSheetData(receiptToEdit, purchaseHistoryItemToEdit)
+        } else null
+
+    /** Data for edit buyer name dialog when available, null otherwise */
+    val editBuyerNameDialogData: ReceiptData?
+        get() = if (showEditBuyerNameDialog && receiptToEditBuyerName != null) {
+            receiptToEditBuyerName
+        } else null
 }
+
+/** Data required to show the edit bottom sheet */
+data class EditBottomSheetData(
+    val receipt: ReceiptData,
+    val item: CheckoutItem
+)
 
 /**
  * User intents (actions) for Purchase History screen following MVI pattern
@@ -60,4 +90,26 @@ sealed interface PurchaseHistoryIntent {
     data class UpdateBuyerName(val receipt: ReceiptData, val newBuyerName: String) :
         PurchaseHistoryIntent
 }
+
+// Extension properties for UI display
+
+/** Unique key for LazyColumn items, combining id and dateTime */
+val ReceiptData.uniqueKey: String
+    get() = "${id}_${dateTime}"
+
+/** Unique key for date header in LazyColumn */
+val LocalDate.headerKey: String
+    get() = "header_$this"
+
+/** Total price formatted as currency string */
+val ReceiptData.formattedTotalPrice: String
+    get() = totalPrice.toCurrency()
+
+/** Total price formatted as currency string */
+val CheckoutItem.formattedTotalPrice: String
+    get() = totalPrice.toCurrency()
+
+/** Unit price formatted as currency string */
+val CheckoutItem.formattedUnitPrice: String
+    get() = unitPrice.toCurrency()
 

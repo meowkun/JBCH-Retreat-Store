@@ -14,4 +14,12 @@ data class ReceiptData @OptIn(ExperimentalTime::class) constructor(
     val paymentMethod: PaymentMethod = PaymentMethod.CASH,
     val checkoutStatus: CheckoutStatus = CheckoutStatus.PENDING,
     val dateTime: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-)
+) {
+    /** Total price of all checkout items */
+    val totalPrice: Double
+        get() = checkoutList.sumOf { it.totalPrice }
+
+    /** Number of items in the checkout list */
+    val itemCount: Int
+        get() = checkoutList.size
+}

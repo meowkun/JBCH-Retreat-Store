@@ -39,7 +39,6 @@ import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreThe
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.DarkBlue
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Secondary
-import com.example.jbchretreatstore.bookstore.presentation.utils.toCurrency
 import com.example.jbchretreatstore.bookstore.presentation.utils.toFormattedDateString
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.checkout_view_item_total_price
@@ -57,15 +56,7 @@ fun PurchaseHistoryScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val onIntent: (PurchaseHistoryIntent) -> Unit = viewModel::handleIntent
     val listState = rememberLazyListState()
-
-    // Group receipts by date
-    val groupedReceipts = remember(uiState.purchasedHistory) {
-        uiState.purchasedHistory
-            .sortedByDescending { it.dateTime }
-            .groupBy { receipt -> receipt.dateTime.date }
-            .toList()
-            .sortedByDescending { it.first }
-    }
+    val groupedReceipts = uiState.groupedReceipts
 
     // Track if user is scrolling
     var isScrolling by remember { mutableStateOf(false) }
@@ -131,13 +122,13 @@ fun PurchaseHistoryScreen(
                     contentPadding = PaddingValues(bottom = Dimensions.gradient_overlay_height)
                 ) {
                     groupedReceipts.forEach { (date, receipts) ->
-                        item(key = "header_$date") {
+                        item(key = date.headerKey) {
                             DateHeader(date = date)
                         }
 
                         items(
                             count = receipts.size,
-                            key = { index -> "${receipts[index].id}_${receipts[index].dateTime}" }
+                            key = { index -> receipts[index].uniqueKey }
                         ) { index ->
                             PurchaseHistoryItemView(
                                 receipt = receipts[index],
@@ -177,7 +168,7 @@ fun PurchaseHistoryScreen(
                     textAlign = TextAlign.End,
                     text = stringResource(
                         Res.string.checkout_view_item_total_price,
-                        uiState.totalAmount.toCurrency()
+                        uiState.formattedTotalAmount
                     ),
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.ExtraBold
@@ -215,18 +206,16 @@ fun PurchaseHistoryScreen(
     }
 
     // Edit purchase history item bottom sheet
-    val receiptToEdit = uiState.receiptToEdit
-    val itemToEdit = uiState.purchaseHistoryItemToEdit
-    if (uiState.showEditBottomSheet && receiptToEdit != null && itemToEdit != null) {
+    uiState.editBottomSheetData?.let { (receipt, item) ->
         EditPurchaseHistoryItemBottomSheet(
-            purchaseHistoryItem = itemToEdit,
+            purchaseHistoryItem = item,
             onDismiss = { onIntent(PurchaseHistoryIntent.ShowEditBottomSheet(false)) },
             onSave = { updatedItem ->
                 onIntent(
                     PurchaseHistoryIntent.UpdateCheckoutItem(
-                    receipt = receiptToEdit,
-                    originalItem = itemToEdit,
-                    updatedItem = updatedItem
+                        receipt = receipt,
+                        originalItem = item,
+                        updatedItem = updatedItem
                     )
                 )
             }
@@ -234,15 +223,14 @@ fun PurchaseHistoryScreen(
     }
 
     // Edit buyer name dialog
-    val receiptToEditBuyerName = uiState.receiptToEditBuyerName
-    if (uiState.showEditBuyerNameDialog && receiptToEditBuyerName != null) {
+    uiState.editBuyerNameDialogData?.let { receipt ->
         EditBuyerNameDialog(
-            currentBuyerName = receiptToEditBuyerName.buyerName,
+            currentBuyerName = receipt.buyerName,
             onDismiss = { onIntent(PurchaseHistoryIntent.ShowEditBuyerNameDialog(false)) },
             onSave = { newBuyerName ->
                 onIntent(
                     PurchaseHistoryIntent.UpdateBuyerName(
-                        receiptToEditBuyerName,
+                        receipt,
                         newBuyerName
                     )
                 )

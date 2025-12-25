@@ -44,4 +44,11 @@ data class CheckoutItem @OptIn(ExperimentalUuidApi::class) constructor(
      */
     val uniqueKey: String
         get() = "${id}_${variantsMap.hashCode()}"
+
+    /**
+     * Unit price calculated from total price and quantity.
+     * Returns total price if quantity is 0 or less.
+     */
+    val unitPrice: Double
+        get() = if (quantity > 0) totalPrice / quantity else totalPrice
 }

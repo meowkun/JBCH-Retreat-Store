@@ -38,7 +38,6 @@ import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreThe
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.MediumBlue
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Shapes
-import com.example.jbchretreatstore.bookstore.presentation.utils.toCurrency
 import com.example.jbchretreatstore.bookstore.presentation.utils.toFormattedDateString
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.checkout_view_item_price
@@ -47,8 +46,10 @@ import jbchretreatstore.composeapp.generated.resources.collapse_description
 import jbchretreatstore.composeapp.generated.resources.expand_description
 import jbchretreatstore.composeapp.generated.resources.ic_trash_can
 import jbchretreatstore.composeapp.generated.resources.purchase_history_edit_item_description
+import jbchretreatstore.composeapp.generated.resources.purchase_history_item_count
 import jbchretreatstore.composeapp.generated.resources.purchase_history_no_items
 import jbchretreatstore.composeapp.generated.resources.purchase_history_remove_button_description
+import jbchretreatstore.composeapp.generated.resources.unknown_buyer
 import jbchretreatstore.composeapp.generated.resources.variant_key_value_format
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -114,14 +115,17 @@ private fun PurchaseHistoryCollapsedView(
         ) {
             Column {
                 Text(
-                    text = receipt.buyerName.ifBlank { "Unknown Buyer" },
+                    text = receipt.buyerName.ifBlank { stringResource(Res.string.unknown_buyer) },
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold
                     ),
                 )
                 Spacer(modifier = Modifier.height(Dimensions.spacing_s))
                 Text(
-                    text = "${receipt.checkoutList.size} items",
+                    text = stringResource(
+                        Res.string.purchase_history_item_count,
+                        receipt.itemCount
+                    ),
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontWeight = FontWeight.Bold
                     ),
@@ -138,7 +142,7 @@ private fun PurchaseHistoryCollapsedView(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = receipt.checkoutList.sumOf { it.totalPrice }.toCurrency(),
+                    text = receipt.formattedTotalPrice,
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold
                     ),
@@ -189,7 +193,7 @@ private fun PurchaseHistoryExpandedView(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = receipt.buyerName.ifBlank { "Unknown Buyer" },
+                text = receipt.buyerName.ifBlank { stringResource(Res.string.unknown_buyer) },
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.Bold
                 ),
@@ -205,7 +209,7 @@ private fun PurchaseHistoryExpandedView(
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = receipt.checkoutList.sumOf { it.totalPrice }.toCurrency(),
+                text = receipt.formattedTotalPrice,
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.Bold
                 ),
@@ -264,7 +268,7 @@ private fun PurchaseHistoryExpandedView(
         Text(
             text = stringResource(
                 Res.string.checkout_view_item_price,
-                receipt.checkoutList.sumOf { it.totalPrice }.toCurrency()
+                receipt.formattedTotalPrice
             ),
             style = MaterialTheme.typography.titleMedium,
         )
@@ -321,7 +325,7 @@ private fun PurchaseHistoryCheckoutItem(
                 Text(
                     text = stringResource(
                         Res.string.checkout_view_item_price,
-                        item.totalPrice.toCurrency()
+                        item.formattedTotalPrice
                     ),
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontWeight = FontWeight.Bold
