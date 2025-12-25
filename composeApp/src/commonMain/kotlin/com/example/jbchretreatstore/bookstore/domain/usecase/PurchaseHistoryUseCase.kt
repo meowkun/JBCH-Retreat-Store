@@ -3,6 +3,7 @@ package com.example.jbchretreatstore.bookstore.domain.usecase
 import com.example.jbchretreatstore.bookstore.data.testdata.SampleTestData
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
+import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
 import com.example.jbchretreatstore.bookstore.domain.repository.BookStoreRepository
 import kotlinx.coroutines.flow.Flow
@@ -165,7 +166,32 @@ class PurchaseHistoryUseCase(
             val currentReceipts = repository.fetchReceiptList().first()
             val updatedReceipts = currentReceipts.map { r ->
                 if (r.id == receipt.id) {
-                    r.copy(buyerName = newBuyerName.ifBlank { "Unknown" })
+                    r.copy(buyerName = newBuyerName.ifBlank { ReceiptData.DEFAULT_BUYER_NAME })
+                } else r
+            }
+            repository.updateReceiptList(updatedReceipts)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Update the buyer name and payment method for a receipt
+     */
+    suspend fun updateBuyerNameAndPaymentMethod(
+        receipt: ReceiptData,
+        newBuyerName: String,
+        newPaymentMethod: PaymentMethod
+    ): Result<Unit> {
+        return try {
+            val currentReceipts = repository.fetchReceiptList().first()
+            val updatedReceipts = currentReceipts.map { r ->
+                if (r.id == receipt.id) {
+                    r.copy(
+                        buyerName = newBuyerName.ifBlank { ReceiptData.DEFAULT_BUYER_NAME },
+                        paymentMethod = newPaymentMethod
+                    )
                 } else r
             }
             repository.updateReceiptList(updatedReceipts)

@@ -3,6 +3,7 @@ package com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
+import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
 import com.example.jbchretreatstore.bookstore.domain.usecase.PurchaseHistoryUseCase
 import com.example.jbchretreatstore.bookstore.presentation.shared.ShareManager
@@ -64,7 +65,8 @@ class PurchaseHistoryViewModel(
 
             is PurchaseHistoryIntent.UpdateBuyerName -> handleUpdateBuyerName(
                 intent.receipt,
-                intent.newBuyerName
+                intent.newBuyerName,
+                intent.newPaymentMethod
             )
         }
     }
@@ -174,9 +176,17 @@ class PurchaseHistoryViewModel(
         }
     }
 
-    private fun handleUpdateBuyerName(receipt: ReceiptData, newBuyerName: String) {
+    private fun handleUpdateBuyerName(
+        receipt: ReceiptData,
+        newBuyerName: String,
+        newPaymentMethod: PaymentMethod
+    ) {
         viewModelScope.launch {
-            purchaseHistoryUseCase.updateBuyerName(receipt, newBuyerName)
+            purchaseHistoryUseCase.updateBuyerNameAndPaymentMethod(
+                receipt,
+                newBuyerName,
+                newPaymentMethod
+            )
                 .onFailure { println("Failed to update buyer name: ${it.message}") }
             reduceDismissEditBuyerNameDialog()
         }

@@ -1,6 +1,7 @@
 package com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory
 
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
+import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
 import com.example.jbchretreatstore.bookstore.presentation.utils.toCurrency
 import kotlinx.datetime.LocalDate
@@ -87,8 +88,11 @@ sealed interface PurchaseHistoryIntent {
     data class ShowEditBuyerNameDialog(val show: Boolean, val receipt: ReceiptData? = null) :
         PurchaseHistoryIntent
 
-    data class UpdateBuyerName(val receipt: ReceiptData, val newBuyerName: String) :
-        PurchaseHistoryIntent
+    data class UpdateBuyerName(
+        val receipt: ReceiptData,
+        val newBuyerName: String,
+        val newPaymentMethod: PaymentMethod
+    ) : PurchaseHistoryIntent
 }
 
 // Extension properties for UI display

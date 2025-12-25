@@ -9,7 +9,7 @@ import kotlin.uuid.Uuid
 
 data class ReceiptData @OptIn(ExperimentalTime::class) constructor(
     val id: Uuid = Uuid.random(),
-    val buyerName: String = "Unknown",
+    val buyerName: String = DEFAULT_BUYER_NAME,
     val checkoutList: List<CheckoutItem> = emptyList(),
     val paymentMethod: PaymentMethod = PaymentMethod.CASH,
     val checkoutStatus: CheckoutStatus = CheckoutStatus.PENDING,
@@ -22,4 +22,9 @@ data class ReceiptData @OptIn(ExperimentalTime::class) constructor(
     /** Number of items in the checkout list */
     val itemCount: Int
         get() = checkoutList.size
+
+    companion object {
+        /** Default buyer name when none is provided */
+        const val DEFAULT_BUYER_NAME = "Unknown"
+    }
 }

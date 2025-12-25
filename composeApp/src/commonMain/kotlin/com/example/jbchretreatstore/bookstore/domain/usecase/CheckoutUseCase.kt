@@ -28,8 +28,8 @@ class CheckoutUseCase(
         checkoutStatus: CheckoutStatus,
         paymentMethod: PaymentMethod = PaymentMethod.CASH
     ): Result<ReceiptData> {
-        // Use "Unknown" if buyer name is empty
-        val finalBuyerName = buyerName.ifBlank { "Unknown" }
+        // Use default buyer name if empty
+        val finalBuyerName = buyerName.ifBlank { ReceiptData.DEFAULT_BUYER_NAME }
 
         // Validate cart is not empty
         if (cart.checkoutList.isEmpty()) {

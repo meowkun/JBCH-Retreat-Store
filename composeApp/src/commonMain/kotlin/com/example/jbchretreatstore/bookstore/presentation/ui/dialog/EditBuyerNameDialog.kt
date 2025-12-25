@@ -22,7 +22,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod
+import com.example.jbchretreatstore.bookstore.presentation.ui.components.RadioButtonVerticalSelection
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.checkout_dialog_buyer_name_hint
 import jbchretreatstore.composeapp.generated.resources.checkout_dialog_cancel_button
@@ -35,10 +38,12 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun EditBuyerNameDialog(
     currentBuyerName: String,
+    currentPaymentMethod: PaymentMethod,
     onDismiss: () -> Unit,
-    onSave: (newBuyerName: String) -> Unit
+    onSave: (newBuyerName: String, newPaymentMethod: PaymentMethod) -> Unit
 ) {
     var buyerName by remember { mutableStateOf(currentBuyerName) }
+    var paymentMethod by remember { mutableStateOf(currentPaymentMethod) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -59,7 +64,9 @@ fun EditBuyerNameDialog(
             }
         },
         text = {
-            Column {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_s)
+            ) {
                 OutlinedTextField(
                     value = buyerName,
                     onValueChange = { buyerName = it },
@@ -69,11 +76,17 @@ fun EditBuyerNameDialog(
                     ),
                     label = { Text(stringResource(Res.string.checkout_dialog_buyer_name_hint)) }
                 )
+
+                RadioButtonVerticalSelection(
+                    radioOptions = PaymentMethod.selectableOptions,
+                    selectedOption = paymentMethod,
+                    onOptionSelected = { paymentMethod = it }
+                )
             }
         },
         confirmButton = {
             TextButton(
-                onClick = { onSave(buyerName.trim()) },
+                onClick = { onSave(buyerName.trim(), paymentMethod) },
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = MaterialTheme.colorScheme.primary
                 )
@@ -100,8 +113,9 @@ fun EditBuyerNameDialogPreview() {
     BookStoreTheme {
         EditBuyerNameDialog(
             currentBuyerName = "John Doe",
+            currentPaymentMethod = PaymentMethod.CASH,
             onDismiss = {},
-            onSave = {}
+            onSave = { _, _ -> }
         )
     }
 }

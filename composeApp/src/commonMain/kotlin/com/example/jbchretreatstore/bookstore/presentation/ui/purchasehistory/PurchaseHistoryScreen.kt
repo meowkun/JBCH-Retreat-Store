@@ -226,12 +226,14 @@ fun PurchaseHistoryScreen(
     uiState.editBuyerNameDialogData?.let { receipt ->
         EditBuyerNameDialog(
             currentBuyerName = receipt.buyerName,
+            currentPaymentMethod = receipt.paymentMethod,
             onDismiss = { onIntent(PurchaseHistoryIntent.ShowEditBuyerNameDialog(false)) },
-            onSave = { newBuyerName ->
+            onSave = { newBuyerName, newPaymentMethod ->
                 onIntent(
                     PurchaseHistoryIntent.UpdateBuyerName(
-                        receipt,
-                        newBuyerName
+                        receipt = receipt,
+                        newBuyerName = newBuyerName,
+                        newPaymentMethod = newPaymentMethod
                     )
                 )
             }

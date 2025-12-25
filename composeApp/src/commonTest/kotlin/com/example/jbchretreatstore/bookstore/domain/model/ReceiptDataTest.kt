@@ -1,7 +1,6 @@
 package com.example.jbchretreatstore.bookstore.domain.model
 
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.number
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -16,10 +15,23 @@ class ReceiptDataTest {
     fun `default constructor creates receipt with default values`() {
         val receipt = ReceiptData()
 
-        assertEquals("Unknown", receipt.buyerName)
+        assertEquals(ReceiptData.DEFAULT_BUYER_NAME, receipt.buyerName)
         assertTrue(receipt.checkoutList.isEmpty())
         assertEquals(PaymentMethod.CASH, receipt.paymentMethod)
         assertEquals(CheckoutStatus.PENDING, receipt.checkoutStatus)
+    }
+
+    // Tests for DEFAULT_BUYER_NAME constant
+
+    @Test
+    fun `DEFAULT_BUYER_NAME is Unknown`() {
+        assertEquals("Unknown", ReceiptData.DEFAULT_BUYER_NAME)
+    }
+
+    @Test
+    fun `default buyerName uses DEFAULT_BUYER_NAME constant`() {
+        val receipt = ReceiptData()
+        assertEquals(ReceiptData.DEFAULT_BUYER_NAME, receipt.buyerName)
     }
 
     @Test
@@ -140,8 +152,8 @@ class ReceiptDataTest {
         val receipt = ReceiptData(dateTime = dateTime)
 
         assertEquals(2024, receipt.dateTime.year)
-        assertEquals(1, receipt.dateTime.month.number)
-        assertEquals(15, receipt.dateTime.day)
+        assertEquals(1, receipt.dateTime.monthNumber)
+        assertEquals(15, receipt.dateTime.dayOfMonth)
         assertEquals(14, receipt.dateTime.hour)
         assertEquals(30, receipt.dateTime.minute)
         assertEquals(45, receipt.dateTime.second)
