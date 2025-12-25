@@ -210,4 +210,23 @@ class PaymentMethodTest {
         assertTrue(cardMethods.contains(PaymentMethod.CREDIT_CARD))
         assertTrue(cardMethods.contains(PaymentMethod.DEBIT_CARD))
     }
+
+    @Test
+    fun `selectableOptions contains ZELLE, VENMO, and CASH`() {
+        val options = PaymentMethod.selectableOptions
+
+        assertEquals(3, options.size)
+        assertEquals(PaymentMethod.ZELLE, options[0])
+        assertEquals(PaymentMethod.VENMO, options[1])
+        assertEquals(PaymentMethod.CASH, options[2])
+    }
+
+    @Test
+    fun `selectableOptions does not contain CREDIT_CARD, DEBIT_CARD, or E_WALLET`() {
+        val options = PaymentMethod.selectableOptions
+
+        assertTrue(PaymentMethod.CREDIT_CARD !in options)
+        assertTrue(PaymentMethod.DEBIT_CARD !in options)
+        assertTrue(PaymentMethod.E_WALLET !in options)
+    }
 }

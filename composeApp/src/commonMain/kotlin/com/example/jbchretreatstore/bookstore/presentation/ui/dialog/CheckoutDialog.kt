@@ -46,7 +46,6 @@ fun CheckoutDialog(
     onDismiss: () -> Unit,
     onCheckout: (buyerName: String) -> Unit
 ) {
-    val radioOptions = listOf(PaymentMethod.ZELLE, PaymentMethod.VENMO, PaymentMethod.CASH)
     var buyerName by remember { mutableStateOf("") }
 
     AlertDialog(
@@ -83,7 +82,7 @@ fun CheckoutDialog(
 
                 // Payment method vertical selection
                 RadioButtonVerticalSelection(
-                    radioOptions = radioOptions,
+                    radioOptions = PaymentMethod.selectableOptions,
                     selectedOption = paymentMethod,
                     onOptionSelected = onPaymentMethodSelected
                 )
