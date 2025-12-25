@@ -1,6 +1,5 @@
 package com.example.jbchretreatstore.bookstore.presentation.navigation
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,6 +30,7 @@ import com.example.jbchretreatstore.bookstore.presentation.ui.checkout.CheckoutI
 import com.example.jbchretreatstore.bookstore.presentation.ui.checkout.CheckoutScreen
 import com.example.jbchretreatstore.bookstore.presentation.ui.checkout.CheckoutViewModel
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.BottomNavigationBar
+import com.example.jbchretreatstore.bookstore.presentation.ui.components.CustomFabState
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.CustomFloatingActionButton
 import com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory.PurchaseHistoryIntent
 import com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory.PurchaseHistoryScreen
@@ -107,18 +107,16 @@ fun BookStoreNavHost() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_m)
             ) {
-                val isOnShopScreen = currentDestination == BookStoreNavDestination.ShopScreen
-                val isOnCheckoutScreen =
-                    currentDestination == BookStoreNavDestination.CheckoutScreen
-                val isOnReceiptScreen = currentDestination == BookStoreNavDestination.ReceiptScreen
-
-                CustomFloatingActionButton(
+                val fabState = CustomFabState(
+                    currentScreen = currentDestination,
                     hasItemsInCart = shopState.hasItemsInCart,
-                    isOnShopScreen = isOnShopScreen,
-                    isOnCheckoutScreen = isOnCheckoutScreen,
                     itemCount = shopState.cartItemCount,
                     totalPrice = checkoutState.totalPrice,
-                    showShareButton = isOnReceiptScreen && purchaseHistoryViewModel.hasReceiptData(),
+                    hasReceiptData = purchaseHistoryViewModel.hasReceiptData()
+                )
+
+                CustomFloatingActionButton(
+                    state = fabState,
                     onCheckoutClick = {
                         navigator.navigateTo(BookStoreNavDestination.CheckoutScreen)
                     },
@@ -133,7 +131,7 @@ fun BookStoreNavHost() {
                     }
                 )
 
-                AnimatedVisibility(visible = !isOnCheckoutScreen) {
+                if (currentDestination != BookStoreNavDestination.CheckoutScreen) {
                     BottomNavigationBar(
                         currentDestination = currentDestination,
                         onNavigate = { destination ->

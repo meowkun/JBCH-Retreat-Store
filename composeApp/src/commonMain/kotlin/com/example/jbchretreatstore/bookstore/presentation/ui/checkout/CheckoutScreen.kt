@@ -35,8 +35,8 @@ fun CheckoutScreen(
     val onIntent: (CheckoutIntent) -> Unit = viewModel::handleIntent
 
     // Navigate back if cart is empty (only on initial load, not after checkout)
-    LaunchedEffect(uiState.checkoutItems.isEmpty(), uiState.checkoutSuccess) {
-        if (uiState.checkoutItems.isEmpty() && !uiState.checkoutSuccess) {
+    LaunchedEffect(uiState.shouldNavigateBackToShop) {
+        if (uiState.shouldNavigateBackToShop) {
             onNavigateBack()
         }
     }

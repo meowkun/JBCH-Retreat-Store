@@ -12,7 +12,11 @@ data class CheckoutUiState(
     val selectedPaymentMethod: PaymentMethod = PaymentMethod.CASH,
     val showCheckoutDialog: Boolean = false,
     val checkoutSuccess: Boolean = false
-)
+) {
+    /** True when cart is empty and checkout hasn't succeeded (should navigate back to shop) */
+    val shouldNavigateBackToShop: Boolean
+        get() = checkoutItems.isEmpty() && !checkoutSuccess
+}
 
 /**
  * User intents (actions) for Checkout screen following MVI pattern

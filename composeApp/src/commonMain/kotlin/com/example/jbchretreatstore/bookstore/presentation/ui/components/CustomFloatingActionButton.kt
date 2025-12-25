@@ -1,6 +1,5 @@
 package com.example.jbchretreatstore.bookstore.presentation.ui.components
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,22 +11,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.jbchretreatstore.bookstore.presentation.navigation.BookStoreNavDestination
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun CustomFloatingActionButton(
-    hasItemsInCart: Boolean,
-    isOnShopScreen: Boolean,
-    isOnCheckoutScreen: Boolean,
-    itemCount: Int,
-    totalPrice: Double,
+    state: CustomFabState,
     onCheckoutClick: () -> Unit,
     onCheckoutButtonClick: () -> Unit,
     onAddItemClick: () -> Unit,
     modifier: Modifier = Modifier,
-    showShareButton: Boolean = false,
     onShareClick: () -> Unit = {}
 ) {
     Row(
@@ -36,7 +31,7 @@ fun CustomFloatingActionButton(
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Checkout button in center - only visible when there are items in cart on ShopScreen
-        AnimatedVisibility(visible = isOnShopScreen && hasItemsInCart) {
+        if (state.showCheckCartButton) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
@@ -44,7 +39,7 @@ fun CustomFloatingActionButton(
             ) {
                 Spacer(modifier = Modifier.weight(1f))
                 CheckCartButton(
-                    itemCount = itemCount,
+                    itemCount = state.itemCount,
                     onClick = onCheckoutClick
                 )
                 Spacer(modifier = Modifier.weight(1f))
@@ -52,7 +47,7 @@ fun CustomFloatingActionButton(
         }
 
         // CheckoutButton - only visible on CheckoutScreen
-        AnimatedVisibility(visible = isOnCheckoutScreen) {
+        if (state.showCheckoutButton) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(bottom = Dimensions.spacing_xxxxl),
                 horizontalArrangement = Arrangement.Center,
@@ -60,7 +55,7 @@ fun CustomFloatingActionButton(
             ) {
                 Spacer(modifier = Modifier.weight(1f))
                 CheckoutButton(
-                    totalPrice = totalPrice,
+                    totalPrice = state.totalPrice,
                     onClick = onCheckoutButtonClick
                 )
                 Spacer(modifier = Modifier.weight(1f))
@@ -68,7 +63,7 @@ fun CustomFloatingActionButton(
         }
 
         // Add Item button on the right - only visible on ShopScreen when cart is empty
-        AnimatedVisibility(visible = isOnShopScreen && !hasItemsInCart) {
+        if (state.showAddItemButton) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End,
@@ -82,7 +77,7 @@ fun CustomFloatingActionButton(
         }
 
         // Share button on the right - only visible on Receipt screen
-        AnimatedVisibility(visible = showShareButton) {
+        if (state.showShareButton) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End,
@@ -107,11 +102,10 @@ fun CustomFloatingActionButtonPreview() {
         ) {
             // Preview with Add Item button (empty cart, on shop screen)
             CustomFloatingActionButton(
-                hasItemsInCart = false,
-                isOnShopScreen = true,
-                isOnCheckoutScreen = false,
-                itemCount = 0,
-                totalPrice = 0.0,
+                state = CustomFabState(
+                    currentScreen = BookStoreNavDestination.ShopScreen,
+                    hasItemsInCart = false
+                ),
                 onCheckoutClick = {},
                 onCheckoutButtonClick = {},
                 onAddItemClick = {}
@@ -121,11 +115,11 @@ fun CustomFloatingActionButtonPreview() {
 
             // Preview with Checkout button (items in cart)
             CustomFloatingActionButton(
-                hasItemsInCart = true,
-                isOnShopScreen = true,
-                isOnCheckoutScreen = false,
-                itemCount = 5,
-                totalPrice = 0.0,
+                state = CustomFabState(
+                    currentScreen = BookStoreNavDestination.ShopScreen,
+                    hasItemsInCart = true,
+                    itemCount = 5
+                ),
                 onCheckoutClick = {},
                 onCheckoutButtonClick = {},
                 onAddItemClick = {}
@@ -135,11 +129,12 @@ fun CustomFloatingActionButtonPreview() {
 
             // Preview with CheckoutButton (on checkout screen)
             CustomFloatingActionButton(
-                hasItemsInCart = true,
-                isOnShopScreen = false,
-                isOnCheckoutScreen = true,
-                itemCount = 5,
-                totalPrice = 99.99,
+                state = CustomFabState(
+                    currentScreen = BookStoreNavDestination.CheckoutScreen,
+                    hasItemsInCart = true,
+                    itemCount = 5,
+                    totalPrice = 99.99
+                ),
                 onCheckoutClick = {},
                 onCheckoutButtonClick = {},
                 onAddItemClick = {}
@@ -149,12 +144,10 @@ fun CustomFloatingActionButtonPreview() {
 
             // Preview with Share button (on receipt screen with data)
             CustomFloatingActionButton(
-                hasItemsInCart = false,
-                isOnShopScreen = false,
-                isOnCheckoutScreen = false,
-                itemCount = 0,
-                totalPrice = 0.0,
-                showShareButton = true,
+                state = CustomFabState(
+                    currentScreen = BookStoreNavDestination.ReceiptScreen,
+                    hasReceiptData = true
+                ),
                 onCheckoutClick = {},
                 onCheckoutButtonClick = {},
                 onAddItemClick = {},
