@@ -1,5 +1,6 @@
 package com.example.jbchretreatstore.bookstore.domain.usecase
 
+import com.example.jbchretreatstore.bookstore.domain.constants.ErrorMessages
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
 
@@ -18,17 +19,17 @@ class ManageCartUseCase {
     ): Result<ReceiptData> {
         // Validate item name is not empty
         if (newItem.itemName.isBlank()) {
-            return Result.failure(IllegalArgumentException("Item name cannot be empty"))
+            return Result.failure(IllegalArgumentException(ErrorMessages.ITEM_NAME_EMPTY))
         }
 
         // Validate quantity is positive
         if (newItem.quantity <= 0) {
-            return Result.failure(IllegalArgumentException("Quantity must be greater than zero"))
+            return Result.failure(IllegalArgumentException(ErrorMessages.ITEM_QUANTITY_INVALID))
         }
 
         // Validate price is positive
         if (newItem.totalPrice <= 0) {
-            return Result.failure(IllegalArgumentException("Price must be greater than zero"))
+            return Result.failure(IllegalArgumentException(ErrorMessages.ITEM_PRICE_INVALID))
         }
 
         // Check if item with same name and options already exists
@@ -67,15 +68,16 @@ class ManageCartUseCase {
         val updatedList = currentCart.checkoutList.filter { it.id != itemToRemove.id }
 
         if (updatedList.size == currentCart.checkoutList.size) {
-            return Result.failure(IllegalArgumentException("Item not found in cart"))
+            return Result.failure(IllegalArgumentException(ErrorMessages.CART_ITEM_NOT_FOUND))
         }
 
         return Result.success(currentCart.copy(checkoutList = updatedList))
     }
 
     /**
-     * Update quantity of an existing cart item
-     * @return Result with updated cart or failure with error message
+     * Update quantity of an existing cart item.
+     * @return Result with updated cart or failure with error message.
+     * @testOnly Currently only used in unit tests.
      */
     fun updateQuantity(
         currentCart: ReceiptData,
@@ -84,20 +86,20 @@ class ManageCartUseCase {
     ): Result<ReceiptData> {
         // Validate quantity is positive
         if (newQuantity <= 0) {
-            return Result.failure(IllegalArgumentException("Quantity must be greater than zero"))
+            return Result.failure(IllegalArgumentException(ErrorMessages.ITEM_QUANTITY_INVALID))
         }
 
         // Find the item in cart
         val itemIndex = currentCart.checkoutList.indexOfFirst { it.id == itemId }
         if (itemIndex == -1) {
-            return Result.failure(IllegalArgumentException("Item not found in cart"))
+            return Result.failure(IllegalArgumentException(ErrorMessages.CART_ITEM_NOT_FOUND))
         }
 
         val item = currentCart.checkoutList[itemIndex]
 
         // Prevent division by zero
         if (item.quantity <= 0) {
-            return Result.failure(IllegalStateException("Cart item has invalid quantity"))
+            return Result.failure(IllegalStateException(ErrorMessages.CART_INVALID_QUANTITY))
         }
 
         // Calculate price per unit (safe from division by zero)
@@ -105,7 +107,7 @@ class ManageCartUseCase {
 
         // Validate price is positive
         if (pricePerUnit <= 0) {
-            return Result.failure(IllegalStateException("Cart item has invalid price"))
+            return Result.failure(IllegalStateException(ErrorMessages.CART_INVALID_PRICE))
         }
 
         // Update item with new quantity and recalculate total price
@@ -122,56 +124,61 @@ class ManageCartUseCase {
     }
 
     /**
-     * Clear all items from cart
-     * @return Result with empty cart
+     * Clear all items from cart.
+     * @return Result with empty cart.
+     * @testOnly Currently only used in unit tests.
      */
     fun clearCart(currentCart: ReceiptData): Result<ReceiptData> {
         return Result.success(currentCart.copy(checkoutList = emptyList()))
     }
 
     /**
-     * Calculate total price of all items in cart
-     * @return Total price as Double
+     * Calculate total price of all items in cart.
+     * @return Total price as Double.
+     * @testOnly Currently only used in unit tests.
      */
     fun calculateTotal(cart: ReceiptData): Double {
         return cart.checkoutList.sumOf { it.totalPrice }
     }
 
     /**
-     * Get total number of items in cart (sum of quantities)
-     * @return Total item count
+     * Get total number of items in cart (sum of quantities).
+     * @return Total item count.
+     * @testOnly Currently only used in unit tests.
      */
     fun getItemCount(cart: ReceiptData): Int {
         return cart.checkoutList.sumOf { it.quantity }
     }
 
     /**
-     * Validate cart before checkout
-     * @return Result.success if valid, Result.failure with error message if invalid
+     * Validate cart before checkout.
+     * @return Result.success if valid, Result.failure with error message if invalid.
+     * @testOnly Currently only used in unit tests.
      */
     fun validateCart(cart: ReceiptData): Result<Unit> {
         if (cart.checkoutList.isEmpty()) {
-            return Result.failure(IllegalStateException("Cart is empty"))
+            return Result.failure(IllegalStateException(ErrorMessages.CART_EMPTY))
         }
 
         if (cart.checkoutList.any { it.quantity <= 0 }) {
-            return Result.failure(IllegalStateException("Invalid item quantity"))
+            return Result.failure(IllegalStateException(ErrorMessages.ITEM_QUANTITY_VALIDATION_FAILED))
         }
 
         if (cart.checkoutList.any { it.totalPrice <= 0 }) {
-            return Result.failure(IllegalStateException("Invalid item price"))
+            return Result.failure(IllegalStateException(ErrorMessages.ITEM_PRICE_VALIDATION_FAILED))
         }
 
         if (cart.checkoutList.any { it.itemName.isBlank() }) {
-            return Result.failure(IllegalStateException("Invalid item name"))
+            return Result.failure(IllegalStateException(ErrorMessages.ITEM_NAME_INVALID))
         }
 
         return Result.success(Unit)
     }
 
     /**
-     * Check if cart contains a specific item
-     * @return true if item exists in cart, false otherwise
+     * Check if cart contains a specific item.
+     * @return true if item exists in cart, false otherwise.
+     * @testOnly Currently only used in unit tests.
      */
     fun containsItem(cart: ReceiptData, itemName: String, options: Map<String, String>): Boolean {
         return cart.checkoutList.any {
@@ -180,15 +187,16 @@ class ManageCartUseCase {
     }
 
     /**
-     * Get item from cart by ID
-     * @return Result with CheckoutItem or failure if not found
+     * Get item from cart by ID.
+     * @return Result with CheckoutItem or failure if not found.
+     * @testOnly Currently only used in unit tests.
      */
     fun getItemById(cart: ReceiptData, itemId: kotlin.uuid.Uuid): Result<CheckoutItem> {
         val item = cart.checkoutList.find { it.id == itemId }
         return if (item != null) {
             Result.success(item)
         } else {
-            Result.failure(IllegalArgumentException("Item not found in cart"))
+            Result.failure(IllegalArgumentException(ErrorMessages.CART_ITEM_NOT_FOUND))
         }
     }
 }

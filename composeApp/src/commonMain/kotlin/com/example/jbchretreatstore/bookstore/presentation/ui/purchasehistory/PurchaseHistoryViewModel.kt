@@ -2,7 +2,9 @@ package com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.jbchretreatstore.bookstore.domain.constants.LogMessages
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
+import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
 import com.example.jbchretreatstore.bookstore.domain.usecase.PurchaseHistoryUseCase
 import com.example.jbchretreatstore.bookstore.presentation.shared.ShareManager
@@ -15,6 +17,10 @@ import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 
+/**
+ * ViewModel for Purchase History screen following MVI architecture pattern.
+ * All user actions are processed through the handleIntent() function.
+ */
 @OptIn(ExperimentalUuidApi::class)
 class PurchaseHistoryViewModel(
     private val purchaseHistoryUseCase: PurchaseHistoryUseCase,
@@ -28,6 +34,104 @@ class PurchaseHistoryViewModel(
         observePurchaseHistory()
     }
 
+    /**
+     * Central intent handler following MVI pattern.
+     * All user actions should be dispatched through this function.
+     */
+    fun handleIntent(intent: PurchaseHistoryIntent) {
+        when (intent) {
+            is PurchaseHistoryIntent.SharePurchaseHistory -> handleSharePurchaseHistory()
+            is PurchaseHistoryIntent.ShowRemoveBottomSheet -> reduceShowRemoveBottomSheet(
+                intent.show,
+                intent.receipt
+            )
+
+            is PurchaseHistoryIntent.RemoveReceipt -> handleRemoveReceipt(intent.receipt)
+            is PurchaseHistoryIntent.ShowEditBottomSheet -> reduceShowEditBottomSheet(
+                intent.show,
+                intent.receipt,
+                intent.item
+            )
+
+            is PurchaseHistoryIntent.UpdateCheckoutItem -> handleUpdateCheckoutItem(
+                intent.receipt,
+                intent.originalItem,
+                intent.updatedItem
+            )
+
+            is PurchaseHistoryIntent.ShowEditBuyerNameDialog -> reduceShowEditBuyerNameDialog(
+                intent.show,
+                intent.receipt
+            )
+
+            is PurchaseHistoryIntent.UpdateBuyerName -> handleUpdateBuyerName(
+                intent.receipt,
+                intent.newBuyerName,
+                intent.newPaymentMethod
+            )
+        }
+    }
+
+    // region State Reducers (pure state updates)
+
+    private fun reduceShowRemoveBottomSheet(show: Boolean, receipt: ReceiptData?) {
+        _uiState.update {
+            it.copy(showRemoveBottomSheet = show, receiptToRemove = receipt)
+        }
+    }
+
+    private fun reduceShowEditBottomSheet(
+        show: Boolean,
+        receipt: ReceiptData?,
+        item: CheckoutItem?
+    ) {
+        _uiState.update {
+            it.copy(
+                showEditBottomSheet = show,
+                receiptToEdit = receipt,
+                purchaseHistoryItemToEdit = item
+            )
+        }
+    }
+
+    private fun reduceShowEditBuyerNameDialog(show: Boolean, receipt: ReceiptData?) {
+        _uiState.update {
+            it.copy(
+                showEditBuyerNameDialog = show,
+                receiptToEditBuyerName = receipt
+            )
+        }
+    }
+
+    private fun reduceDismissRemoveBottomSheet() {
+        _uiState.update {
+            it.copy(showRemoveBottomSheet = false, receiptToRemove = null)
+        }
+    }
+
+    private fun reduceDismissEditBottomSheet() {
+        _uiState.update {
+            it.copy(
+                showEditBottomSheet = false,
+                receiptToEdit = null,
+                purchaseHistoryItemToEdit = null
+            )
+        }
+    }
+
+    private fun reduceDismissEditBuyerNameDialog() {
+        _uiState.update {
+            it.copy(
+                showEditBuyerNameDialog = false,
+                receiptToEditBuyerName = null
+            )
+        }
+    }
+
+    // endregion
+
+    // region Side Effects (async operations)
+
     private fun observePurchaseHistory() {
         viewModelScope.launch {
             purchaseHistoryUseCase.getPurchaseHistory().collect { purchasedHistory ->
@@ -39,105 +143,83 @@ class PurchaseHistoryViewModel(
     }
 
     @OptIn(ExperimentalTime::class)
-    fun sharePurchaseHistory() {
+    private fun handleSharePurchaseHistory() {
         viewModelScope.launch {
             try {
                 val csvResult = convertReceiptsToCsv(_uiState.value.purchasedHistory)
                 val timestamp = Clock.System.now().toEpochMilliseconds()
                 shareManager.shareCsv(csvResult.combinedCsv, "purchase_history_$timestamp.csv")
             } catch (e: Exception) {
-                println("Failed to share purchase history: ${e.message}")
+                println(LogMessages.withError(LogMessages.SHARE_FAILED_PREFIX, e.message))
             }
         }
     }
 
-    fun showRemoveBottomSheet(show: Boolean, receipt: ReceiptData? = null) {
-        _uiState.update {
-            it.copy(showRemoveBottomSheet = show, receiptToRemove = receipt)
-        }
-    }
-
-    fun removeReceipt(receipt: ReceiptData) {
+    private fun handleRemoveReceipt(receipt: ReceiptData) {
         viewModelScope.launch {
             purchaseHistoryUseCase.removeReceipt(receipt)
-                .onFailure { println("Failed to remove receipt: ${it.message}") }
+                .onFailure {
+                    println(
+                        LogMessages.withError(
+                            LogMessages.REMOVE_RECEIPT_FAILED_PREFIX,
+                            it.message
+                        )
+                    )
+                }
             // Always dismiss - flow collection handles UI update
-            dismissRemoveBottomSheet()
+            reduceDismissRemoveBottomSheet()
         }
     }
 
-    fun showEditBottomSheet(
-        show: Boolean,
-        receipt: ReceiptData? = null,
-        purchaseHistoryItem: CheckoutItem? = null
-    ) {
-        _uiState.update {
-            it.copy(
-                showEditBottomSheet = show,
-                receiptToEdit = receipt,
-                purchaseHistoryItemToEdit = purchaseHistoryItem
-            )
-        }
-    }
-
-    fun updateCheckoutItem(
+    private fun handleUpdateCheckoutItem(
         receipt: ReceiptData,
         originalItem: CheckoutItem,
         updatedItem: CheckoutItem
     ) {
         viewModelScope.launch {
             purchaseHistoryUseCase.updateCheckoutItemByVariants(receipt, originalItem, updatedItem)
-                .onFailure { println("Failed to update checkout item: ${it.message}") }
+                .onFailure {
+                    println(
+                        LogMessages.withError(
+                            LogMessages.UPDATE_CHECKOUT_ITEM_FAILED_PREFIX,
+                            it.message
+                        )
+                    )
+                }
             // Always dismiss - flow collection handles UI update
-            dismissEditBottomSheet()
+            reduceDismissEditBottomSheet()
         }
     }
 
-    private fun dismissRemoveBottomSheet() {
-        _uiState.update {
-            it.copy(showRemoveBottomSheet = false, receiptToRemove = null)
-        }
-    }
-
-    private fun dismissEditBottomSheet() {
-        _uiState.update {
-            it.copy(
-                showEditBottomSheet = false,
-                receiptToEdit = null,
-                purchaseHistoryItemToEdit = null
-            )
-        }
-    }
-
-    fun showEditBuyerNameDialog(show: Boolean, receipt: ReceiptData? = null) {
-        _uiState.update {
-            it.copy(
-                showEditBuyerNameDialog = show,
-                receiptToEditBuyerName = receipt
-            )
-        }
-    }
-
-    fun updateBuyerName(receipt: ReceiptData, newBuyerName: String) {
+    private fun handleUpdateBuyerName(
+        receipt: ReceiptData,
+        newBuyerName: String,
+        newPaymentMethod: PaymentMethod
+    ) {
         viewModelScope.launch {
-            purchaseHistoryUseCase.updateBuyerName(receipt, newBuyerName)
-                .onFailure { println("Failed to update buyer name: ${it.message}") }
-            dismissEditBuyerNameDialog()
+            purchaseHistoryUseCase.updateBuyerNameAndPaymentMethod(
+                receipt,
+                newBuyerName,
+                newPaymentMethod
+            )
+                .onFailure {
+                    println(
+                        LogMessages.withError(
+                            LogMessages.UPDATE_BUYER_NAME_FAILED_PREFIX,
+                            it.message
+                        )
+                    )
+                }
+            reduceDismissEditBuyerNameDialog()
         }
     }
 
-    private fun dismissEditBuyerNameDialog() {
-        _uiState.update {
-            it.copy(
-                showEditBuyerNameDialog = false,
-                receiptToEditBuyerName = null
-            )
-        }
-    }
+    // endregion
 
     /**
      * Check if there is any receipt data to display/share
      */
     fun hasReceiptData(): Boolean = uiState.value.hasReceiptData
 }
+
 

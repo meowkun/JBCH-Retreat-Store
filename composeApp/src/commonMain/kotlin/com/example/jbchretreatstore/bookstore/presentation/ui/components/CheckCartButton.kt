@@ -23,6 +23,7 @@ import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Primary
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.cart_icon_description
+import jbchretreatstore.composeapp.generated.resources.cart_item_count_format
 import jbchretreatstore.composeapp.generated.resources.check_cart_button
 import jbchretreatstore.composeapp.generated.resources.ic_cart
 import org.jetbrains.compose.resources.painterResource
@@ -62,7 +63,7 @@ fun CheckCartButton(
                     withStyle(style = SpanStyle(fontWeight = FontWeight.ExtraBold)) {
                         append(stringResource(Res.string.check_cart_button))
                     }
-                    append("  ($itemCount)")
+                    append(stringResource(Res.string.cart_item_count_format, itemCount))
                 }
             )
         }

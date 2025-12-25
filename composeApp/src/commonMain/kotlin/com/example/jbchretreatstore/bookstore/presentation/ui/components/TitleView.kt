@@ -16,8 +16,10 @@ import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreThe
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.SearchContentColor
 import jbchretreatstore.composeapp.generated.resources.Res
+import jbchretreatstore.composeapp.generated.resources.back_description
 import jbchretreatstore.composeapp.generated.resources.ic_back_arrow
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -37,7 +39,7 @@ fun TitleView(
         ) {
             Icon(
                 painter = painterResource(Res.drawable.ic_back_arrow),
-                contentDescription = "Back",
+                contentDescription = stringResource(Res.string.back_description),
                 tint = SearchContentColor
             )
         }

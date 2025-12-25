@@ -1,5 +1,6 @@
 package com.example.jbchretreatstore.bookstore.domain.usecase
 
+import com.example.jbchretreatstore.bookstore.domain.constants.ErrorMessages
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
 import kotlin.test.Test
@@ -45,7 +46,7 @@ class ManageCartUseCaseTest {
 
         assertTrue(result.isFailure)
         assertTrue(result.exceptionOrNull() is IllegalArgumentException)
-        assertEquals("Item name cannot be empty", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_NAME_EMPTY, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -60,7 +61,7 @@ class ManageCartUseCaseTest {
         val result = useCase.addToCart(cart, newItem)
 
         assertTrue(result.isFailure)
-        assertEquals("Item name cannot be empty", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_NAME_EMPTY, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -75,7 +76,7 @@ class ManageCartUseCaseTest {
         val result = useCase.addToCart(cart, newItem)
 
         assertTrue(result.isFailure)
-        assertEquals("Quantity must be greater than zero", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_QUANTITY_INVALID, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -90,7 +91,7 @@ class ManageCartUseCaseTest {
         val result = useCase.addToCart(cart, newItem)
 
         assertTrue(result.isFailure)
-        assertEquals("Quantity must be greater than zero", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_QUANTITY_INVALID, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -105,7 +106,7 @@ class ManageCartUseCaseTest {
         val result = useCase.addToCart(cart, newItem)
 
         assertTrue(result.isFailure)
-        assertEquals("Price must be greater than zero", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_PRICE_INVALID, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -120,7 +121,7 @@ class ManageCartUseCaseTest {
         val result = useCase.addToCart(cart, newItem)
 
         assertTrue(result.isFailure)
-        assertEquals("Price must be greater than zero", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_PRICE_INVALID, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -242,7 +243,7 @@ class ManageCartUseCaseTest {
         val result = useCase.removeFromCart(cart, nonExistentItem)
 
         assertTrue(result.isFailure)
-        assertEquals("Item not found in cart", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.CART_ITEM_NOT_FOUND, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -292,7 +293,7 @@ class ManageCartUseCaseTest {
         val result = useCase.updateQuantity(cart, itemId, 0)
 
         assertTrue(result.isFailure)
-        assertEquals("Quantity must be greater than zero", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_QUANTITY_INVALID, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -309,7 +310,7 @@ class ManageCartUseCaseTest {
         val result = useCase.updateQuantity(cart, itemId, -1)
 
         assertTrue(result.isFailure)
-        assertEquals("Quantity must be greater than zero", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_QUANTITY_INVALID, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -323,11 +324,11 @@ class ManageCartUseCaseTest {
         val result = useCase.updateQuantity(cart, Uuid.random(), 5)
 
         assertTrue(result.isFailure)
-        assertEquals("Item not found in cart", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.CART_ITEM_NOT_FOUND, result.exceptionOrNull()?.message)
     }
 
     @Test
-    fun `updateQuantity fails when item has zero quantity (edge case)`() {
+    fun `updateQuantity fails when item has zero quantity edge case`() {
         val itemId = Uuid.random()
         // This is an edge case where an item might have 0 quantity due to a bug
         val item = CheckoutItem(
@@ -682,7 +683,7 @@ class ManageCartUseCaseTest {
         val result = useCase.getItemById(cart, Uuid.random())
 
         assertTrue(result.isFailure)
-        assertEquals("Item not found in cart", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.CART_ITEM_NOT_FOUND, result.exceptionOrNull()?.message)
     }
 
     @Test

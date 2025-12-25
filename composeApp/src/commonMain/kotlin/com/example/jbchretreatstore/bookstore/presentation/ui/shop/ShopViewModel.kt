@@ -2,11 +2,11 @@ package com.example.jbchretreatstore.bookstore.presentation.ui.shop
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.jbchretreatstore.bookstore.domain.constants.LogMessages
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.domain.usecase.ManageCartUseCase
 import com.example.jbchretreatstore.bookstore.domain.usecase.ManageDisplayItemsUseCase
-import com.example.jbchretreatstore.bookstore.domain.usecase.PurchaseHistoryUseCase
 import com.example.jbchretreatstore.bookstore.presentation.shared.CartStateHolder
 import com.example.jbchretreatstore.bookstore.presentation.shared.SnackbarManager
 import jbchretreatstore.composeapp.generated.resources.Res
@@ -25,10 +25,13 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel for Shop screen following MVI architecture pattern.
+ * All user actions are processed through the handleIntent() function.
+ */
 class ShopViewModel(
     private val manageDisplayItemsUseCase: ManageDisplayItemsUseCase,
     private val manageCartUseCase: ManageCartUseCase,
-    private val purchaseHistoryUseCase: PurchaseHistoryUseCase,
     private val cartStateHolder: CartStateHolder,
     private val snackbarManager: SnackbarManager
 ) : ViewModel() {
@@ -50,23 +53,52 @@ class ShopViewModel(
     )
 
     init {
-//        loadTestDataOnce()
         loadDisplayItems()
     }
 
     /**
-     * Load test data only on first app run
+     * Central intent handler following MVI pattern.
+     * All user actions should be dispatched through this function.
      */
-    private fun loadTestDataOnce() {
-        viewModelScope.launch {
-            // Load both display items and purchase history test data if not already loaded
-            val wasLoaded = manageDisplayItemsUseCase.loadTestDataIfNeeded()
-            if (wasLoaded) {
-                // Also load purchase history test data
-                purchaseHistoryUseCase.loadTestData()
-            }
+    fun handleIntent(intent: ShopIntent) {
+        when (intent) {
+            is ShopIntent.UpdateSearchQuery -> reduceSearchQuery(intent.query)
+            is ShopIntent.AddDisplayItem -> handleAddDisplayItem(intent.item)
+            is ShopIntent.UpdateDisplayItem -> handleUpdateDisplayItem(intent.item)
+            is ShopIntent.DeleteDisplayItem -> handleDeleteDisplayItem(intent.item)
+            is ShopIntent.AddToCart -> handleAddToCart(intent.checkoutItem)
+            is ShopIntent.ShowAddItemDialog -> reduceShowAddItemDialog(intent.show)
+            is ShopIntent.ShowRemoveItemDialog -> reduceShowRemoveItemDialog(
+                intent.show,
+                intent.item
+            )
+
+            is ShopIntent.ShowEditItemDialog -> reduceShowEditItemDialog(intent.show, intent.item)
+            is ShopIntent.LoadTestData -> handleLoadTestData()
         }
     }
+
+    // region State Reducers (pure state updates)
+
+    private fun reduceSearchQuery(query: String) {
+        _uiState.update { it.copy(searchQuery = query) }
+    }
+
+    private fun reduceShowAddItemDialog(show: Boolean) {
+        _uiState.update { it.copy(showAddItemDialog = show) }
+    }
+
+    private fun reduceShowRemoveItemDialog(show: Boolean, item: DisplayItem?) {
+        _uiState.update { it.copy(showRemoveItemDialog = show, itemToRemove = item) }
+    }
+
+    private fun reduceShowEditItemDialog(show: Boolean, item: DisplayItem?) {
+        _uiState.update { it.copy(showEditItemDialog = show, itemToEdit = item) }
+    }
+
+    // endregion
+
+    // region Side Effects (async operations)
 
     private fun loadDisplayItems() {
         viewModelScope.launch {
@@ -81,39 +113,49 @@ class ShopViewModel(
         }
     }
 
-    fun onSearchQueryChange(query: String) {
-        _uiState.update { it.copy(searchQuery = query) }
-    }
-
-    fun onAddDisplayItem(newItem: DisplayItem) {
+    private fun handleAddDisplayItem(newItem: DisplayItem) {
         viewModelScope.launch {
             val result = manageDisplayItemsUseCase.addDisplayItem(newItem)
             result.onSuccess {
                 _uiState.update { it.copy(showAddItemDialog = false) }
                 snackbarManager.showSnackbar(Res.string.item_added_success)
             }.onFailure { error ->
-                println("Failed to add item: ${error.message}")
+                println(LogMessages.withError(LogMessages.ADD_ITEM_FAILED_PREFIX, error.message))
                 _uiState.update { it.copy(showAddItemDialog = false) }
                 snackbarManager.showSnackbar(Res.string.item_add_failed)
             }
         }
     }
 
-    fun onDeleteDisplayItem(displayItem: DisplayItem) {
+    private fun handleDeleteDisplayItem(displayItem: DisplayItem) {
         viewModelScope.launch {
             val result = manageDisplayItemsUseCase.removeDisplayItem(displayItem)
             result.onSuccess {
-                _uiState.update { it.copy(showRemoveItemDialog = false) }
+                _uiState.update { it.copy(showRemoveItemDialog = false, itemToRemove = null) }
                 snackbarManager.showSnackbar(Res.string.item_removed_success)
             }.onFailure { error ->
-                println("Failed to remove item: ${error.message}")
-                _uiState.update { it.copy(showRemoveItemDialog = false) }
+                println(LogMessages.withError(LogMessages.REMOVE_ITEM_FAILED_PREFIX, error.message))
+                _uiState.update { it.copy(showRemoveItemDialog = false, itemToRemove = null) }
                 snackbarManager.showSnackbar(Res.string.item_remove_failed)
             }
         }
     }
 
-    fun onAddToCart(checkoutItem: CheckoutItem) {
+    private fun handleUpdateDisplayItem(updatedItem: DisplayItem) {
+        viewModelScope.launch {
+            val result = manageDisplayItemsUseCase.updateDisplayItem(updatedItem)
+            result.onSuccess {
+                _uiState.update { it.copy(showEditItemDialog = false, itemToEdit = null) }
+                snackbarManager.showSnackbar(Res.string.item_update_success)
+            }.onFailure { error ->
+                println(LogMessages.withError(LogMessages.UPDATE_ITEM_FAILED_PREFIX, error.message))
+                _uiState.update { it.copy(showEditItemDialog = false, itemToEdit = null) }
+                snackbarManager.showSnackbar(Res.string.item_update_failed)
+            }
+        }
+    }
+
+    private fun handleAddToCart(checkoutItem: CheckoutItem) {
         val result = manageCartUseCase.addToCart(
             cartStateHolder.cartState.value,
             checkoutItem
@@ -122,44 +164,17 @@ class ShopViewModel(
             cartStateHolder.updateCart(updatedCart)
             snackbarManager.showSnackbar(Res.string.added_to_cart)
         }.onFailure { error ->
-            println("Failed to add to cart: ${error.message}")
+            println(LogMessages.withError(LogMessages.ADD_TO_CART_FAILED_PREFIX, error.message))
             snackbarManager.showSnackbar(Res.string.checkout_failed)
         }
     }
 
-    fun showAddItemDialog(show: Boolean) {
-        _uiState.update { it.copy(showAddItemDialog = show) }
-    }
-
-    fun showRemoveItemDialog(show: Boolean, item: DisplayItem? = null) {
-        _uiState.update { it.copy(showRemoveItemDialog = show, itemToRemove = item) }
-    }
-
-    fun showEditItemDialog(show: Boolean, item: DisplayItem? = null) {
-        _uiState.update { it.copy(showEditItemDialog = show, itemToEdit = item) }
-    }
-
-    fun onUpdateDisplayItem(updatedItem: DisplayItem) {
-        viewModelScope.launch {
-            val result = manageDisplayItemsUseCase.updateDisplayItem(updatedItem)
-            result.onSuccess {
-                _uiState.update { it.copy(showEditItemDialog = false, itemToEdit = null) }
-                snackbarManager.showSnackbar(Res.string.item_update_success)
-            }.onFailure { error ->
-                println("Failed to update item: ${error.message}")
-                _uiState.update { it.copy(showEditItemDialog = false, itemToEdit = null) }
-                snackbarManager.showSnackbar(Res.string.item_update_failed)
-            }
-        }
-    }
-
-    /**
-     * Load sample test data for development/testing purposes
-     */
-    fun loadTestData() {
+    private fun handleLoadTestData() {
         viewModelScope.launch {
             manageDisplayItemsUseCase.loadTestData()
         }
     }
+
+    // endregion
 }
 

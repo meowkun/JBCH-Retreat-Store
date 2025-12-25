@@ -2,6 +2,7 @@ package com.example.jbchretreatstore.bookstore.presentation.ui.checkout
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.jbchretreatstore.bookstore.domain.constants.LogMessages
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
 import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod
@@ -20,6 +21,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel for Checkout screen following MVI architecture pattern.
+ * All user actions are processed through the handleIntent() function.
+ */
 class CheckoutViewModel(
     private val manageCartUseCase: ManageCartUseCase,
     private val checkoutUseCase: CheckoutUseCase,
@@ -43,11 +48,39 @@ class CheckoutViewModel(
         initialValue = CheckoutUiState()
     )
 
-    fun onPaymentMethodSelected(paymentMethod: PaymentMethod) {
+    /**
+     * Central intent handler following MVI pattern.
+     * All user actions should be dispatched through this function.
+     */
+    fun handleIntent(intent: CheckoutIntent) {
+        when (intent) {
+            is CheckoutIntent.SelectPaymentMethod -> reducePaymentMethod(intent.paymentMethod)
+            is CheckoutIntent.ProcessCheckout -> handleProcessCheckout(intent.buyerName)
+            is CheckoutIntent.RemoveFromCart -> handleRemoveFromCart(intent.item)
+            is CheckoutIntent.ShowCheckoutDialog -> reduceShowCheckoutDialog(intent.show)
+            is CheckoutIntent.CheckoutSuccessHandled -> reduceCheckoutSuccessHandled()
+        }
+    }
+
+    // region State Reducers (pure state updates)
+
+    private fun reducePaymentMethod(paymentMethod: PaymentMethod) {
         _uiState.update { it.copy(selectedPaymentMethod = paymentMethod) }
     }
 
-    fun onRemoveFromCart(checkoutItem: CheckoutItem) {
+    private fun reduceShowCheckoutDialog(show: Boolean) {
+        _uiState.update { it.copy(showCheckoutDialog = show) }
+    }
+
+    private fun reduceCheckoutSuccessHandled() {
+        _uiState.update { it.copy(checkoutSuccess = false) }
+    }
+
+    // endregion
+
+    // region Side Effects (async operations)
+
+    private fun handleRemoveFromCart(checkoutItem: CheckoutItem) {
         val result = manageCartUseCase.removeFromCart(
             cartStateHolder.cartState.value,
             checkoutItem
@@ -57,11 +90,7 @@ class CheckoutViewModel(
         }
     }
 
-    fun showCheckoutDialog(show: Boolean) {
-        _uiState.update { it.copy(showCheckoutDialog = show) }
-    }
-
-    fun processCheckout(buyerName: String) {
+    private fun handleProcessCheckout(buyerName: String) {
         viewModelScope.launch {
             val checkoutState = CheckoutState(
                 buyerName = buyerName,
@@ -86,19 +115,14 @@ class CheckoutViewModel(
                 }
                 snackbarManager.showSnackbar(Res.string.checkout_success)
             }.onFailure { error ->
-                println("Checkout failed: ${error.message}")
+                println(LogMessages.withError(LogMessages.CHECKOUT_FAILED_PREFIX, error.message))
                 _uiState.update { it.copy(showCheckoutDialog = false) }
                 snackbarManager.showSnackbar(Res.string.checkout_failed)
             }
         }
     }
 
-    /**
-     * Reset checkout success state after navigation is handled
-     */
-    fun onCheckoutSuccessHandled() {
-        _uiState.update { it.copy(checkoutSuccess = false) }
-    }
+    // endregion
 
     fun isCartEmpty(): Boolean = cartStateHolder.cartState.value.checkoutList.isEmpty()
 }

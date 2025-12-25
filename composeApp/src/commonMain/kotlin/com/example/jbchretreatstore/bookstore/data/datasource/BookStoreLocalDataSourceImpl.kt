@@ -7,6 +7,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.jbchretreatstore.bookstore.data.model.DisplayItemDto
 import com.example.jbchretreatstore.bookstore.data.model.ReceiptDataDto
+import com.example.jbchretreatstore.bookstore.domain.constants.ErrorMessages
+import com.example.jbchretreatstore.bookstore.domain.constants.LogMessages
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -33,8 +35,8 @@ class BookStoreLocalDataSourceImpl(
                 prefs[displayItemsKey] = jsonString
             }
         } catch (e: Exception) {
-            println("Error saving display items: ${e.message}")
-            throw IllegalStateException("Failed to save display items", e)
+            println(LogMessages.withError(LogMessages.SAVE_DISPLAY_ITEMS_ERROR_PREFIX, e.message))
+            throw IllegalStateException(ErrorMessages.SAVE_DISPLAY_ITEMS_FAILED, e)
         }
     }
 
@@ -45,7 +47,12 @@ class BookStoreLocalDataSourceImpl(
                     json.decodeFromString<List<DisplayItemDto>>(it)
                 } ?: emptyList()
             } catch (e: Exception) {
-                println("Error loading display items: ${e.message}")
+                println(
+                    LogMessages.withError(
+                        LogMessages.LOAD_DISPLAY_ITEMS_ERROR_PREFIX,
+                        e.message
+                    )
+                )
                 // Return empty list instead of crashing
                 emptyList()
             }
@@ -58,8 +65,8 @@ class BookStoreLocalDataSourceImpl(
                 prefs[receiptsKey] = jsonString
             }
         } catch (e: Exception) {
-            println("Error saving receipts: ${e.message}")
-            throw IllegalStateException("Failed to save receipts", e)
+            println(LogMessages.withError(LogMessages.SAVE_RECEIPTS_ERROR_PREFIX, e.message))
+            throw IllegalStateException(ErrorMessages.SAVE_RECEIPTS_FAILED, e)
         }
     }
 
@@ -70,7 +77,7 @@ class BookStoreLocalDataSourceImpl(
                     json.decodeFromString<List<ReceiptDataDto>>(it)
                 } ?: emptyList()
             } catch (e: Exception) {
-                println("Error loading receipts: ${e.message}")
+                println(LogMessages.withError(LogMessages.LOAD_RECEIPTS_ERROR_PREFIX, e.message))
                 // Return empty list instead of crashing
                 emptyList()
             }

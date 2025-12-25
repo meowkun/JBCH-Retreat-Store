@@ -15,10 +15,23 @@ class ReceiptDataTest {
     fun `default constructor creates receipt with default values`() {
         val receipt = ReceiptData()
 
-        assertEquals("", receipt.buyerName)
+        assertEquals(ReceiptData.DEFAULT_BUYER_NAME, receipt.buyerName)
         assertTrue(receipt.checkoutList.isEmpty())
         assertEquals(PaymentMethod.CASH, receipt.paymentMethod)
         assertEquals(CheckoutStatus.PENDING, receipt.checkoutStatus)
+    }
+
+    // Tests for DEFAULT_BUYER_NAME constant
+
+    @Test
+    fun `DEFAULT_BUYER_NAME is Unknown`() {
+        assertEquals("Unknown", ReceiptData.DEFAULT_BUYER_NAME)
+    }
+
+    @Test
+    fun `default buyerName uses DEFAULT_BUYER_NAME constant`() {
+        val receipt = ReceiptData()
+        assertEquals(ReceiptData.DEFAULT_BUYER_NAME, receipt.buyerName)
     }
 
     @Test
@@ -201,6 +214,68 @@ class ReceiptDataTest {
         val receipt = ReceiptData(checkoutList = checkoutList)
 
         assertEquals(100, receipt.checkoutList.size)
+    }
+
+    // Tests for totalPrice derived property
+
+    @Test
+    fun `totalPrice returns zero for empty checkout list`() {
+        val receipt = ReceiptData(checkoutList = emptyList())
+
+        assertEquals(0.0, receipt.totalPrice)
+    }
+
+    @Test
+    fun `totalPrice returns sum of checkout item prices`() {
+        val checkoutList = listOf(
+            CheckoutItem(itemName = "Item 1", totalPrice = 10.0),
+            CheckoutItem(itemName = "Item 2", totalPrice = 25.5),
+            CheckoutItem(itemName = "Item 3", totalPrice = 14.5)
+        )
+        val receipt = ReceiptData(checkoutList = checkoutList)
+
+        assertEquals(50.0, receipt.totalPrice)
+    }
+
+    @Test
+    fun `totalPrice handles single item`() {
+        val checkoutList = listOf(
+            CheckoutItem(itemName = "Single Item", totalPrice = 99.99)
+        )
+        val receipt = ReceiptData(checkoutList = checkoutList)
+
+        assertEquals(99.99, receipt.totalPrice)
+    }
+
+    // Tests for itemCount derived property
+
+    @Test
+    fun `itemCount returns zero for empty checkout list`() {
+        val receipt = ReceiptData(checkoutList = emptyList())
+
+        assertEquals(0, receipt.itemCount)
+    }
+
+    @Test
+    fun `itemCount returns correct count for multiple items`() {
+        val checkoutList = listOf(
+            CheckoutItem(itemName = "Item 1"),
+            CheckoutItem(itemName = "Item 2"),
+            CheckoutItem(itemName = "Item 3")
+        )
+        val receipt = ReceiptData(checkoutList = checkoutList)
+
+        assertEquals(3, receipt.itemCount)
+    }
+
+    @Test
+    fun `itemCount returns one for single item`() {
+        val checkoutList = listOf(
+            CheckoutItem(itemName = "Single Item")
+        )
+        val receipt = ReceiptData(checkoutList = checkoutList)
+
+        assertEquals(1, receipt.itemCount)
     }
 }
 

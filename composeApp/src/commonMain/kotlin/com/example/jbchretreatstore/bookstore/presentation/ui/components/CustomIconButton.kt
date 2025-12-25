@@ -30,6 +30,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions.spacing_l
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions.spacing_s
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions.spacing_xs
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Primary
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.UnselectedIconColor
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -44,7 +46,7 @@ fun CustomIconButton(
     selectedColor: Color = Primary,
     unselectedColor: Color = UnselectedIconColor,
     iconSize: Dp = spacing_l,
-    spacing: Dp = 4.dp
+    spacing: Dp = spacing_xs
 ) {
     CustomIconButtonContent(
         text = text,
@@ -53,7 +55,6 @@ fun CustomIconButton(
         isSelected = isSelected,
         selectedColor = selectedColor,
         unselectedColor = unselectedColor,
-        iconSize = iconSize,
         spacing = spacing
     ) { color ->
         Icon(
@@ -75,7 +76,7 @@ fun CustomIconButton(
     selectedColor: Color = Primary,
     unselectedColor: Color = UnselectedIconColor,
     iconSize: Dp = spacing_l,
-    spacing: Dp = 4.dp
+    spacing: Dp = spacing_xs
 ) {
     CustomIconButtonContent(
         text = text,
@@ -84,7 +85,6 @@ fun CustomIconButton(
         isSelected = isSelected,
         selectedColor = selectedColor,
         unselectedColor = unselectedColor,
-        iconSize = iconSize,
         spacing = spacing
     ) { color ->
         Icon(
@@ -104,7 +104,6 @@ private fun CustomIconButtonContent(
     isSelected: Boolean,
     selectedColor: Color,
     unselectedColor: Color,
-    iconSize: Dp,
     spacing: Dp,
     iconContent: @Composable (Color) -> Unit
 ) {
@@ -117,7 +116,7 @@ private fun CustomIconButtonContent(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = ripple(bounded = true)
             )
-            .padding(8.dp),
+            .padding(spacing_s),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         iconContent(color)

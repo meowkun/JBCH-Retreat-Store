@@ -1,6 +1,5 @@
 package com.example.jbchretreatstore.bookstore.presentation.navigation
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,12 +26,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.jbchretreatstore.bookstore.presentation.shared.SnackbarManager
+import com.example.jbchretreatstore.bookstore.presentation.ui.checkout.CheckoutIntent
 import com.example.jbchretreatstore.bookstore.presentation.ui.checkout.CheckoutScreen
 import com.example.jbchretreatstore.bookstore.presentation.ui.checkout.CheckoutViewModel
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.BottomNavigationBar
+import com.example.jbchretreatstore.bookstore.presentation.ui.components.CustomFabState
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.CustomFloatingActionButton
+import com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory.PurchaseHistoryIntent
 import com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory.PurchaseHistoryScreen
 import com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory.PurchaseHistoryViewModel
+import com.example.jbchretreatstore.bookstore.presentation.ui.shop.ShopIntent
 import com.example.jbchretreatstore.bookstore.presentation.ui.shop.ShopScreen
 import com.example.jbchretreatstore.bookstore.presentation.ui.shop.ShopViewModel
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
@@ -104,33 +107,31 @@ fun BookStoreNavHost() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_m)
             ) {
-                val isOnShopScreen = currentDestination == BookStoreNavDestination.ShopScreen
-                val isOnCheckoutScreen =
-                    currentDestination == BookStoreNavDestination.CheckoutScreen
-                val isOnReceiptScreen = currentDestination == BookStoreNavDestination.ReceiptScreen
-
-                CustomFloatingActionButton(
+                val fabState = CustomFabState(
+                    currentScreen = currentDestination,
                     hasItemsInCart = shopState.hasItemsInCart,
-                    isOnShopScreen = isOnShopScreen,
-                    isOnCheckoutScreen = isOnCheckoutScreen,
                     itemCount = shopState.cartItemCount,
                     totalPrice = checkoutState.totalPrice,
-                    showShareButton = isOnReceiptScreen && purchaseHistoryViewModel.hasReceiptData(),
+                    hasReceiptData = purchaseHistoryViewModel.hasReceiptData()
+                )
+
+                CustomFloatingActionButton(
+                    state = fabState,
                     onCheckoutClick = {
                         navigator.navigateTo(BookStoreNavDestination.CheckoutScreen)
                     },
                     onCheckoutButtonClick = {
-                        checkoutViewModel.showCheckoutDialog(true)
+                        checkoutViewModel.handleIntent(CheckoutIntent.ShowCheckoutDialog(true))
                     },
                     onAddItemClick = {
-                        shopViewModel.showAddItemDialog(true)
+                        shopViewModel.handleIntent(ShopIntent.ShowAddItemDialog(true))
                     },
                     onShareClick = {
-                        purchaseHistoryViewModel.sharePurchaseHistory()
+                        purchaseHistoryViewModel.handleIntent(PurchaseHistoryIntent.SharePurchaseHistory)
                     }
                 )
 
-                AnimatedVisibility(visible = !isOnCheckoutScreen) {
+                if (currentDestination != BookStoreNavDestination.CheckoutScreen) {
                     BottomNavigationBar(
                         currentDestination = currentDestination,
                         onNavigate = { destination ->

@@ -43,7 +43,6 @@ import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions.corner_radius_percent_l
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.MediumBlue
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.White
-import com.example.jbchretreatstore.bookstore.presentation.utils.toCurrency
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.ic_chevron_small
 import jbchretreatstore.composeapp.generated.resources.item_option_menu_selection_hint
@@ -91,15 +90,7 @@ fun EditPurchaseHistoryItemContent(
     onDismiss: () -> Unit,
     onSave: (CheckoutItem) -> Unit
 ) {
-    // Calculate unit price from total price and quantity
-    val unitPrice = remember(purchaseHistoryItem) {
-        if (purchaseHistoryItem.quantity > 0) {
-            purchaseHistoryItem.totalPrice / purchaseHistoryItem.quantity
-        } else {
-            purchaseHistoryItem.totalPrice
-        }
-    }
-
+    val unitPrice = purchaseHistoryItem.unitPrice
     var editedItem by remember { mutableStateOf(purchaseHistoryItem) }
 
     Column(
@@ -184,7 +175,7 @@ fun EditPurchaseHistoryItemContent(
             )
 
             Text(
-                text = editedItem.totalPrice.toCurrency(),
+                text = editedItem.formattedTotalPrice,
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.Bold
                 )

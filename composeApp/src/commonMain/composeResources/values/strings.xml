@@ -1,24 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
-    <!--  App branding  -->
-    <string name="app_logo_description">JBCH Market Manager</string>
 
     <!--  Search bar  -->
     <string name="search_placeholder">Search For Books</string>
-    <string name="search_icon_description">Search icon</string>
-    <string name="clear_search_description">Clear search</string>
 
     <!--  Item view  -->
     <string name="search_hint">Find item...</string>
     <string name="clear_hint">Clear search</string>
-    <string name="item_arrow_up_content_description">Collapse item</string>
-    <string name="item_arrow_down_content_description">Expend item</string>
-    <string name="drop_down_content_description">Drop down</string>
     <string name="item_price_per_unit">%1$d/each</string>
     <string name="item_option_menu_selection_hint">Select %1$d</string>
     <string name="quantity_label">Quantity</string>
     <string name="total_price_text">Total: %1$d</string>
     <string name="add_to_cart">Add to cart</string>
+    <string name="add_to_cart_total"> Total (%1$s)</string>
 
     <!--  Add item dialog  -->
     <string name="add_item_dialog_title">Add New Item</string>
@@ -42,15 +36,13 @@
     <!--  Edit item dialog  -->
     <string name="edit_item_dialog_title">Edit Item</string>
     <string name="edit_item_update">Update</string>
-    <string name="edit_item_button_description">Edit item</string>
 
     <!--  Reorderable variants list  -->
-    <string name="reorderable_drag_handle_description">Reorder</string>
     <string name="add_item_duplicate_variant_key_error">Variant with this name already exists</string>
 
     <!--  Remove item dialog  -->
     <string name="remove_item_dialog_title">Remove Item</string>
-    <string name="remove_item_dialog_message">Are you sure you want to %1$d?</string>
+    <string name="remove_item_dialog_message">Are you sure you want to remove</string>
     <string name="remove_item_cancel">Cancel</string>
     <string name="remove_item_remove">Remove</string>
 
@@ -72,13 +64,14 @@
 
     <!--  Purchase history view  -->
     <string name="purchase_history_view_title">Purchase History</string>
+    <string name="purchase_history_item_count">%1$d items</string>
+    <string name="unknown_buyer">Unknown Buyer</string>
+    <string name="unknown">Unknown</string>
     <string name="purchase_history_remove_title">Remove Purchase Record</string>
     <string name="purchase_history_remove_message">Are you sure you want to remove this purchase record?</string>
     <string name="purchase_history_remove_confirm">Yes, Remove</string>
     <string name="purchase_history_remove_cancel">Cancel</string>
-    <string name="purchase_history_remove_button_description">Remove purchase record</string>
     <string name="purchase_history_no_items">No items</string>
-    <string name="purchase_history_edit_item_description">Edit item</string>
     <string name="purchase_history_edit_buyer_name_title">Edit Buyer Name</string>
     <string name="purchase_history_edit_total">Total</string>
     <string name="purchase_history_edit_save">Save</string>
@@ -106,21 +99,40 @@
     <!-- Validation messages -->
     <string name="cart_empty">Cart is empty</string>
 
-    <!-- Stepper component -->
-    <string name="stepper_decrease">Decrease</string>
-    <string name="stepper_increase">Increase</string>
-
     <!-- Checkout button -->
     <string name="check_cart_button">Check Cart</string>
-    <string name="cart_icon_description">Cart icon</string>
-    <string name="checkout_button_description">Checkout</string>
+    <string name="cart_item_count_format">  (%1$d)</string>
     <string name="checkout_button_text">Checkout</string>
+    <string name="checkout_total_price_format">  (%1$s)</string>
 
     <!-- Bottom Navigation -->
     <string name="bottom_nav_shop">Shop</string>
     <string name="bottom_nav_receipt">Receipt</string>
 
     <!-- Content Descriptions -->
+    <string name="app_logo_description">JBCH Market Manager</string>
+    <string name="search_icon_description">Search icon</string>
+    <string name="clear_search_description">Clear search</string>
+    <string name="item_arrow_up_content_description">Collapse item</string>
+    <string name="item_arrow_down_content_description">Expend item</string>
+    <string name="drop_down_content_description">Drop down</string>
+    <string name="edit_item_button_description">Edit item</string>
+    <string name="reorderable_drag_handle_description">Reorder</string>
+    <string name="purchase_history_remove_button_description">Remove purchase record</string>
+    <string name="purchase_history_edit_item_description">Edit item</string>
+    <string name="stepper_decrease">Decrease</string>
+    <string name="stepper_increase">Increase</string>
+    <string name="cart_icon_description">Cart icon</string>
+    <string name="checkout_button_description">Checkout</string>
     <string name="close_dialog_description">Close dialog</string>
     <string name="remove_variant_value_description">Remove variant value</string>
+    <string name="delete_item_description">Delete item</string>
+    <string name="expand_description">Expand</string>
+    <string name="collapse_description">Collapse</string>
+    <string name="back_description">Back</string>
+    <string name="share_purchase_history_description">Share Purchase History</string>
+    <string name="add_item_button_description">Add Item</string>
+
+    <!-- Variant formatting -->
+    <string name="variant_key_value_format">%1$s: %2$s</string>
 </resources>

@@ -32,10 +32,11 @@ fun CheckoutScreen(
     onCheckoutSuccess: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val onIntent: (CheckoutIntent) -> Unit = viewModel::handleIntent
 
     // Navigate back if cart is empty (only on initial load, not after checkout)
-    LaunchedEffect(uiState.checkoutItems.isEmpty(), uiState.checkoutSuccess) {
-        if (uiState.checkoutItems.isEmpty() && !uiState.checkoutSuccess) {
+    LaunchedEffect(uiState.shouldNavigateBackToShop) {
+        if (uiState.shouldNavigateBackToShop) {
             onNavigateBack()
         }
     }
@@ -43,7 +44,7 @@ fun CheckoutScreen(
     // Handle checkout success navigation
     LaunchedEffect(uiState.checkoutSuccess) {
         if (uiState.checkoutSuccess) {
-            viewModel.onCheckoutSuccessHandled()
+            onIntent(CheckoutIntent.CheckoutSuccessHandled)
             onCheckoutSuccess()
         }
     }
@@ -51,10 +52,10 @@ fun CheckoutScreen(
     CheckoutScreenContent(
         uiState = uiState,
         onNavigateBack = onNavigateBack,
-        onRemoveItem = { viewModel.onRemoveFromCart(it) },
-        onPaymentMethodSelected = { viewModel.onPaymentMethodSelected(it) },
-        onDismissDialog = { viewModel.showCheckoutDialog(false) },
-        onCheckout = { buyerName -> viewModel.processCheckout(buyerName) }
+        onRemoveItem = { onIntent(CheckoutIntent.RemoveFromCart(it)) },
+        onPaymentMethodSelected = { onIntent(CheckoutIntent.SelectPaymentMethod(it)) },
+        onDismissDialog = { onIntent(CheckoutIntent.ShowCheckoutDialog(false)) },
+        onCheckout = { buyerName -> onIntent(CheckoutIntent.ProcessCheckout(buyerName)) }
     )
 }
 
@@ -84,12 +85,12 @@ private fun CheckoutScreenContent(
                 verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_m),
                 contentPadding = PaddingValues(
                     top = Dimensions.spacing_s,
-                    bottom = Dimensions.checkout_button_height + Dimensions.spacing_xxl
+                    bottom = Dimensions.gradient_overlay_height
                 ),
             ) {
                 items(
                     items = uiState.checkoutItems,
-                    key = { "${it.id}_${it.variantsMap.hashCode()}" }
+                    key = { it.uniqueKey }
                 ) { item ->
                     CheckoutItemView(
                         checkoutItem = item,

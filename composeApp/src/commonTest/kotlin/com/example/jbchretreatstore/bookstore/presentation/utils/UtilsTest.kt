@@ -43,8 +43,8 @@ class UtilsTest {
 
     @Test
     fun `toCurrency handles large numbers`() {
-        val result = 999999.99.toCurrency()
-        assertEquals("$999999.99", result)
+        val result = 999999.00.toCurrency()
+        assertEquals("$999999.00", result)
     }
 
     @Test

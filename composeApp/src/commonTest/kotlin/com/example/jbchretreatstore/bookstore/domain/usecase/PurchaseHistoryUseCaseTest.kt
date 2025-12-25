@@ -530,5 +530,296 @@ class PurchaseHistoryUseCaseTest {
 
         assertEquals(999999999.99, revenue, 0.01)
     }
+
+    // ============= UPDATE BUYER NAME TESTS =============
+
+    @Test
+    fun `updateBuyerName succeeds with valid name`() = runTest {
+        val receiptId = Uuid.random()
+        val receipt = ReceiptData(
+            id = receiptId,
+            buyerName = "Original Name",
+            checkoutStatus = CheckoutStatus.CHECKED_OUT
+        )
+        repository.setReceipts(listOf(receipt))
+
+        val result = useCase.updateBuyerName(receipt, "New Name")
+
+        assertTrue(result.isSuccess)
+        assertEquals("New Name", repository.lastSavedReceipts?.first()?.buyerName)
+    }
+
+    @Test
+    fun `updateBuyerName uses Unknown for empty name`() = runTest {
+        val receiptId = Uuid.random()
+        val receipt = ReceiptData(
+            id = receiptId,
+            buyerName = "Original Name",
+            checkoutStatus = CheckoutStatus.CHECKED_OUT
+        )
+        repository.setReceipts(listOf(receipt))
+
+        val result = useCase.updateBuyerName(receipt, "")
+
+        assertTrue(result.isSuccess)
+        assertEquals("Unknown", repository.lastSavedReceipts?.first()?.buyerName)
+    }
+
+    @Test
+    fun `updateBuyerName uses Unknown for blank name`() = runTest {
+        val receiptId = Uuid.random()
+        val receipt = ReceiptData(
+            id = receiptId,
+            buyerName = "Original Name",
+            checkoutStatus = CheckoutStatus.CHECKED_OUT
+        )
+        repository.setReceipts(listOf(receipt))
+
+        val result = useCase.updateBuyerName(receipt, "   ")
+
+        assertTrue(result.isSuccess)
+        assertEquals("Unknown", repository.lastSavedReceipts?.first()?.buyerName)
+    }
+
+    @Test
+    fun `updateBuyerName only updates specified receipt`() = runTest {
+        val receipt1 =
+            ReceiptData(buyerName = "Buyer 1", checkoutStatus = CheckoutStatus.CHECKED_OUT)
+        val receipt2 =
+            ReceiptData(buyerName = "Buyer 2", checkoutStatus = CheckoutStatus.CHECKED_OUT)
+        repository.setReceipts(listOf(receipt1, receipt2))
+
+        val result = useCase.updateBuyerName(receipt1, "Updated Buyer 1")
+
+        assertTrue(result.isSuccess)
+        assertEquals("Updated Buyer 1", repository.lastSavedReceipts?.first()?.buyerName)
+        assertEquals("Buyer 2", repository.lastSavedReceipts?.get(1)?.buyerName)
+    }
+
+    @Test
+    fun `updateBuyerName with unicode characters`() = runTest {
+        val receipt =
+            ReceiptData(buyerName = "Original", checkoutStatus = CheckoutStatus.CHECKED_OUT)
+        repository.setReceipts(listOf(receipt))
+
+        val result = useCase.updateBuyerName(receipt, "张三 李四")
+
+        assertTrue(result.isSuccess)
+        assertEquals("张三 李四", repository.lastSavedReceipts?.first()?.buyerName)
+    }
+
+    @Test
+    fun `updateBuyerName with special characters`() = runTest {
+        val receipt =
+            ReceiptData(buyerName = "Original", checkoutStatus = CheckoutStatus.CHECKED_OUT)
+        repository.setReceipts(listOf(receipt))
+
+        val result = useCase.updateBuyerName(receipt, "José García-López O'Connor")
+
+        assertTrue(result.isSuccess)
+        assertEquals("José García-López O'Connor", repository.lastSavedReceipts?.first()?.buyerName)
+    }
+
+    @Test
+    fun `updateBuyerName with very long name`() = runTest {
+        val receipt =
+            ReceiptData(buyerName = "Original", checkoutStatus = CheckoutStatus.CHECKED_OUT)
+        repository.setReceipts(listOf(receipt))
+        val longName = "A".repeat(1000)
+
+        val result = useCase.updateBuyerName(receipt, longName)
+
+        assertTrue(result.isSuccess)
+        assertEquals(1000, repository.lastSavedReceipts?.first()?.buyerName?.length)
+    }
+
+    // ============= CLEAR ALL RECEIPTS TESTS =============
+
+    @Test
+    fun `clearAllReceipts removes all receipts`() = runTest {
+        val receipts = listOf(
+            ReceiptData(buyerName = "Buyer 1", checkoutStatus = CheckoutStatus.CHECKED_OUT),
+            ReceiptData(buyerName = "Buyer 2", checkoutStatus = CheckoutStatus.SAVE_FOR_LATER),
+            ReceiptData(buyerName = "Buyer 3", checkoutStatus = CheckoutStatus.PENDING)
+        )
+        repository.setReceipts(receipts)
+
+        useCase.clearAllReceipts()
+
+        assertTrue(repository.lastSavedReceipts?.isEmpty() == true)
+    }
+
+    @Test
+    fun `clearAllReceipts on empty repository`() = runTest {
+        useCase.clearAllReceipts()
+
+        assertTrue(repository.lastSavedReceipts?.isEmpty() == true)
+    }
+
+    // ============= REMOVE RECEIPT EDGE CASES =============
+
+    @Test
+    fun `removeReceipt handles non-existent receipt gracefully`() = runTest {
+        val existingReceipt =
+            ReceiptData(buyerName = "Existing", checkoutStatus = CheckoutStatus.CHECKED_OUT)
+        repository.setReceipts(listOf(existingReceipt))
+
+        val nonExistentReceipt = ReceiptData(
+            id = Uuid.random(),
+            buyerName = "Non-existent",
+            checkoutStatus = CheckoutStatus.CHECKED_OUT
+        )
+
+        val result = useCase.removeReceipt(nonExistentReceipt)
+
+        // Should succeed but not remove anything (item wasn't there)
+        assertTrue(result.isSuccess)
+        assertEquals(1, repository.lastSavedReceipts?.size)
+    }
+
+    @Test
+    fun `removeReceipt from empty repository`() = runTest {
+        val receipt = ReceiptData(buyerName = "Test", checkoutStatus = CheckoutStatus.CHECKED_OUT)
+
+        val result = useCase.removeReceipt(receipt)
+
+        assertTrue(result.isSuccess)
+        assertTrue(repository.lastSavedReceipts?.isEmpty() == true)
+    }
+
+    // ============= UPDATE CHECKOUT ITEM ADDITIONAL TESTS =============
+
+    @Test
+    fun `updateCheckoutItemByVariants with item not in receipt`() = runTest {
+        val receipt = ReceiptData(
+            buyerName = "Test",
+            checkoutList = listOf(
+                CheckoutItem(itemName = "Existing Item", quantity = 1, totalPrice = 10.0)
+            ),
+            checkoutStatus = CheckoutStatus.CHECKED_OUT
+        )
+        repository.setReceipts(listOf(receipt))
+
+        val nonExistentItem = CheckoutItem(
+            itemName = "Non-existent",
+            quantity = 1,
+            totalPrice = 10.0
+        )
+        val updatedItem = nonExistentItem.copy(quantity = 2, totalPrice = 20.0)
+
+        val result = useCase.updateCheckoutItemByVariants(receipt, nonExistentItem, updatedItem)
+
+        // Should succeed but not change anything
+        assertTrue(result.isSuccess)
+        assertEquals(1, repository.lastSavedReceipts?.first()?.checkoutList?.size)
+        assertEquals(
+            "Existing Item",
+            repository.lastSavedReceipts?.first()?.checkoutList?.first()?.itemName
+        )
+    }
+
+    @Test
+    fun `updateCheckoutItemByVariants preserves receipt metadata`() = runTest {
+        val originalItem = CheckoutItem(
+            itemName = "Book",
+            quantity = 1,
+            totalPrice = 10.0
+        )
+        val receipt = ReceiptData(
+            buyerName = "Test Buyer",
+            checkoutList = listOf(originalItem),
+            checkoutStatus = CheckoutStatus.CHECKED_OUT,
+            paymentMethod = com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod.VENMO
+        )
+        repository.setReceipts(listOf(receipt))
+
+        val updatedItem = originalItem.copy(quantity = 5, totalPrice = 50.0)
+
+        val result = useCase.updateCheckoutItemByVariants(receipt, originalItem, updatedItem)
+
+        assertTrue(result.isSuccess)
+        val savedReceipt = repository.lastSavedReceipts?.first()
+        assertEquals("Test Buyer", savedReceipt?.buyerName)
+        assertEquals(CheckoutStatus.CHECKED_OUT, savedReceipt?.checkoutStatus)
+        assertEquals(
+            com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod.VENMO,
+            savedReceipt?.paymentMethod
+        )
+    }
+
+    @Test
+    fun `updateCheckoutItemByVariants with empty variants`() = runTest {
+        val originalItem = CheckoutItem(
+            itemName = "Simple Book",
+            quantity = 1,
+            variants = emptyList(),
+            totalPrice = 10.0
+        )
+        val receipt = ReceiptData(
+            buyerName = "Test",
+            checkoutList = listOf(originalItem),
+            checkoutStatus = CheckoutStatus.CHECKED_OUT
+        )
+        repository.setReceipts(listOf(receipt))
+
+        val updatedItem = originalItem.copy(quantity = 3, totalPrice = 30.0)
+
+        val result = useCase.updateCheckoutItemByVariants(receipt, originalItem, updatedItem)
+
+        assertTrue(result.isSuccess)
+        assertEquals(3, repository.lastSavedReceipts?.first()?.checkoutList?.first()?.quantity)
+    }
+
+    // ============= FLOW REACTIVITY TESTS =============
+
+    @Test
+    fun `getPurchaseHistory updates when repository changes`() = runTest {
+        useCase.getPurchaseHistory().test {
+            // Initial empty state
+            val initial = awaitItem()
+            assertTrue(initial.isEmpty())
+
+            // Add a receipt
+            val newReceipt = ReceiptData(
+                buyerName = "New Buyer",
+                checkoutStatus = CheckoutStatus.CHECKED_OUT,
+                checkoutList = listOf(
+                    CheckoutItem(itemName = "Book", quantity = 1, totalPrice = 10.0)
+                )
+            )
+            repository.setReceipts(listOf(newReceipt))
+
+            val updated = awaitItem()
+            assertEquals(1, updated.size)
+            assertEquals("New Buyer", updated.first().buyerName)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `getSavedForLater updates when repository changes`() = runTest {
+        useCase.getSavedForLater().test {
+            // Initial empty state
+            val initial = awaitItem()
+            assertTrue(initial.isEmpty())
+
+            // Add a saved receipt
+            val savedReceipt = ReceiptData(
+                buyerName = "Saved Buyer",
+                checkoutStatus = CheckoutStatus.SAVE_FOR_LATER,
+                checkoutList = listOf(
+                    CheckoutItem(itemName = "Book", quantity = 1, totalPrice = 10.0)
+                )
+            )
+            repository.setReceipts(listOf(savedReceipt))
+
+            val updated = awaitItem()
+            assertEquals(1, updated.size)
+            assertEquals("Saved Buyer", updated.first().buyerName)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
 }
 

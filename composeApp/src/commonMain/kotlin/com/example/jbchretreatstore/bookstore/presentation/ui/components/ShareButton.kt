@@ -7,6 +7,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import jbchretreatstore.composeapp.generated.resources.Res
+import jbchretreatstore.composeapp.generated.resources.share_purchase_history_description
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ShareButton(
@@ -21,7 +24,7 @@ fun ShareButton(
     ) {
         Icon(
             imageVector = Icons.Filled.Share,
-            contentDescription = "Share Purchase History"
+            contentDescription = stringResource(Res.string.share_purchase_history_description)
         )
     }
 }

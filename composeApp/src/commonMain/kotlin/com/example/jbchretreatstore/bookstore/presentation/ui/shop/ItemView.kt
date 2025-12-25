@@ -53,6 +53,7 @@ import androidx.compose.ui.text.withStyle
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.Stepper
+import com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory.formattedTotalPrice
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Black
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
@@ -63,6 +64,8 @@ import com.example.jbchretreatstore.bookstore.presentation.ui.theme.White
 import com.example.jbchretreatstore.bookstore.presentation.utils.toCurrency
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.add_to_cart
+import jbchretreatstore.composeapp.generated.resources.add_to_cart_total
+import jbchretreatstore.composeapp.generated.resources.delete_item_description
 import jbchretreatstore.composeapp.generated.resources.edit_item_button_description
 import jbchretreatstore.composeapp.generated.resources.ic_chevron
 import jbchretreatstore.composeapp.generated.resources.ic_chevron_small
@@ -119,7 +122,9 @@ fun ItemView(
     onEditItem: (DisplayItem) -> Unit
 ) {
     var expanded by rememberSaveable { mutableStateOf(true) }
+    // Use inputs vararg to reset state when displayItem content changes (name, price, variants)
     var checkoutItem by rememberSaveable(
+        displayItem.id, displayItem.name, displayItem.price, displayItem.variants,
         stateSaver = CheckoutItemSaver
     ) {
         mutableStateOf(
@@ -296,7 +301,7 @@ fun ItemExpandableView(
             IconButton(onClick = onDeleteClick) {
                 Image(
                     painter = painterResource(Res.drawable.ic_trash_can),
-                    contentDescription = "Delete item"
+                    contentDescription = stringResource(Res.string.delete_item_description)
                 )
             }
 
@@ -316,7 +321,12 @@ fun ItemExpandableView(
                         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
                             append(stringResource(Res.string.add_to_cart))
                         }
-                        append(" Total (${checkoutItem.totalPrice.toCurrency()})")
+                        append(
+                            stringResource(
+                                Res.string.add_to_cart_total,
+                                checkoutItem.formattedTotalPrice
+                            )
+                        )
                     },
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -348,7 +358,7 @@ fun ItemVariantMenu(
         OutlinedTextField(
             modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, true)
                 .wrapContentSize(),
-            value = checkoutItem.variantsMap[variant.key] ?: variant.valueList.first(),
+            value = checkoutItem.getSelectedVariantValue(variant),
             onValueChange = { },
             textStyle = MaterialTheme.typography.bodyLarge.copy(
                 fontWeight = FontWeight.Bold

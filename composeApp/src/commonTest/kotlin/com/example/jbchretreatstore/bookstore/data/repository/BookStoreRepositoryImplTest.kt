@@ -209,6 +209,7 @@ class BookStoreRepositoryImplTest {
     private class FakeLocalDataSource : BookStoreLocalDataSource {
         private val _displayItems = MutableStateFlow<List<DisplayItemDto>>(emptyList())
         private val _receipts = MutableStateFlow<List<ReceiptDataDto>>(emptyList())
+        private var testDataLoaded = false
 
         var saveDisplayItemsCalled = false
             private set
@@ -237,6 +238,14 @@ class BookStoreRepositoryImplTest {
 
         override fun getReceipts(): Flow<List<ReceiptDataDto>> {
             return _receipts.asStateFlow()
+        }
+
+        override suspend fun isTestDataLoaded(): Boolean {
+            return testDataLoaded
+        }
+
+        override suspend fun setTestDataLoaded(loaded: Boolean) {
+            testDataLoaded = loaded
         }
 
         fun setDisplayItems(items: List<DisplayItemDto>) {

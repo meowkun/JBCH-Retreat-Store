@@ -6,5 +6,10 @@ enum class PaymentMethod(val methodName: String) {
     DEBIT_CARD("Debit Card"),
     E_WALLET("E-Wallet"),
     ZELLE("Zelle"),
-    VENMO("Venmo"),
+    VENMO("Venmo");
+
+    companion object {
+        /** Payment methods available for selection in checkout */
+        val selectableOptions = listOf(ZELLE, VENMO, CASH)
+    }
 }

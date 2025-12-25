@@ -12,6 +12,8 @@ object DisplayItemMapper {
             price = dto.price,
             variants = dto.options.map { optionDto ->
                 DisplayItem.Variant(
+                    // Note: Variant IDs are regenerated on load since DTO doesn't store them
+                    // This is acceptable as variant identity is based on key, not ID
                     key = optionDto.optionKey,
                     valueList = optionDto.optionValueList
                 )

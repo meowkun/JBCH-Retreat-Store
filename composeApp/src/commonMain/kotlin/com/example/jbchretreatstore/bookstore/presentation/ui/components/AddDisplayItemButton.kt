@@ -7,6 +7,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Primary
+import jbchretreatstore.composeapp.generated.resources.Res
+import jbchretreatstore.composeapp.generated.resources.add_item_button_description
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun AddDisplayItemButton(
@@ -20,7 +23,7 @@ fun AddDisplayItemButton(
     ) {
         Icon(
             imageVector = Icons.Default.Add,
-            contentDescription = "Add Item"
+            contentDescription = stringResource(Res.string.add_item_button_description)
         )
     }
 }

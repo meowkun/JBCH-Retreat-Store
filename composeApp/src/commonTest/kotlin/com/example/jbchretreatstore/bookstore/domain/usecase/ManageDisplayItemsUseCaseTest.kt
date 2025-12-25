@@ -1,12 +1,14 @@
 package com.example.jbchretreatstore.bookstore.domain.usecase
 
 import app.cash.turbine.test
+import com.example.jbchretreatstore.bookstore.domain.constants.ErrorMessages
 import com.example.jbchretreatstore.bookstore.domain.model.DisplayItem
 import com.example.jbchretreatstore.bookstore.fake.FakeBookStoreRepository
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -72,7 +74,7 @@ class ManageDisplayItemsUseCaseTest {
 
         assertTrue(result.isFailure)
         assertTrue(result.exceptionOrNull() is IllegalArgumentException)
-        assertEquals("Item name cannot be empty", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_NAME_EMPTY, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -82,7 +84,7 @@ class ManageDisplayItemsUseCaseTest {
         val result = useCase.addDisplayItem(newItem)
 
         assertTrue(result.isFailure)
-        assertEquals("Item name cannot be empty", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_NAME_EMPTY, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -92,7 +94,7 @@ class ManageDisplayItemsUseCaseTest {
         val result = useCase.addDisplayItem(newItem)
 
         assertTrue(result.isFailure)
-        assertEquals("Item price must be greater than zero", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_PRICE_INVALID, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -102,7 +104,7 @@ class ManageDisplayItemsUseCaseTest {
         val result = useCase.addDisplayItem(newItem)
 
         assertTrue(result.isFailure)
-        assertEquals("Item price must be greater than zero", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_PRICE_INVALID, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -202,7 +204,7 @@ class ManageDisplayItemsUseCaseTest {
         val result = useCase.removeDisplayItem(nonExistentItem)
 
         assertTrue(result.isFailure)
-        assertEquals("Item not found", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_NOT_FOUND, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -254,7 +256,7 @@ class ManageDisplayItemsUseCaseTest {
         val result = useCase.updateDisplayItem(nonExistentItem)
 
         assertTrue(result.isFailure)
-        assertEquals("Item not found", result.exceptionOrNull()?.message)
+        assertEquals(ErrorMessages.ITEM_NOT_FOUND, result.exceptionOrNull()?.message)
     }
 
     @Test
@@ -464,6 +466,181 @@ class ManageDisplayItemsUseCaseTest {
 
         assertTrue(result.isSuccess)
         assertEquals(50, repository.lastSavedDisplayItems?.first()?.variants?.size)
+    }
+
+    // ============= CLEAR ALL ITEMS TESTS =============
+
+    @Test
+    fun `clearAllItems removes all items`() = runTest {
+        val items = listOf(
+            DisplayItem(name = "Item 1", price = 10.0),
+            DisplayItem(name = "Item 2", price = 20.0),
+            DisplayItem(name = "Item 3", price = 30.0)
+        )
+        repository.setDisplayItems(items)
+
+        useCase.clearAllItems()
+
+        assertTrue(repository.lastSavedDisplayItems?.isEmpty() == true)
+    }
+
+    @Test
+    fun `clearAllItems on empty repository`() = runTest {
+        useCase.clearAllItems()
+
+        assertTrue(repository.lastSavedDisplayItems?.isEmpty() == true)
+    }
+
+    // ============= LOAD TEST DATA IF NEEDED TESTS =============
+
+    @Test
+    fun `loadTestDataIfNeeded loads data when not previously loaded`() = runTest {
+        val loaded = useCase.loadTestDataIfNeeded()
+
+        assertTrue(loaded)
+        assertTrue(repository.updateDisplayItemsCalled)
+    }
+
+    @Test
+    fun `loadTestDataIfNeeded does not load when already loaded`() = runTest {
+        // First load
+        val firstResult = useCase.loadTestDataIfNeeded()
+        assertTrue(firstResult)
+
+        // Second load - should not reload since flag is set
+        val loaded = useCase.loadTestDataIfNeeded()
+
+        assertFalse(loaded)
+    }
+
+    @Test
+    fun `loadTestDataIfNeeded sets testDataLoaded flag`() = runTest {
+        useCase.loadTestDataIfNeeded()
+
+        assertTrue(repository.isTestDataLoaded())
+    }
+
+    // ============= FLOW REACTIVITY TESTS =============
+
+    @Test
+    fun `getDisplayItems updates when repository changes`() = runTest {
+        useCase.getDisplayItems().test {
+            // Initial empty state
+            val initial = awaitItem()
+            assertTrue(initial.isEmpty())
+
+            // Add items
+            val newItems = listOf(
+                DisplayItem(name = "New Item", price = 15.0)
+            )
+            repository.setDisplayItems(newItems)
+
+            val updated = awaitItem()
+            assertEquals(1, updated.size)
+            assertEquals("New Item", updated.first().name)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    // ============= CONCURRENT OPERATIONS TESTS =============
+
+    @Test
+    fun `multiple addDisplayItem operations preserve order`() = runTest {
+        val items = listOf("Alpha", "Beta", "Gamma", "Delta")
+
+        items.forEach { name ->
+            useCase.addDisplayItem(DisplayItem(name = name, price = 10.0))
+        }
+
+        val savedItems = repository.lastSavedDisplayItems
+        assertEquals(4, savedItems?.size)
+        assertEquals("Alpha", savedItems?.get(0)?.name)
+        assertEquals("Beta", savedItems?.get(1)?.name)
+        assertEquals("Gamma", savedItems?.get(2)?.name)
+        assertEquals("Delta", savedItems?.get(3)?.name)
+    }
+
+    @Test
+    fun `addDisplayItem then removeDisplayItem works correctly`() = runTest {
+        val item = DisplayItem(name = "Temporary Item", price = 15.0)
+        useCase.addDisplayItem(item)
+
+        val addedItem = repository.lastSavedDisplayItems?.first()!!
+        useCase.removeDisplayItem(addedItem)
+
+        assertTrue(repository.lastSavedDisplayItems?.isEmpty() == true)
+    }
+
+    @Test
+    fun `updateDisplayItem changes are reflected in getDisplayItems`() = runTest {
+        val item = DisplayItem(name = "Original", price = 10.0)
+        repository.setDisplayItems(listOf(item))
+
+        useCase.getDisplayItems().test {
+            val initial = awaitItem()
+            assertEquals("Original", initial.first().name)
+
+            val updated = item.copy(name = "Updated")
+            useCase.updateDisplayItem(updated)
+
+            val afterUpdate = awaitItem()
+            assertEquals("Updated", afterUpdate.first().name)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    // ============= VALIDATION EDGE CASES =============
+
+    @Test
+    fun `addDisplayItem with price at precision limit`() = runTest {
+        val newItem = DisplayItem(name = "Precise Price", price = 0.01)
+
+        val result = useCase.addDisplayItem(newItem)
+
+        assertTrue(result.isSuccess)
+        assertEquals(0.01, repository.lastSavedDisplayItems?.first()?.price ?: 0.0, 0.001)
+    }
+
+    @Test
+    fun `addDisplayItem with name containing only whitespace and letters`() = runTest {
+        val newItem = DisplayItem(name = "  Valid Name  ", price = 10.0)
+
+        val result = useCase.addDisplayItem(newItem)
+
+        assertTrue(result.isSuccess)
+    }
+
+    @Test
+    fun `updateDisplayItem preserves ID even when all other fields change`() = runTest {
+        val originalId = Uuid.random()
+        val original = DisplayItem(
+            id = originalId,
+            name = "Original",
+            price = 10.0,
+            variants = emptyList(),
+            isInCart = false
+        )
+        repository.setDisplayItems(listOf(original))
+
+        val updated = DisplayItem(
+            id = originalId,
+            name = "Completely Different",
+            price = 999.99,
+            variants = listOf(DisplayItem.Variant(key = "Size", valueList = listOf("XL"))),
+            isInCart = true
+        )
+
+        val result = useCase.updateDisplayItem(updated)
+
+        assertTrue(result.isSuccess)
+        val saved = repository.lastSavedDisplayItems?.first()
+        assertEquals(originalId, saved?.id)
+        assertEquals("Completely Different", saved?.name)
+        assertEquals(999.99, saved?.price ?: 0.0, 0.01)
+        assertEquals(1, saved?.variants?.size)
+        assertTrue(saved?.isInCart == true)
     }
 }
 

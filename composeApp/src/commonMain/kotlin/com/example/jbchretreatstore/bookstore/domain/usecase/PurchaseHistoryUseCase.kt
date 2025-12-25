@@ -3,6 +3,7 @@ package com.example.jbchretreatstore.bookstore.domain.usecase
 import com.example.jbchretreatstore.bookstore.data.testdata.SampleTestData
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutStatus
+import com.example.jbchretreatstore.bookstore.domain.model.PaymentMethod
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
 import com.example.jbchretreatstore.bookstore.domain.repository.BookStoreRepository
 import kotlinx.coroutines.flow.Flow
@@ -19,7 +20,8 @@ class PurchaseHistoryUseCase(
 ) {
 
     /**
-     * Get all receipts
+     * Get all receipts.
+     * @testOnly Currently only used in unit tests.
      */
     fun getAllReceipts(): Flow<List<ReceiptData>> {
         return repository.fetchReceiptList()
@@ -35,7 +37,8 @@ class PurchaseHistoryUseCase(
     }
 
     /**
-     * Get saved for later items
+     * Get saved for later items.
+     * @testOnly Currently only used in unit tests.
      */
     fun getSavedForLater(): Flow<List<ReceiptData>> {
         return repository.fetchReceiptList().map { receipts ->
@@ -44,7 +47,8 @@ class PurchaseHistoryUseCase(
     }
 
     /**
-     * Calculate total revenue from all purchases
+     * Calculate total revenue from all purchases.
+     * @testOnly Currently only used in unit tests.
      */
     suspend fun calculateTotalRevenue(): Double {
         return repository.fetchReceiptList().first()
@@ -53,7 +57,8 @@ class PurchaseHistoryUseCase(
     }
 
     /**
-     * Get receipts by buyer name
+     * Get receipts by buyer name.
+     * @testOnly Currently only used in unit tests.
      */
     fun getReceiptsByBuyer(buyerName: String): Flow<List<ReceiptData>> {
         return repository.fetchReceiptList().map { receipts ->
@@ -64,7 +69,8 @@ class PurchaseHistoryUseCase(
     }
 
     /**
-     * Get receipt count
+     * Get receipt count.
+     * @testOnly Currently only used in unit tests.
      */
     suspend fun getReceiptCount(): Int {
         return repository.fetchReceiptList().map { it.size }.first()
@@ -160,7 +166,32 @@ class PurchaseHistoryUseCase(
             val currentReceipts = repository.fetchReceiptList().first()
             val updatedReceipts = currentReceipts.map { r ->
                 if (r.id == receipt.id) {
-                    r.copy(buyerName = newBuyerName.ifBlank { "Unknown" })
+                    r.copy(buyerName = newBuyerName.ifBlank { ReceiptData.DEFAULT_BUYER_NAME })
+                } else r
+            }
+            repository.updateReceiptList(updatedReceipts)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Update the buyer name and payment method for a receipt
+     */
+    suspend fun updateBuyerNameAndPaymentMethod(
+        receipt: ReceiptData,
+        newBuyerName: String,
+        newPaymentMethod: PaymentMethod
+    ): Result<Unit> {
+        return try {
+            val currentReceipts = repository.fetchReceiptList().first()
+            val updatedReceipts = currentReceipts.map { r ->
+                if (r.id == receipt.id) {
+                    r.copy(
+                        buyerName = newBuyerName.ifBlank { ReceiptData.DEFAULT_BUYER_NAME },
+                        paymentMethod = newPaymentMethod
+                    )
                 } else r
             }
             repository.updateReceiptList(updatedReceipts)

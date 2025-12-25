@@ -4,6 +4,7 @@ import com.example.jbchretreatstore.bookstore.createDataStore
 import com.example.jbchretreatstore.bookstore.data.datasource.BookStoreLocalDataSource
 import com.example.jbchretreatstore.bookstore.data.datasource.BookStoreLocalDataSourceImpl
 import com.example.jbchretreatstore.bookstore.data.repository.BookStoreRepositoryImpl
+import com.example.jbchretreatstore.bookstore.data.testdata.TestDataLoader
 import com.example.jbchretreatstore.bookstore.domain.repository.BookStoreRepository
 import com.example.jbchretreatstore.bookstore.domain.usecase.CheckoutUseCase
 import com.example.jbchretreatstore.bookstore.domain.usecase.ManageCartUseCase
@@ -37,6 +38,9 @@ val bookStoreModule = module {
 
     // Repositories
     singleOf(::BookStoreRepositoryImpl) bind BookStoreRepository::class
+
+    // Test Data Loader
+    single { TestDataLoader(get()) }
 
     // Use Cases
     singleOf(::ManageDisplayItemsUseCase)
