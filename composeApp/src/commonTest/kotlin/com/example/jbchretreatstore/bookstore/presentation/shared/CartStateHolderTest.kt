@@ -28,7 +28,7 @@ class CartStateHolderTest {
     fun `initial state is empty ReceiptData`() = runTest {
         cartStateHolder.cartState.test {
             val cart = awaitItem()
-            assertEquals("Unknown", cart.buyerName)
+            assertEquals("N/A", cart.buyerName)
             assertTrue(cart.checkoutList.isEmpty())
             assertEquals(CheckoutStatus.PENDING, cart.checkoutStatus)
             assertEquals(PaymentMethod.CASH, cart.paymentMethod)
@@ -174,7 +174,7 @@ class CartStateHolderTest {
 
         cartStateHolder.cartState.test {
             val result = awaitItem()
-            assertEquals("Unknown", result.buyerName)
+            assertEquals("N/A", result.buyerName)
             assertTrue(result.checkoutList.isEmpty())
             assertEquals(CheckoutStatus.PENDING, result.checkoutStatus)
             assertEquals(PaymentMethod.CASH, result.paymentMethod)

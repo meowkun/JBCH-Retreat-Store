@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory
+package com.example.jbchretreatstore.bookstore.presentation.ui.bottomsheet
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -37,6 +37,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.font.FontWeight
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.Stepper
+import com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory.formattedTotalPrice
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions.corner_radius_percent_l

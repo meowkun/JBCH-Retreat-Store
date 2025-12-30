@@ -94,7 +94,7 @@ class CheckoutUseCaseTest {
     }
 
     @Test
-    fun `processCheckout uses Unknown for empty buyer name`() = runTest {
+    fun `processCheckout uses NA for empty buyer name`() = runTest {
         val cart = ReceiptData(
             checkoutList = listOf(
                 CheckoutItem(itemName = "Book", quantity = 1, totalPrice = 20.0)
@@ -108,11 +108,11 @@ class CheckoutUseCaseTest {
         )
 
         assertTrue(result.isSuccess)
-        assertEquals("Unknown", result.getOrThrow().buyerName)
+        assertEquals("NA", result.getOrThrow().buyerName)
     }
 
     @Test
-    fun `processCheckout uses Unknown for blank buyer name`() = runTest {
+    fun `processCheckout uses NA for blank buyer name`() = runTest {
         val cart = ReceiptData(
             checkoutList = listOf(
                 CheckoutItem(itemName = "Book", quantity = 1, totalPrice = 20.0)
@@ -126,7 +126,7 @@ class CheckoutUseCaseTest {
         )
 
         assertTrue(result.isSuccess)
-        assertEquals("Unknown", result.getOrThrow().buyerName)
+        assertEquals("NA", result.getOrThrow().buyerName)
     }
 
     @Test
@@ -322,7 +322,7 @@ class CheckoutUseCaseTest {
     }
 
     @Test
-    fun `processCheckout with CheckoutState uses Unknown for empty buyer name`() = runTest {
+    fun `processCheckout with CheckoutState uses NA for empty buyer name`() = runTest {
         val cart = ReceiptData(
             checkoutList = listOf(
                 CheckoutItem(itemName = "Book", quantity = 1, totalPrice = 20.0)
@@ -337,7 +337,7 @@ class CheckoutUseCaseTest {
         val result = useCase.processCheckout(cart, checkoutState)
 
         assertTrue(result.isSuccess)
-        assertEquals("Unknown", result.getOrThrow().buyerName)
+        assertEquals("NA", result.getOrThrow().buyerName)
     }
 
     // ============= SAVE FOR LATER TESTS =============
@@ -359,7 +359,7 @@ class CheckoutUseCaseTest {
     }
 
     @Test
-    fun `saveForLater uses Unknown for empty buyer name`() = runTest {
+    fun `saveForLater uses NA for empty buyer name`() = runTest {
         val cart = ReceiptData(
             checkoutList = listOf(
                 CheckoutItem(itemName = "Book", quantity = 1, totalPrice = 20.0)
@@ -369,7 +369,7 @@ class CheckoutUseCaseTest {
         val result = useCase.saveForLater(cart, "")
 
         assertTrue(result.isSuccess)
-        assertEquals("Unknown", result.getOrThrow().buyerName)
+        assertEquals("NA", result.getOrThrow().buyerName)
     }
 
     @Test
