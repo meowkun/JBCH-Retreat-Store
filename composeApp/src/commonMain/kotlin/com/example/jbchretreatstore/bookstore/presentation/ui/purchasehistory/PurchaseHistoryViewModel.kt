@@ -41,7 +41,7 @@ class PurchaseHistoryViewModel(
     fun handleIntent(intent: PurchaseHistoryIntent) {
         when (intent) {
             is PurchaseHistoryIntent.SharePurchaseHistory -> handleSharePurchaseHistory()
-            is PurchaseHistoryIntent.ShowRemoveBottomSheet -> reduceShowRemoveBottomSheet(
+            is PurchaseHistoryIntent.ShowRemoveDialog -> reduceShowRemoveDialog(
                 intent.show,
                 intent.receipt
             )
@@ -85,9 +85,9 @@ class PurchaseHistoryViewModel(
 
     // region State Reducers (pure state updates)
 
-    private fun reduceShowRemoveBottomSheet(show: Boolean, receipt: ReceiptData?) {
+    private fun reduceShowRemoveDialog(show: Boolean, receipt: ReceiptData?) {
         _uiState.update {
-            it.copy(showRemoveBottomSheet = show, receiptToRemove = receipt)
+            it.copy(showRemoveDialog = show, receiptToRemove = receipt)
         }
     }
 
@@ -114,9 +114,9 @@ class PurchaseHistoryViewModel(
         }
     }
 
-    private fun reduceDismissRemoveBottomSheet() {
+    private fun reduceDismissRemoveDialog() {
         _uiState.update {
-            it.copy(showRemoveBottomSheet = false, receiptToRemove = null)
+            it.copy(showRemoveDialog = false, receiptToRemove = null)
         }
     }
 
@@ -217,7 +217,7 @@ class PurchaseHistoryViewModel(
                     )
                 }
             // Always dismiss - flow collection handles UI update
-            reduceDismissRemoveBottomSheet()
+            reduceDismissRemoveDialog()
         }
     }
 

@@ -39,9 +39,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
 import com.example.jbchretreatstore.bookstore.domain.model.ReceiptData
+import com.example.jbchretreatstore.bookstore.presentation.ui.bottomsheet.EditPurchaseHistoryItemBottomSheet
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.TitleView
 import com.example.jbchretreatstore.bookstore.presentation.ui.dialog.EditBuyerNameDialog
 import com.example.jbchretreatstore.bookstore.presentation.ui.dialog.EditMonthNameDialog
+import com.example.jbchretreatstore.bookstore.presentation.ui.dialog.RemoveConfirmationDialog
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.DarkBlue
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
@@ -181,7 +183,7 @@ fun PurchaseHistoryScreen(
                                         receipt = dateGroup.receipts[index],
                                         onRemoveClick = { receipt ->
                                             onIntent(
-                                                PurchaseHistoryIntent.ShowRemoveBottomSheet(
+                                                PurchaseHistoryIntent.ShowRemoveDialog(
                                                     true,
                                                     receipt
                                                 )
@@ -245,11 +247,11 @@ fun PurchaseHistoryScreen(
         }
     }
 
-    // Remove confirmation bottom sheet
+    // Remove confirmation dialog
     uiState.receiptToRemove?.let { receipt ->
-        if (uiState.showRemoveBottomSheet) {
-            RemoveConfirmationBottomSheet(
-                onDismiss = { onIntent(PurchaseHistoryIntent.ShowRemoveBottomSheet(false)) },
+        if (uiState.showRemoveDialog) {
+            RemoveConfirmationDialog(
+                onDismiss = { onIntent(PurchaseHistoryIntent.ShowRemoveDialog(false)) },
                 onConfirm = { onIntent(PurchaseHistoryIntent.RemoveReceipt(receipt)) }
             )
         }

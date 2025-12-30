@@ -68,13 +68,16 @@ class ShopViewModel(
             is ShopIntent.DeleteDisplayItem -> handleDeleteDisplayItem(intent.item)
             is ShopIntent.ReorderDisplayItems -> handleReorderDisplayItems(intent.items)
             is ShopIntent.AddToCart -> handleAddToCart(intent.checkoutItem)
-            is ShopIntent.ShowAddItemDialog -> reduceShowAddItemDialog(intent.show)
+            is ShopIntent.ShowAddItemBottomSheet -> reduceShowAddItemBottomSheet(intent.show)
             is ShopIntent.ShowRemoveItemDialog -> reduceShowRemoveItemDialog(
                 intent.show,
                 intent.item
             )
 
-            is ShopIntent.ShowEditItemDialog -> reduceShowEditItemDialog(intent.show, intent.item)
+            is ShopIntent.ShowEditItemBottomSheet -> reduceShowEditItemBottomSheet(
+                intent.show,
+                intent.item
+            )
             is ShopIntent.LoadTestData -> handleLoadTestData()
         }
     }
@@ -85,16 +88,16 @@ class ShopViewModel(
         _uiState.update { it.copy(searchQuery = query) }
     }
 
-    private fun reduceShowAddItemDialog(show: Boolean) {
-        _uiState.update { it.copy(showAddItemDialog = show) }
+    private fun reduceShowAddItemBottomSheet(show: Boolean) {
+        _uiState.update { it.copy(showAddItemBottomSheet = show) }
     }
 
     private fun reduceShowRemoveItemDialog(show: Boolean, item: DisplayItem?) {
         _uiState.update { it.copy(showRemoveItemDialog = show, itemToRemove = item) }
     }
 
-    private fun reduceShowEditItemDialog(show: Boolean, item: DisplayItem?) {
-        _uiState.update { it.copy(showEditItemDialog = show, itemToEdit = item) }
+    private fun reduceShowEditItemBottomSheet(show: Boolean, item: DisplayItem?) {
+        _uiState.update { it.copy(showEditItemBottomSheet = show, itemToEdit = item) }
     }
 
     // endregion
@@ -118,11 +121,11 @@ class ShopViewModel(
         viewModelScope.launch {
             val result = manageDisplayItemsUseCase.addDisplayItem(newItem)
             result.onSuccess {
-                _uiState.update { it.copy(showAddItemDialog = false) }
+                _uiState.update { it.copy(showAddItemBottomSheet = false) }
                 snackbarManager.showSnackbar(Res.string.item_added_success)
             }.onFailure { error ->
                 println(LogMessages.withError(LogMessages.ADD_ITEM_FAILED_PREFIX, error.message))
-                _uiState.update { it.copy(showAddItemDialog = false) }
+                _uiState.update { it.copy(showAddItemBottomSheet = false) }
                 snackbarManager.showSnackbar(Res.string.item_add_failed)
             }
         }
@@ -146,11 +149,11 @@ class ShopViewModel(
         viewModelScope.launch {
             val result = manageDisplayItemsUseCase.updateDisplayItem(updatedItem)
             result.onSuccess {
-                _uiState.update { it.copy(showEditItemDialog = false, itemToEdit = null) }
+                _uiState.update { it.copy(showEditItemBottomSheet = false, itemToEdit = null) }
                 snackbarManager.showSnackbar(Res.string.item_update_success)
             }.onFailure { error ->
                 println(LogMessages.withError(LogMessages.UPDATE_ITEM_FAILED_PREFIX, error.message))
-                _uiState.update { it.copy(showEditItemDialog = false, itemToEdit = null) }
+                _uiState.update { it.copy(showEditItemBottomSheet = false, itemToEdit = null) }
                 snackbarManager.showSnackbar(Res.string.item_update_failed)
             }
         }

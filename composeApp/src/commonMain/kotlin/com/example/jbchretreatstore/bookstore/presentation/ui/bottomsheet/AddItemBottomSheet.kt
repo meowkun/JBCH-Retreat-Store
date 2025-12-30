@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.presentation.ui.dialog
+package com.example.jbchretreatstore.bookstore.presentation.ui.bottomsheet
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +18,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.DragHandle
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -29,13 +28,17 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -72,6 +75,7 @@ import jbchretreatstore.composeapp.generated.resources.add_item_price_place_hold
 import jbchretreatstore.composeapp.generated.resources.add_item_save
 import jbchretreatstore.composeapp.generated.resources.ic_close
 import jbchretreatstore.composeapp.generated.resources.reorderable_drag_handle_description
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -79,15 +83,16 @@ import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
 /**
- * Dialog for adding or editing an item in the store.
+ * Bottom sheet for adding or editing an item in the store.
  * Supports adding/editing basic item information (name, price) and optional variants.
  *
- * @param onDismiss Callback when dialog is dismissed
+ * @param onDismiss Callback when bottom sheet is dismissed
  * @param onAddItem Callback when item is added or updated
- * @param initialItem Optional item to edit. If null, dialog is in add mode.
+ * @param initialItem Optional item to edit. If null, bottom sheet is in add mode.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddItemDialog(
+fun AddItemBottomSheet(
     onDismiss: () -> Unit,
     onAddItem: (DisplayItem) -> Unit,
     initialItem: DisplayItem? = null
@@ -96,10 +101,32 @@ fun AddItemDialog(
         mutableStateOf(AddItemState.fromItem(initialItem))
     }
 
-    AlertDialog(
-        onDismissRequest = {},
-        containerColor = White,
-        title = {
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+        confirmValueChange = { it != SheetValue.Hidden } // Prevent swipe to dismiss
+    )
+    val scope = rememberCoroutineScope()
+
+    // Helper to properly hide sheet before calling onDismiss
+    val hideSheet: () -> Unit = {
+        scope.launch {
+            sheetState.hide()
+        }.invokeOnCompletion {
+            onDismiss()
+        }
+    }
+
+    ModalBottomSheet(
+        onDismissRequest = {}, // Prevent dismiss on outside tap - use close button instead
+        sheetState = sheetState,
+        containerColor = White
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Dimensions.spacing_m)
+                .padding(bottom = Dimensions.spacing_xl)
+        ) {
             DialogTitle(
                 title = stringResource(viewState.dialogTitleRes),
                 showBackArrow = viewState.displayAddOptionView,
@@ -107,12 +134,13 @@ fun AddItemDialog(
                     if (viewState.displayAddOptionView) {
                         viewState = viewState.navigateBack()
                     } else {
-                        onDismiss()
+                        hideSheet()
                     }
                 }
             )
-        },
-        text = {
+
+            Spacer(Modifier.height(Dimensions.spacing_m))
+
             if (viewState.displayAddOptionView) {
                 viewState.AddNewVariantView(
                     updateViewState = { viewState = it }
@@ -120,13 +148,17 @@ fun AddItemDialog(
             } else {
                 viewState.AddItemContent(
                     updateViewState = { viewState = it },
-                    onAddItem = onAddItem
+                    onAddItem = { item ->
+                        scope.launch {
+                            sheetState.hide()
+                        }.invokeOnCompletion {
+                            onAddItem(item)
+                        }
+                    }
                 )
             }
-        },
-        confirmButton = {},
-        dismissButton = {}
-    )
+        }
+    }
 }
 
 /**
@@ -632,9 +664,9 @@ fun VariantDisplayItemPreview() {
 
 @Preview
 @Composable
-fun AddItemDialogPreview() {
+fun AddItemBottomSheetPreview() {
     BookStoreTheme {
-        AddItemDialog(
+        AddItemBottomSheet(
             onDismiss = {},
             onAddItem = {}
         )
@@ -643,9 +675,9 @@ fun AddItemDialogPreview() {
 
 @Preview
 @Composable
-fun EditItemDialogPreview() {
+fun EditItemBottomSheetPreview() {
     BookStoreTheme {
-        AddItemDialog(
+        AddItemBottomSheet(
             onDismiss = {},
             onAddItem = {},
             initialItem = DisplayItem(
@@ -665,3 +697,4 @@ fun EditItemDialogPreview() {
         )
     }
 }
+

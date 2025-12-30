@@ -71,7 +71,7 @@ data class MonthGroup(
 data class PurchaseHistoryUiState(
     val purchasedHistory: List<ReceiptData> = emptyList(),
     val isLoading: Boolean = true,
-    val showRemoveBottomSheet: Boolean = false,
+    val showRemoveDialog: Boolean = false,
     val receiptToRemove: ReceiptData? = null,
     val showEditBottomSheet: Boolean = false,
     val receiptToEdit: ReceiptData? = null,
@@ -151,7 +151,7 @@ sealed interface PurchaseHistoryIntent {
     data object SharePurchaseHistory : PurchaseHistoryIntent
 
     // Remove receipt
-    data class ShowRemoveBottomSheet(val show: Boolean, val receipt: ReceiptData? = null) :
+    data class ShowRemoveDialog(val show: Boolean, val receipt: ReceiptData? = null) :
         PurchaseHistoryIntent
 
     data class RemoveReceipt(val receipt: ReceiptData) : PurchaseHistoryIntent

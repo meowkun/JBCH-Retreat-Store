@@ -124,7 +124,7 @@ fun BookStoreNavHost() {
                         checkoutViewModel.handleIntent(CheckoutIntent.ShowCheckoutDialog(true))
                     },
                     onAddItemClick = {
-                        shopViewModel.handleIntent(ShopIntent.ShowAddItemDialog(true))
+                        shopViewModel.handleIntent(ShopIntent.ShowAddItemBottomSheet(true))
                     },
                     onShareClick = {
                         purchaseHistoryViewModel.handleIntent(PurchaseHistoryIntent.SharePurchaseHistory)

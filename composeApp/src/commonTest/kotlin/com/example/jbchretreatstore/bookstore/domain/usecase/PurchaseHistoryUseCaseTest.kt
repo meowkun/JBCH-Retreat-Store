@@ -550,7 +550,7 @@ class PurchaseHistoryUseCaseTest {
     }
 
     @Test
-    fun `updateBuyerName uses Unknown for empty name`() = runTest {
+    fun `updateBuyerName uses NA for empty name`() = runTest {
         val receiptId = Uuid.random()
         val receipt = ReceiptData(
             id = receiptId,
@@ -562,11 +562,11 @@ class PurchaseHistoryUseCaseTest {
         val result = useCase.updateBuyerName(receipt, "")
 
         assertTrue(result.isSuccess)
-        assertEquals("Unknown", repository.lastSavedReceipts?.first()?.buyerName)
+        assertEquals("NA", repository.lastSavedReceipts?.first()?.buyerName)
     }
 
     @Test
-    fun `updateBuyerName uses Unknown for blank name`() = runTest {
+    fun `updateBuyerName uses NA for blank name`() = runTest {
         val receiptId = Uuid.random()
         val receipt = ReceiptData(
             id = receiptId,
@@ -578,7 +578,7 @@ class PurchaseHistoryUseCaseTest {
         val result = useCase.updateBuyerName(receipt, "   ")
 
         assertTrue(result.isSuccess)
-        assertEquals("Unknown", repository.lastSavedReceipts?.first()?.buyerName)
+        assertEquals("NA", repository.lastSavedReceipts?.first()?.buyerName)
     }
 
     @Test

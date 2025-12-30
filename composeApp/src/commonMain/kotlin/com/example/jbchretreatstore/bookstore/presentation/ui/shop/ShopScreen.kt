@@ -11,8 +11,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.jbchretreatstore.bookstore.presentation.ui.bottomsheet.AddItemBottomSheet
 import com.example.jbchretreatstore.bookstore.presentation.ui.components.BottomGradientOverlay
-import com.example.jbchretreatstore.bookstore.presentation.ui.dialog.AddItemDialog
 import com.example.jbchretreatstore.bookstore.presentation.ui.dialog.RemoveItemDialog
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 
@@ -47,7 +47,7 @@ fun ShopScreen(
                     displayItemList = uiState.searchedItemList,
                     onAddToCart = { onIntent(ShopIntent.AddToCart(it)) },
                     onDeleteItem = { onIntent(ShopIntent.ShowRemoveItemDialog(true, it)) },
-                    onEditItem = { onIntent(ShopIntent.ShowEditItemDialog(true, it)) },
+                    onEditItem = { onIntent(ShopIntent.ShowEditItemBottomSheet(true, it)) },
                     onReorderItems = { onIntent(ShopIntent.ReorderDisplayItems(it)) },
                     isReorderEnabled = uiState.isReorderEnabled
                 )
@@ -58,10 +58,10 @@ fun ShopScreen(
         }
     }
 
-    // Show add item dialog
-    if (uiState.showAddItemDialog) {
-        AddItemDialog(
-            onDismiss = { onIntent(ShopIntent.ShowAddItemDialog(false)) },
+    // Show add item bottom sheet
+    if (uiState.showAddItemBottomSheet) {
+        AddItemBottomSheet(
+            onDismiss = { onIntent(ShopIntent.ShowAddItemBottomSheet(false)) },
             onAddItem = { newItem -> onIntent(ShopIntent.AddDisplayItem(newItem)) }
         )
     }
@@ -75,10 +75,10 @@ fun ShopScreen(
         )
     }
 
-    // Show edit item dialog
-    uiState.editDialogData?.let { item ->
-        AddItemDialog(
-            onDismiss = { onIntent(ShopIntent.ShowEditItemDialog(false)) },
+    // Show edit item bottom sheet
+    uiState.editBottomSheetData?.let { item ->
+        AddItemBottomSheet(
+            onDismiss = { onIntent(ShopIntent.ShowEditItemBottomSheet(false)) },
             onAddItem = { updatedItem -> onIntent(ShopIntent.UpdateDisplayItem(updatedItem)) },
             initialItem = item
         )

@@ -24,8 +24,8 @@ class ReceiptDataTest {
     // Tests for DEFAULT_BUYER_NAME constant
 
     @Test
-    fun `DEFAULT_BUYER_NAME is Unknown`() {
-        assertEquals("Unknown", ReceiptData.DEFAULT_BUYER_NAME)
+    fun `DEFAULT_BUYER_NAME is NA`() {
+        assertEquals("NA", ReceiptData.DEFAULT_BUYER_NAME)
     }
 
     @Test

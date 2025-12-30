@@ -11,9 +11,9 @@ data class ShopUiState(
     val searchQuery: String = "",
     val displayItemList: List<DisplayItem> = emptyList(),
     val isLoading: Boolean = true,
-    val showAddItemDialog: Boolean = false,
+    val showAddItemBottomSheet: Boolean = false,
     val showRemoveItemDialog: Boolean = false,
-    val showEditItemDialog: Boolean = false,
+    val showEditItemBottomSheet: Boolean = false,
     val itemToRemove: DisplayItem? = null,
     val itemToEdit: DisplayItem? = null,
     val cartItemCount: Int = 0,
@@ -40,9 +40,9 @@ data class ShopUiState(
     val removeDialogData: DisplayItem?
         get() = if (showRemoveItemDialog && itemToRemove != null) itemToRemove else null
 
-    /** Data for edit item dialog when available, null otherwise */
-    val editDialogData: DisplayItem?
-        get() = if (showEditItemDialog && itemToEdit != null) itemToEdit else null
+    /** Data for edit item bottom sheet when available, null otherwise */
+    val editBottomSheetData: DisplayItem?
+        get() = if (showEditItemBottomSheet && itemToEdit != null) itemToEdit else null
 }
 
 // Extension properties for UI display
@@ -74,10 +74,11 @@ sealed interface ShopIntent {
     // Cart
     data class AddToCart(val checkoutItem: CheckoutItem) : ShopIntent
 
-    // Dialog visibility
-    data class ShowAddItemDialog(val show: Boolean) : ShopIntent
+    // Dialog/BottomSheet visibility
+    data class ShowAddItemBottomSheet(val show: Boolean) : ShopIntent
     data class ShowRemoveItemDialog(val show: Boolean, val item: DisplayItem? = null) : ShopIntent
-    data class ShowEditItemDialog(val show: Boolean, val item: DisplayItem? = null) : ShopIntent
+    data class ShowEditItemBottomSheet(val show: Boolean, val item: DisplayItem? = null) :
+        ShopIntent
 
     // Test data
     data object LoadTestData : ShopIntent

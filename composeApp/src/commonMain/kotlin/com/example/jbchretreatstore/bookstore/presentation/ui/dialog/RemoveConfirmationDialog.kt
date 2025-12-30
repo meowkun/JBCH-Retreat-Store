@@ -1,4 +1,4 @@
-package com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory
+package com.example.jbchretreatstore.bookstore.presentation.ui.dialog
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,16 +9,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.White
 import jbchretreatstore.composeapp.generated.resources.Res
 import jbchretreatstore.composeapp.generated.resources.purchase_history_remove_cancel
 import jbchretreatstore.composeapp.generated.resources.purchase_history_remove_confirm
@@ -35,30 +34,33 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
- * Bottom sheet for confirming removal of a purchase record
+ * Dialog for confirming removal of a purchase record
  *
- * @param onDismiss Callback when the bottom sheet is dismissed
+ * @param onDismiss Callback when the dialog is dismissed
  * @param onConfirm Callback when the user confirms the removal
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RemoveConfirmationBottomSheet(
+fun RemoveConfirmationDialog(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit
 ) {
-    ModalBottomSheet(
+    AlertDialog(
         onDismissRequest = onDismiss,
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    ) {
-        RemoveConfirmationContent(
-            onDismiss = onDismiss,
-            onConfirm = onConfirm
-        )
-    }
+        containerColor = White,
+        title = null,
+        text = {
+            RemoveConfirmationContent(
+                onDismiss = onDismiss,
+                onConfirm = onConfirm
+            )
+        },
+        confirmButton = {},
+        dismissButton = {}
+    )
 }
 
 /**
- * Content for the remove confirmation bottom sheet
+ * Content for the remove confirmation dialog
  */
 @Composable
 fun RemoveConfirmationContent(
@@ -68,8 +70,7 @@ fun RemoveConfirmationContent(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(Dimensions.spacing_m)
-            .padding(bottom = Dimensions.spacing_xl),
+            .padding(vertical = Dimensions.spacing_s),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(Dimensions.spacing_m)
     ) {
@@ -100,7 +101,8 @@ fun RemoveConfirmationContent(
         // Confirm button
         Button(
             onClick = onConfirm,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
+                .padding(horizontal = Dimensions.spacing_m),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.error
             ),
@@ -117,7 +119,8 @@ fun RemoveConfirmationContent(
         // Cancel button
         OutlinedButton(
             onClick = onDismiss,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
+                .padding(horizontal = Dimensions.spacing_m),
             shape = RoundedCornerShape(Dimensions.corner_radius_s)
         ) {
             Text(
