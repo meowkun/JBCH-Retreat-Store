@@ -65,7 +65,9 @@ class ManageCartUseCase {
         currentCart: ReceiptData,
         itemToRemove: CheckoutItem
     ): Result<ReceiptData> {
-        val updatedList = currentCart.checkoutList.filter { it.id != itemToRemove.id }
+        val updatedList = currentCart.checkoutList.filter {
+            it != itemToRemove
+        }
 
         if (updatedList.size == currentCart.checkoutList.size) {
             return Result.failure(IllegalArgumentException(ErrorMessages.CART_ITEM_NOT_FOUND))

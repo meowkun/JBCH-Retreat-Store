@@ -65,8 +65,8 @@
     <!--  Purchase history view  -->
     <string name="purchase_history_view_title">Purchase History</string>
     <string name="purchase_history_item_count">%1$d items</string>
-    <string name="unknown_buyer">Unknown Buyer</string>
-    <string name="unknown">Unknown</string>
+    <string name="unknown_buyer">N/A</string>
+    <string name="unknown">N/A</string>
     <string name="purchase_history_remove_title">Remove Purchase Record</string>
     <string name="purchase_history_remove_message">Are you sure you want to remove this purchase record?</string>
     <string name="purchase_history_remove_confirm">Yes, Remove</string>

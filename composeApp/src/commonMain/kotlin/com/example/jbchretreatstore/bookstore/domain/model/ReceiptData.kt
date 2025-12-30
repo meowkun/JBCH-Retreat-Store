@@ -25,6 +25,6 @@ data class ReceiptData @OptIn(ExperimentalTime::class) constructor(
 
     companion object {
         /** Default buyer name when none is provided */
-        const val DEFAULT_BUYER_NAME = "Unknown"
+        const val DEFAULT_BUYER_NAME = "N/A"
     }
 }

@@ -34,7 +34,7 @@ fun ItemListView(
         verticalArrangement = Arrangement.spacedBy(Dimensions.item_spacing),
         contentPadding = PaddingValues(bottom = Dimensions.gradient_overlay_height)
     ) {
-        items(items = displayItemList, key = { it.id }) { item ->
+        items(items = displayItemList, key = { it.uniqueKey }) { item ->
             ItemView(
                 displayItem = item,
                 modifier = Modifier.fillParentMaxWidth(),

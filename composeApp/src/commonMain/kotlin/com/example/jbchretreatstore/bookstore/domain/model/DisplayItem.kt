@@ -17,4 +17,7 @@ data class DisplayItem(
         val key: String = "",
         val valueList: List<String> = emptyList()
     )
+
+    val uniqueKey: String
+        get() = "${id}_${name.hashCode()}_${price.hashCode()}_${variants.hashCode()}"
 }

@@ -43,7 +43,7 @@ data class CheckoutItem @OptIn(ExperimentalUuidApi::class) constructor(
      * Useful for LazyColumn item keys.
      */
     val uniqueKey: String
-        get() = "${id}_${variantsMap.hashCode()}"
+        get() = "${id}_${itemName.hashCode()}_${quantity.hashCode()}_${totalPrice.hashCode()}_${variantsMap.hashCode()}"
 
     /**
      * Unit price calculated from total price and quantity.
