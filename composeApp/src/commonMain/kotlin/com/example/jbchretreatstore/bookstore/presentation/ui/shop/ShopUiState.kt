@@ -32,6 +32,10 @@ data class ShopUiState(
     val showClearSearchButton: Boolean
         get() = searchQuery.isNotBlank()
 
+    /** True when reordering items is allowed (disabled during search) */
+    val isReorderEnabled: Boolean
+        get() = searchQuery.isBlank()
+
     /** Data for remove item dialog when available, null otherwise */
     val removeDialogData: DisplayItem?
         get() = if (showRemoveItemDialog && itemToRemove != null) itemToRemove else null
@@ -65,6 +69,7 @@ sealed interface ShopIntent {
     data class AddDisplayItem(val item: DisplayItem) : ShopIntent
     data class UpdateDisplayItem(val item: DisplayItem) : ShopIntent
     data class DeleteDisplayItem(val item: DisplayItem) : ShopIntent
+    data class ReorderDisplayItems(val items: List<DisplayItem>) : ShopIntent
 
     // Cart
     data class AddToCart(val checkoutItem: CheckoutItem) : ShopIntent

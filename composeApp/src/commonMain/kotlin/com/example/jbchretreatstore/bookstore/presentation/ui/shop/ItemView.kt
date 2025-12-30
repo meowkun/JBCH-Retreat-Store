@@ -15,10 +15,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.rounded.DragHandle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -58,6 +60,7 @@ import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Black
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions.corner_radius_percent_l
+import com.example.jbchretreatstore.bookstore.presentation.ui.theme.LightGrayBlue
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.MediumBlue
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Shapes
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.White
@@ -72,6 +75,7 @@ import jbchretreatstore.composeapp.generated.resources.ic_chevron_small
 import jbchretreatstore.composeapp.generated.resources.ic_trash_can
 import jbchretreatstore.composeapp.generated.resources.item_option_menu_selection_hint
 import jbchretreatstore.composeapp.generated.resources.item_price_per_unit
+import jbchretreatstore.composeapp.generated.resources.reorderable_drag_handle_description
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -119,7 +123,8 @@ fun ItemView(
     modifier: Modifier = Modifier,
     onAddToCart: (CheckoutItem) -> Unit,
     onDeleteItem: (DisplayItem) -> Unit,
-    onEditItem: (DisplayItem) -> Unit
+    onEditItem: (DisplayItem) -> Unit,
+    dragHandleModifier: Modifier = Modifier,
 ) {
     var expanded by rememberSaveable { mutableStateOf(true) }
     // Use inputs vararg to reset state when displayItem content changes (name, price, variants)
@@ -146,7 +151,7 @@ fun ItemView(
     ElevatedCard(
         shape = Shapes.itemCard,
         modifier = modifier
-            .padding(horizontal = Dimensions.spacing_m)
+            .padding(Dimensions.spacing_m)
             .border(
                 width = Dimensions.border_width,
                 color = MediumBlue,
@@ -161,11 +166,10 @@ fun ItemView(
         ) {
             ItemDescriptionView(
                 displayItem = displayItem,
-                checkoutItem = checkoutItem,
-                expanded = expanded
-            ) {
-                expanded = !expanded
-            }
+                expanded = expanded,
+                dragHandleModifier = dragHandleModifier,
+                onItemClicked = { expanded = !expanded }
+            )
 
         }
         if (expanded) {
@@ -190,8 +194,8 @@ fun ItemView(
 @Composable
 fun ItemDescriptionView(
     displayItem: DisplayItem,
-    checkoutItem: CheckoutItem,
     expanded: Boolean,
+    dragHandleModifier: Modifier = Modifier,
     onItemClicked: () -> Unit = {},
 ) {
     val rotationAngle by animateFloatAsState(
@@ -204,10 +208,23 @@ fun ItemDescriptionView(
             .clickable {
                 onItemClicked.invoke()
             }
-            .padding(all = Dimensions.spacing_m),
+            .padding(vertical = Dimensions.spacing_s, horizontal = Dimensions.spacing_m),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // Drag handle
+        IconButton(
+            modifier = dragHandleModifier
+                .size(Dimensions.icon_size_l),
+            onClick = {},
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.DragHandle,
+                tint = LightGrayBlue,
+                contentDescription = stringResource(Res.string.reorderable_drag_handle_description)
+            )
+        }
+
         Text(
             text = displayItem.name,
             style = MaterialTheme.typography.titleLarge,
@@ -474,10 +491,6 @@ fun ItemDescriptionViewPreview() {
                         valueList = listOf("English", "French", "Spanish")
                     )
                 )
-            ),
-            checkoutItem = CheckoutItem(
-                itemName = "Holy Bible - NIV",
-                totalPrice = 45.99
             ),
             expanded = true,
             onItemClicked = {}
