@@ -1,6 +1,5 @@
 package com.example.jbchretreatstore.bookstore.presentation.ui.shop
 
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -66,9 +65,8 @@ fun ItemListView(
                 key = item.uniqueKey,
                 enabled = isReorderEnabled
             ) { isDragging ->
-                val elevation by animateDpAsState(
+                val elevation =
                     if (isDragging) Dimensions.reorderable_item_drag_elevation else Dimensions.elevation_none
-                )
 
                 Surface(
                     shadowElevation = elevation,

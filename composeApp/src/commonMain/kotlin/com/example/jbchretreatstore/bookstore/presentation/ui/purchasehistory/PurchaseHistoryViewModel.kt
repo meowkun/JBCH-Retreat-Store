@@ -69,6 +69,17 @@ class PurchaseHistoryViewModel(
                 intent.newBuyerName,
                 intent.newPaymentMethod
             )
+
+            is PurchaseHistoryIntent.ToggleMonthExpanded -> reduceToggleMonthExpanded(intent.yearMonth)
+            is PurchaseHistoryIntent.ShowEditMonthNameDialog -> reduceShowEditMonthNameDialog(
+                intent.show,
+                intent.yearMonth
+            )
+
+            is PurchaseHistoryIntent.UpdateMonthName -> reduceUpdateMonthName(
+                intent.yearMonth,
+                intent.newName
+            )
         }
     }
 
@@ -124,6 +135,45 @@ class PurchaseHistoryViewModel(
             it.copy(
                 showEditBuyerNameDialog = false,
                 receiptToEditBuyerName = null
+            )
+        }
+    }
+
+    private fun reduceToggleMonthExpanded(yearMonth: YearMonth) {
+        _uiState.update { state ->
+            val currentCollapsed = state.collapsedMonths
+            val newCollapsed = if (currentCollapsed.contains(yearMonth.key)) {
+                // Was collapsed, now expand (remove from collapsed set)
+                currentCollapsed - yearMonth.key
+            } else {
+                // Was expanded, now collapse (add to collapsed set)
+                currentCollapsed + yearMonth.key
+            }
+            state.copy(collapsedMonths = newCollapsed)
+        }
+    }
+
+    private fun reduceShowEditMonthNameDialog(show: Boolean, yearMonth: YearMonth?) {
+        _uiState.update {
+            it.copy(
+                showEditMonthNameDialog = show,
+                monthToEditName = yearMonth
+            )
+        }
+    }
+
+    private fun reduceUpdateMonthName(yearMonth: YearMonth, newName: String?) {
+        _uiState.update { state ->
+            val currentNames = state.customMonthNames.toMutableMap()
+            if (newName.isNullOrBlank()) {
+                currentNames.remove(yearMonth.key)
+            } else {
+                currentNames[yearMonth.key] = newName
+            }
+            state.copy(
+                customMonthNames = currentNames,
+                showEditMonthNameDialog = false,
+                monthToEditName = null
             )
         }
     }

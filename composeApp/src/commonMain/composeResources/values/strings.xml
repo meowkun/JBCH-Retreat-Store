@@ -76,6 +76,11 @@
     <string name="purchase_history_edit_total">Total</string>
     <string name="purchase_history_edit_save">Save</string>
     <string name="purchase_history_edit_cancel">Cancel</string>
+    <string name="purchase_history_month_group_receipts">%1$d receipts</string>
+    <string name="purchase_history_edit_month_name_title">Edit Group Name</string>
+    <string name="purchase_history_month_name_hint">Group Name (leave empty for default)</string>
+    <string name="purchase_history_month_name_default">Default: %1$s</string>
+    <string name="purchase_history_month_name_clear">Clear custom name</string>
 
     <!-- Display item messages -->
     <string name="item_added_success">Item added successfully</string>

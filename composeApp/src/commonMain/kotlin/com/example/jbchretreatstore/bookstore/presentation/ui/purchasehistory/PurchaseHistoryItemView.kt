@@ -1,6 +1,5 @@
 package com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -69,7 +68,6 @@ fun PurchaseHistoryItemView(
         shape = Shapes.itemCard,
         border = BorderStroke(Dimensions.border_width, MediumBlue),
         modifier = Modifier.fillMaxWidth().padding(horizontal = Dimensions.spacing_m)
-            .animateContentSize()
     ) {
         Column(
             modifier = Modifier

@@ -1,7 +1,5 @@
 package com.example.jbchretreatstore.bookstore.presentation.ui.shop
 
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -156,7 +154,7 @@ fun ItemView(
                 width = Dimensions.border_width,
                 color = MediumBlue,
                 shape = Shapes.itemCard
-            ).animateContentSize()
+            )
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -198,9 +196,7 @@ fun ItemDescriptionView(
     dragHandleModifier: Modifier = Modifier,
     onItemClicked: () -> Unit = {},
 ) {
-    val rotationAngle by animateFloatAsState(
-        targetValue = if (expanded) 0f else 180f
-    )
+    val rotationAngle = if (expanded) 0f else 180f
 
     Row(
         modifier = Modifier
@@ -229,6 +225,9 @@ fun ItemDescriptionView(
             text = displayItem.name,
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.weight(1f)
+                .padding(end = Dimensions.spacing_m),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
 
         PriceTag(displayItem.price)
@@ -363,9 +362,7 @@ fun ItemVariantMenu(
     updateCartItem: (CheckoutItem) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val rotationAngle by animateFloatAsState(
-        targetValue = if (expanded) 180f else 0f
-    )
+    val rotationAngle = if (expanded) 180f else 0f
 
     ExposedDropdownMenuBox(
         expanded = expanded,
