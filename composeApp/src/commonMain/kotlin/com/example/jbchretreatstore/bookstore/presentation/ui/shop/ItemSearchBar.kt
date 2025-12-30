@@ -1,8 +1,5 @@
 package com.example.jbchretreatstore.bookstore.presentation.ui.shop
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -84,11 +81,7 @@ fun ItemSearchBar(
             imeAction = ImeAction.Done
         ),
         trailingIcon = {
-            AnimatedVisibility(
-                visible = searchQuery.isNotBlank(),
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
+            if (searchQuery.isNotBlank()) {
                 IconButton(onClick = { onSearchQueryChange("") }) {
                     Icon(
                         imageVector = Icons.Default.Close,

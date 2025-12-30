@@ -1,6 +1,5 @@
 package com.example.jbchretreatstore.bookstore.presentation.ui.purchasehistory
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -226,9 +225,7 @@ private fun EditPurchaseHistoryVariantDropdown(
     onValueSelected: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val rotationAngle by animateFloatAsState(
-        targetValue = if (expanded) 180f else 0f
-    )
+    val rotationAngle = if (expanded) 180f else 0f
 
     ExposedDropdownMenuBox(
         expanded = expanded,

@@ -130,6 +130,16 @@ class ManageDisplayItemsUseCase(
     suspend fun clearAllItems() {
         repository.updateDisplayItems(emptyList())
     }
+
+    /**
+     * Reorder display items
+     * @param reorderedItems The new ordered list of display items
+     * @return Result indicating success or failure
+     */
+    suspend fun reorderDisplayItems(reorderedItems: List<DisplayItem>): Result<Unit> {
+        repository.updateDisplayItems(reorderedItems)
+        return Result.success(Unit)
+    }
 }
 
 

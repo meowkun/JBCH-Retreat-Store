@@ -47,7 +47,9 @@ fun ShopScreen(
                     displayItemList = uiState.searchedItemList,
                     onAddToCart = { onIntent(ShopIntent.AddToCart(it)) },
                     onDeleteItem = { onIntent(ShopIntent.ShowRemoveItemDialog(true, it)) },
-                    onEditItem = { onIntent(ShopIntent.ShowEditItemDialog(true, it)) }
+                    onEditItem = { onIntent(ShopIntent.ShowEditItemDialog(true, it)) },
+                    onReorderItems = { onIntent(ShopIntent.ReorderDisplayItems(it)) },
+                    isReorderEnabled = uiState.isReorderEnabled
                 )
             }
 

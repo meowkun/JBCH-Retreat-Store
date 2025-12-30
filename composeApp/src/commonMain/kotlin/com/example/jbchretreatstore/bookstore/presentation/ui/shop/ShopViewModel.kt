@@ -66,6 +66,7 @@ class ShopViewModel(
             is ShopIntent.AddDisplayItem -> handleAddDisplayItem(intent.item)
             is ShopIntent.UpdateDisplayItem -> handleUpdateDisplayItem(intent.item)
             is ShopIntent.DeleteDisplayItem -> handleDeleteDisplayItem(intent.item)
+            is ShopIntent.ReorderDisplayItems -> handleReorderDisplayItems(intent.items)
             is ShopIntent.AddToCart -> handleAddToCart(intent.checkoutItem)
             is ShopIntent.ShowAddItemDialog -> reduceShowAddItemDialog(intent.show)
             is ShopIntent.ShowRemoveItemDialog -> reduceShowRemoveItemDialog(
@@ -172,6 +173,12 @@ class ShopViewModel(
     private fun handleLoadTestData() {
         viewModelScope.launch {
             manageDisplayItemsUseCase.loadTestData()
+        }
+    }
+
+    private fun handleReorderDisplayItems(reorderedItems: List<DisplayItem>) {
+        viewModelScope.launch {
+            manageDisplayItemsUseCase.reorderDisplayItems(reorderedItems)
         }
     }
 

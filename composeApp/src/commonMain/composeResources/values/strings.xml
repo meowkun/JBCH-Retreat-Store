@@ -65,8 +65,8 @@
     <!--  Purchase history view  -->
     <string name="purchase_history_view_title">Purchase History</string>
     <string name="purchase_history_item_count">%1$d items</string>
-    <string name="unknown_buyer">Unknown Buyer</string>
-    <string name="unknown">Unknown</string>
+    <string name="unknown_buyer">N/A</string>
+    <string name="unknown">N/A</string>
     <string name="purchase_history_remove_title">Remove Purchase Record</string>
     <string name="purchase_history_remove_message">Are you sure you want to remove this purchase record?</string>
     <string name="purchase_history_remove_confirm">Yes, Remove</string>
@@ -76,6 +76,11 @@
     <string name="purchase_history_edit_total">Total</string>
     <string name="purchase_history_edit_save">Save</string>
     <string name="purchase_history_edit_cancel">Cancel</string>
+    <string name="purchase_history_month_group_receipts">%1$d receipts</string>
+    <string name="purchase_history_edit_month_name_title">Edit Group Name</string>
+    <string name="purchase_history_month_name_hint">Group Name (leave empty for default)</string>
+    <string name="purchase_history_month_name_default">Default: %1$s</string>
+    <string name="purchase_history_month_name_clear">Clear custom name</string>
 
     <!-- Display item messages -->
     <string name="item_added_success">Item added successfully</string>

@@ -1,6 +1,5 @@
 package com.example.jbchretreatstore.bookstore.presentation.ui.dialog
 
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -372,9 +371,8 @@ fun ReorderableVariantsList(
                 reorderableLazyListState,
                 key = variant.id
             ) { isDragging ->
-                val elevation by animateDpAsState(
+                val elevation =
                     if (isDragging) Dimensions.reorderable_item_drag_elevation else Dimensions.elevation_none
-                )
 
                 Surface(
                     shadowElevation = elevation,
@@ -454,9 +452,8 @@ fun ReorderableVariantValuesList(
                 reorderableLazyListState,
                 key = value
             ) { isDragging ->
-                val elevation by animateDpAsState(
+                val elevation =
                     if (isDragging) Dimensions.reorderable_item_drag_elevation else Dimensions.elevation_none
-                )
 
                 Surface(
                     shadowElevation = elevation,
