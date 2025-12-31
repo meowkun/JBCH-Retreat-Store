@@ -148,13 +148,13 @@ fun EditPurchaseHistoryItemContent(
                 onDecrement = { newQuantity ->
                     editedItem = editedItem.copy(
                         quantity = newQuantity,
-                        totalPrice = unitPrice * newQuantity
+                        unitPrice = unitPrice
                     )
                 },
                 onIncrement = { newQuantity ->
                     editedItem = editedItem.copy(
                         quantity = newQuantity,
-                        totalPrice = unitPrice * newQuantity
+                        unitPrice = unitPrice
                     )
                 },
                 minValue = 1
@@ -304,7 +304,7 @@ private fun EditPurchaseHistoryItemContentPreview() {
                 purchaseHistoryItem = CheckoutItem(
                     itemName = "Bible",
                     quantity = 2,
-                    totalPrice = 80.0,
+                    unitPrice = 80.0,
                     variants = listOf(
                         CheckoutItem.Variant(
                             key = "Language",

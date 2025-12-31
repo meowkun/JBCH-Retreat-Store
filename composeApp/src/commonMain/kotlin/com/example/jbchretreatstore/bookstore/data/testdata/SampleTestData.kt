@@ -416,7 +416,7 @@ object SampleTestData {
                             itemName = item.name,
                             quantity = quantity,
                             variants = checkoutVariants,
-                            totalPrice = item.price * quantity
+                            unitPrice = item.price
                         )
                     )
                 }

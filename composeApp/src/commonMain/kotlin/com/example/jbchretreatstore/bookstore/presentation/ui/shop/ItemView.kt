@@ -93,7 +93,7 @@ private val CheckoutItemSaver: Saver<CheckoutItem, Any> = listSaver(
             item.variants.map { variant ->
                 listOf(variant.key, variant.valueList, variant.selectedValue)
             },
-            item.totalPrice
+            item.unitPrice
         )
     },
     restore = { list ->
@@ -109,7 +109,7 @@ private val CheckoutItemSaver: Saver<CheckoutItem, Any> = listSaver(
                     selectedValue = variantList[2] as String
                 )
             },
-            totalPrice = list[4] as Double
+            unitPrice = list[4] as Double
         )
     }
 )
@@ -140,7 +140,7 @@ fun ItemView(
                         selectedValue = variant.valueList.firstOrNull() ?: ""
                     )
                 },
-                totalPrice = displayItem.price
+                unitPrice = displayItem.price
             )
         )
     }
@@ -447,18 +447,12 @@ fun QuantityStepper(
         value = checkoutItem.quantity,
         onDecrement = { newQuantity ->
             updateCartItem.invoke(
-                checkoutItem.copy(
-                    quantity = newQuantity,
-                    totalPrice = displayItem.price * newQuantity
-                )
+                checkoutItem.copy(quantity = newQuantity)
             )
         },
         onIncrement = { newQuantity ->
             updateCartItem.invoke(
-                checkoutItem.copy(
-                    quantity = newQuantity,
-                    totalPrice = displayItem.price * newQuantity
-                )
+                checkoutItem.copy(quantity = newQuantity)
             )
         },
         minValue = 1
@@ -506,7 +500,7 @@ fun ItemVariantMenuPreview() {
             ),
             checkoutItem = CheckoutItem(
                 itemName = "T-Shirt",
-                totalPrice = 25.00
+                unitPrice = 25.00
             ),
             updateCartItem = {}
         )
@@ -525,7 +519,7 @@ fun QuantityStepperPreview() {
             checkoutItem = CheckoutItem(
                 itemName = "Bible",
                 quantity = 2,
-                totalPrice = 80.00
+                unitPrice = 80.00
             ),
             updateCartItem = {}
         )

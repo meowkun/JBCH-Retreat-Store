@@ -120,19 +120,17 @@ class PurchaseHistoryUseCase(
                             updatedItem.totalPrice
                         }
                         r.checkoutList.mapNotNull { item ->
-                            when {
+                            when (item.itemName) {
                                 // This is the existing item with matching variants - add updated item's quantity
-                                item.itemName == existingItem.itemName &&
-                                        item.variantsMap == existingItem.variantsMap -> {
+                                existingItem.itemName if item.variantsMap == existingItem.variantsMap -> {
                                     val newQuantity = item.quantity + updatedItem.quantity
                                     item.copy(
                                         quantity = newQuantity,
-                                        totalPrice = unitPrice * newQuantity
+                                        unitPrice = unitPrice
                                     )
                                 }
                                 // This is the original item being edited - remove it (merged into existing)
-                                item.itemName == originalItem.itemName &&
-                                        item.variantsMap == originalItem.variantsMap -> null
+                                originalItem.itemName if item.variantsMap == originalItem.variantsMap -> null
                                 // Other items - keep as is
                                 else -> item
                             }

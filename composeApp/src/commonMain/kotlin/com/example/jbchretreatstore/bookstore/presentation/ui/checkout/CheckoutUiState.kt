@@ -29,6 +29,8 @@ sealed interface CheckoutIntent {
     // Cart management
     data class RemoveFromCart(val item: CheckoutItem) : CheckoutIntent
 
+    data class UpdateItemQuantity(val item: CheckoutItem, val newQuantity: Int) : CheckoutIntent
+
     // Dialog visibility
     data class ShowCheckoutDialog(val show: Boolean) : CheckoutIntent
 

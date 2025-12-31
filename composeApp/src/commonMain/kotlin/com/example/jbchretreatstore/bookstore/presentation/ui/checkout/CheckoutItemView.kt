@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import com.example.jbchretreatstore.bookstore.domain.model.CheckoutItem
+import com.example.jbchretreatstore.bookstore.presentation.ui.components.Stepper
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.BookStoreTheme
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.Dimensions
 import com.example.jbchretreatstore.bookstore.presentation.ui.theme.MediumBlue
@@ -33,7 +34,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun CheckoutItemView(
     checkoutItem: CheckoutItem,
-    onRemoveItem: (CheckoutItem) -> Unit
+    onRemoveItem: (CheckoutItem) -> Unit,
+    onUpdateQuantity: (CheckoutItem, Int) -> Unit
 ) {
     OutlinedCard(
         shape = Shapes.itemCard,
@@ -101,10 +103,23 @@ fun CheckoutItemView(
                     ),
                 )
 
-                IconButton(onClick = { onRemoveItem(checkoutItem) }) {
-                    Image(
-                        painter = painterResource(Res.drawable.ic_trash_can),
-                        contentDescription = stringResource(Res.string.delete_item_description)
+                Row {
+                    IconButton(onClick = { onRemoveItem(checkoutItem) }) {
+                        Image(
+                            painter = painterResource(Res.drawable.ic_trash_can),
+                            contentDescription = stringResource(Res.string.delete_item_description)
+                        )
+                    }
+
+                    Stepper(
+                        value = checkoutItem.quantity,
+                        onDecrement = { newQuantity ->
+                            onUpdateQuantity.invoke(checkoutItem, newQuantity)
+                        },
+                        onIncrement = { newQuantity ->
+                            onUpdateQuantity.invoke(checkoutItem, newQuantity)
+                        },
+                        minValue = 0
                     )
                 }
             }
@@ -125,14 +140,15 @@ fun CheckoutItemViewPreview() {
                 checkoutItem = CheckoutItem(
                     itemName = "Christian T-Shirt - Faith",
                     quantity = 2,
-                    totalPrice = 24.99,
+                    unitPrice = 24.99,
                     variants = listOf(
                         CheckoutItem.Variant("Size", listOf("S", "M", "L", "XL"), "Large"),
                         CheckoutItem.Variant("Color", listOf("Red", "Blue", "Green"), "Blue"),
                         CheckoutItem.Variant("Design", listOf("Cross", "Fish", "Dove"), "Cross")
                     )
                 ),
-                onRemoveItem = {}
+                onRemoveItem = {},
+                onUpdateQuantity = { _, _ -> }
             )
 
             // Simple item without variants
@@ -140,10 +156,11 @@ fun CheckoutItemViewPreview() {
                 checkoutItem = CheckoutItem(
                     itemName = "Holy Bible - NIV",
                     quantity = 1,
-                    totalPrice = 45.99,
+                    unitPrice = 45.99,
                     variants = emptyList()
                 ),
-                onRemoveItem = {}
+                onRemoveItem = {},
+                onUpdateQuantity = { _, _ -> }
             )
         }
     }
