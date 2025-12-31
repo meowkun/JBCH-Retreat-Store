@@ -57,6 +57,10 @@ class CheckoutViewModel(
             is CheckoutIntent.SelectPaymentMethod -> reducePaymentMethod(intent.paymentMethod)
             is CheckoutIntent.ProcessCheckout -> handleProcessCheckout(intent.buyerName)
             is CheckoutIntent.RemoveFromCart -> handleRemoveFromCart(intent.item)
+            is CheckoutIntent.UpdateItemQuantity -> handleQuantityUpdate(
+                intent.item,
+                intent.newQuantity
+            )
             is CheckoutIntent.ShowCheckoutDialog -> reduceShowCheckoutDialog(intent.show)
             is CheckoutIntent.CheckoutSuccessHandled -> reduceCheckoutSuccessHandled()
         }
@@ -84,6 +88,17 @@ class CheckoutViewModel(
         val result = manageCartUseCase.removeFromCart(
             cartStateHolder.cartState.value,
             checkoutItem
+        )
+        result.onSuccess { updatedCart ->
+            cartStateHolder.updateCart(updatedCart)
+        }
+    }
+
+    private fun handleQuantityUpdate(itemToUpdate: CheckoutItem, newQuantity: Int) {
+        val result = manageCartUseCase.updateQuantity(
+            cartStateHolder.cartState.value,
+            itemToUpdate,
+            newQuantity
         )
         result.onSuccess { updatedCart ->
             cartStateHolder.updateCart(updatedCart)

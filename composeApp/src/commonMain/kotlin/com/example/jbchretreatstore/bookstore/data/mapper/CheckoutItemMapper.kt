@@ -34,7 +34,7 @@ object CheckoutItemMapper {
             itemName = dto.itemName,
             quantity = dto.quantity,
             variants = variants,
-            totalPrice = dto.totalPrice
+            unitPrice = dto.unitPrice
         )
     }
 
@@ -51,7 +51,7 @@ object CheckoutItemMapper {
                     selectedValue = variant.selectedValue
                 )
             },
-            totalPrice = domain.totalPrice
+            unitPrice = domain.unitPrice
         )
     }
 

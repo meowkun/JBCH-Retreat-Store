@@ -360,7 +360,7 @@ private fun PurchaseHistoryCollapsedViewPreview() {
                         checkoutList = listOf(
                             CheckoutItem(
                                 itemName = "Bible",
-                                totalPrice = 40.0,
+                                unitPrice = 40.0,
                                 quantity = 2,
                                 variants = listOf(
                                     CheckoutItem.Variant(
@@ -372,7 +372,7 @@ private fun PurchaseHistoryCollapsedViewPreview() {
                             ),
                             CheckoutItem(
                                 itemName = "T-shirt",
-                                totalPrice = 15.0,
+                                unitPrice = 15.0,
                                 quantity = 1,
                                 variants = listOf(
                                     CheckoutItem.Variant("Size", listOf("S", "M", "L", "XL"), "L")
@@ -407,7 +407,7 @@ private fun PurchaseHistoryExpandedViewPreview() {
                         checkoutList = listOf(
                             CheckoutItem(
                                 itemName = "Bible",
-                                totalPrice = 40.0,
+                                unitPrice = 40.0,
                                 quantity = 2,
                                 variants = listOf(
                                     CheckoutItem.Variant(
@@ -424,7 +424,7 @@ private fun PurchaseHistoryExpandedViewPreview() {
                             ),
                             CheckoutItem(
                                 itemName = "T-shirt",
-                                totalPrice = 15.0,
+                                unitPrice = 15.0,
                                 quantity = 1,
                                 variants = listOf(
                                     CheckoutItem.Variant("Size", listOf("S", "M", "L", "XL"), "L"),

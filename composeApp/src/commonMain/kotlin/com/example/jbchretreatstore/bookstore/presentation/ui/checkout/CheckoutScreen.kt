@@ -53,6 +53,14 @@ fun CheckoutScreen(
         uiState = uiState,
         onNavigateBack = onNavigateBack,
         onRemoveItem = { onIntent(CheckoutIntent.RemoveFromCart(it)) },
+        onUpdateQuantity = { item, newQuantity ->
+            onIntent(
+                CheckoutIntent.UpdateItemQuantity(
+                    item,
+                    newQuantity
+                )
+            )
+        },
         onPaymentMethodSelected = { onIntent(CheckoutIntent.SelectPaymentMethod(it)) },
         onDismissDialog = { onIntent(CheckoutIntent.ShowCheckoutDialog(false)) },
         onCheckout = { buyerName -> onIntent(CheckoutIntent.ProcessCheckout(buyerName)) }
@@ -64,6 +72,7 @@ private fun CheckoutScreenContent(
     uiState: CheckoutUiState,
     onNavigateBack: () -> Unit,
     onRemoveItem: (CheckoutItem) -> Unit,
+    onUpdateQuantity: (CheckoutItem, Int) -> Unit,
     onPaymentMethodSelected: (PaymentMethod) -> Unit,
     onDismissDialog: () -> Unit,
     onCheckout: (String) -> Unit
@@ -94,7 +103,8 @@ private fun CheckoutScreenContent(
                 ) { item ->
                     CheckoutItemView(
                         checkoutItem = item,
-                        onRemoveItem = onRemoveItem
+                        onRemoveItem = onRemoveItem,
+                        onUpdateQuantity = onUpdateQuantity
                     )
                 }
             }
@@ -122,7 +132,7 @@ private fun CheckoutScreenPreview() {
                     CheckoutItem(
                         itemName = "Holy Bible - NIV",
                         quantity = 2,
-                        totalPrice = 91.98,
+                        unitPrice = 91.98,
                         variants = listOf(
                             CheckoutItem.Variant(
                                 "Language",
@@ -139,7 +149,7 @@ private fun CheckoutScreenPreview() {
                     CheckoutItem(
                         itemName = "Christian T-Shirt",
                         quantity = 3,
-                        totalPrice = 59.97,
+                        unitPrice = 59.97,
                         variants = listOf(
                             CheckoutItem.Variant("Size", listOf("S", "M", "L", "XL"), "L"),
                             CheckoutItem.Variant("Color", listOf("White", "Black", "Navy"), "Navy")
@@ -148,7 +158,7 @@ private fun CheckoutScreenPreview() {
                     CheckoutItem(
                         itemName = "Devotional Journal",
                         quantity = 1,
-                        totalPrice = 24.99,
+                        unitPrice = 24.99,
                         variants = emptyList()
                     )
                 ),
@@ -157,6 +167,7 @@ private fun CheckoutScreenPreview() {
             ),
             onNavigateBack = {},
             onRemoveItem = {},
+            onUpdateQuantity = { _, _ -> },
             onPaymentMethodSelected = {},
             onDismissDialog = {},
             onCheckout = {}
@@ -174,7 +185,7 @@ private fun CheckoutScreenWithDialogPreview() {
                     CheckoutItem(
                         itemName = "Holy Bible - NIV",
                         quantity = 1,
-                        totalPrice = 45.99,
+                        unitPrice = 45.99,
                         variants = listOf(
                             CheckoutItem.Variant(
                                 "Language",
@@ -190,6 +201,7 @@ private fun CheckoutScreenWithDialogPreview() {
             ),
             onNavigateBack = {},
             onRemoveItem = {},
+            onUpdateQuantity = { _, _ -> },
             onPaymentMethodSelected = {},
             onDismissDialog = {},
             onCheckout = {}
@@ -208,6 +220,7 @@ private fun CheckoutScreenEmptyPreview() {
             ),
             onNavigateBack = {},
             onRemoveItem = {},
+            onUpdateQuantity = { _, _ -> },
             onPaymentMethodSelected = {},
             onDismissDialog = {},
             onCheckout = {}

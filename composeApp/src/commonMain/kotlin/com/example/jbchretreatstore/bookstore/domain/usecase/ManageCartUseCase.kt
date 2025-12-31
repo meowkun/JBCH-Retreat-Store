@@ -28,23 +28,25 @@ class ManageCartUseCase {
         }
 
         // Validate price is positive
-        if (newItem.totalPrice <= 0) {
+        if (newItem.unitPrice <= 0) {
             return Result.failure(IllegalArgumentException(ErrorMessages.ITEM_PRICE_INVALID))
         }
 
-        // Check if item with same name and options already exists
+        // Check if item with same name, variants, and unit price already exists
         val existingItem = currentCart.checkoutList.find {
-            it.itemName == newItem.itemName && it.variantsMap == newItem.variantsMap
+            it.itemName == newItem.itemName &&
+                    it.variantsMap == newItem.variantsMap &&
+                    it.unitPrice == newItem.unitPrice
         }
 
         val updatedList = if (existingItem != null) {
-            // Update existing item quantity and price
+            // Update existing item quantity
             currentCart.checkoutList.map { item ->
-                if (item.itemName == newItem.itemName && item.variantsMap == newItem.variantsMap) {
-                    item.copy(
-                        quantity = item.quantity + newItem.quantity,
-                        totalPrice = item.totalPrice + newItem.totalPrice
-                    )
+                if (item.itemName == newItem.itemName &&
+                    item.variantsMap == newItem.variantsMap &&
+                    item.unitPrice == newItem.unitPrice
+                ) {
+                    item.copy(quantity = item.quantity + newItem.quantity)
                 } else {
                     item
                 }
@@ -79,43 +81,31 @@ class ManageCartUseCase {
     /**
      * Update quantity of an existing cart item.
      * @return Result with updated cart or failure with error message.
-     * @testOnly Currently only used in unit tests.
      */
     fun updateQuantity(
         currentCart: ReceiptData,
-        itemId: kotlin.uuid.Uuid,
+        itemToUpdate: CheckoutItem,
         newQuantity: Int
     ): Result<ReceiptData> {
-        // Validate quantity is positive
-        if (newQuantity <= 0) {
-            return Result.failure(IllegalArgumentException(ErrorMessages.ITEM_QUANTITY_INVALID))
-        }
-
         // Find the item in cart
-        val itemIndex = currentCart.checkoutList.indexOfFirst { it.id == itemId }
+        val itemIndex = currentCart.checkoutList.indexOfFirst { it == itemToUpdate }
         if (itemIndex == -1) {
             return Result.failure(IllegalArgumentException(ErrorMessages.CART_ITEM_NOT_FOUND))
         }
 
         val item = currentCart.checkoutList[itemIndex]
 
-        // Prevent division by zero
-        if (item.quantity <= 0) {
-            return Result.failure(IllegalStateException(ErrorMessages.CART_INVALID_QUANTITY))
+        // Remove item if quantity <= 0
+        if (newQuantity <= 0) {
+            val updatedList = currentCart.checkoutList.filter {
+                it != itemToUpdate
+            }
+            return Result.success(currentCart.copy(checkoutList = updatedList))
         }
 
-        // Calculate price per unit (safe from division by zero)
-        val pricePerUnit = item.totalPrice / item.quantity
-
-        // Validate price is positive
-        if (pricePerUnit <= 0) {
-            return Result.failure(IllegalStateException(ErrorMessages.CART_INVALID_PRICE))
-        }
-
-        // Update item with new quantity and recalculate total price
+        // Update item with new quantity (unitPrice stays the same)
         val updatedItem = item.copy(
-            quantity = newQuantity,
-            totalPrice = pricePerUnit * newQuantity
+            quantity = newQuantity
         )
 
         val updatedList = currentCart.checkoutList.toMutableList().apply {
